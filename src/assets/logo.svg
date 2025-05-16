@@ -1,0 +1,36 @@
+<svg width="320" height="80" viewBox="0 0 320 80" fill="none" xmlns="http://www.w3.org/2000/svg">
+  <!-- Shield shape for healthcare/protection -->
+  <path d="M40 10 Q55 15 60 35 Q60 55 40 70 Q20 55 20 35 Q25 15 40 10 Z" fill="#e3f2fd" stroke="#1976d2" stroke-width="2"/>
+  
+  <!-- Heart for care -->
+  <path d="M40 27
+           C40 22, 50 22, 50 27
+           C50 32, 40 38, 40 42
+           C40 38, 30 32, 30 27
+           C30 22, 40 22, 40 27 Z"
+        fill="#f06292" stroke="#c2185b" stroke-width="1"/>
+  
+  <!-- Gender symbols overlay (♂, ♀, ⚧) -->
+  <!-- Female symbol (left) -->
+  <circle cx="29" cy="23" r="5" stroke="#8e24aa" stroke-width="2" fill="white"/>
+  <line x1="29" y1="28" x2="29" y2="32" stroke="#8e24aa" stroke-width="2"/>
+  <line x1="27" y1="30" x2="31" y2="30" stroke="#8e24aa" stroke-width="2"/>
+  <!-- Male symbol (right) -->
+  <circle cx="51" cy="23" r="5" stroke="#1976d2" stroke-width="2" fill="white"/>
+  <line x1="54.5" y1="19.5" x2="58" y2="16" stroke="#1976d2" stroke-width="2"/>
+  <line x1="51" y1="18" x2="51" y2="16" stroke="#1976d2" stroke-width="2"/>
+  <line x1="56" y1="23" x2="58" y2="23" stroke="#1976d2" stroke-width="2"/>
+  <!-- Trans symbol (center, smaller, overlay) -->
+  <circle cx="40" cy="23" r="4" stroke="#7e57c2" stroke-width="1.5" fill="white"/>
+  <line x1="40" y1="19" x2="40" y2="15" stroke="#7e57c2" stroke-width="1.5"/>
+  <line x1="38" y1="17" x2="42" y2="17" stroke="#7e57c2" stroke-width="1.5"/>
+  <line x1="37" y1="26" x2="43" y2="26" stroke="#7e57c2" stroke-width="1.5"/>
+  <!-- Plus for medical cross (center of shield) -->
+  <rect x="38.5" y="32" width="3" height="10" rx="1.5" fill="#1976d2"/>
+  <rect x="35" y="36.5" width="10" height="3" rx="1.5" fill="#1976d2"/>
+  
+  <!-- Text: System name -->
+  <text x="80" y="38" font-family="Segoe UI, Arial, sans-serif" font-weight="bold" font-size="20" fill="#1976d2">Gender</text>
+  <text x="80" y="60" font-family="Segoe UI, Arial, sans-serif" font-size="16" fill="#7e57c2">Healthcare Service</text>
+  <text x="80" y="75" font-family="Segoe UI, Arial, sans-serif" font-size="14" fill="#333">Management System</text>
+</svg>
