@@ -1,11 +1,18 @@
 import React from "react";
 import { NavLink } from "react-router-dom";
+import logo from "../assets/logo.svg";
 
 function Header() {
   return (
     <header className="app-header">
       <div className="container">
-        <h1>Gender Healthcare Service Management System</h1>
+        <NavLink to="/">
+          <img
+            src={logo}
+            alt="Logo"
+            style={{ height: "62px", cursor: "pointer" }}
+          />
+        </NavLink>
         <nav>
           <ul>
             <li>
@@ -38,6 +45,22 @@ function Header() {
                 className={({ isActive }) => (isActive ? "active" : "")}
               >
                 Contact
+              </NavLink>
+            </li>
+            <li>
+              <NavLink
+                to="/Blog"
+                className={({ isActive }) => (isActive ? "active" : "")}
+              >
+                Blogs
+              </NavLink>
+            </li>
+            <li>
+              <NavLink
+                to="/login"
+                className={({ isActive }) => (isActive ? "active" : "")}
+              >
+                Login
               </NavLink>
             </li>
           </ul>

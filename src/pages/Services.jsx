@@ -8,7 +8,7 @@ function Services() {
     return (
       <div className="services-page">
         <div className="container">
-          <h2>Our Healthcare Services</h2>
+          <h2>Menstrual Cycle Tracking</h2>
           <div className="loading">Loading services...</div>
         </div>
       </div>

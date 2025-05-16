@@ -7,11 +7,11 @@ import apiClient from "../utils/axiosConfig";
 const servicesData = [
   {
     id: 1,
-    name: "Primary Care",
+    name: "Menstrual Cycle Tracking",
     description:
-      "Comprehensive primary healthcare services tailored to individual needs.",
+      "Track, predict, and manage your menstrual cycles for better reproductive health.",
     details:
-      "Our primary care services include regular check-ups, preventive care, and treatment for common illnesses. We provide personalized care that considers gender-specific health needs and concerns.",
+      "Our menstrual cycle tracking service helps you monitor your periods, predict ovulation and fertile windows, and receive timely reminders. The platform is designed to support individual health needs, offering insights and guidance tailored to your reproductive health journey.",
   },
   {
     id: 2,
