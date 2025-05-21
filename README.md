@@ -1,13 +1,15 @@
 # Gender Healthcare Service Management System
 
-A comprehensive web application built with React and Vite to manage gender-specific healthcare services.
+A comprehensive web application built with React, Vite, and Tailwind CSS to provide gender-sensitive healthcare services and information.
 
 ## Features
 
-- **Patient Management**: Efficiently manage patient records and appointments
-- **Healthcare Services**: Comprehensive catalog of gender-specific healthcare services
-- **Resource Management**: Optimize healthcare resources and staff scheduling
-- **User-Friendly Interface**: Modern, responsive design for all devices
+- **Gender-Sensitive Healthcare Services**: Comprehensive catalog of reproductive and sexual health services
+- **Menstrual Cycle Tracking**: Tools for monitoring and predicting menstrual cycles
+- **Educational Resources**: Blog articles and resources about gender-specific health concerns
+- **Appointment Booking**: Simple interface for scheduling healthcare consultations
+- **User-Friendly Interface**: Modern, responsive design optimized for all devices
+- **Secure Authentication**: Protected routes and user account management
 
 ## Technologies
 
@@ -15,13 +17,16 @@ A comprehensive web application built with React and Vite to manage gender-speci
 - React Router
 - Axios
 - Vite
-- CSS
+- Tailwindcss
+- Framer Motion for animations
+- Lucide Icons
+- Context API for state management
 
 ## Getting Started
 
 ### Prerequisites
 
-- Node.js (v14.0.0 or higher)
+- Node.js (v16.0.0 or higher)
 - npm or yarn
 
 ### Installation
@@ -62,6 +67,7 @@ npm run build
 
 ```
 src/
+├── data/           # Mock data
 ├── assets/         # Static assets
 ├── components/     # Reusable components
 ├── pages/          # Application pages
@@ -78,6 +84,25 @@ The project uses Axios for API calls. API endpoints are organized in the `servic
 
 Currently using simulated data for development - replace with actual endpoints when connecting to a backend.
 
-## License
+## Key Features Implementation
 
-This project is licensed under the MIT License - see the [LICENSE](LICENSE) file for details.
+- **Responsive Design**: Fully responsive layout using Tailwind CSS for all device sizes
+- **Interactive UI**: Smooth animations and transitions with Framer Motion
+- **Authentication Flow**: Complete login/signup process with validation
+- **Protected Routes**: Secure access to user-specific features
+- **Service Catalog**: Categorized healthcare services with detailed information
+- **Blog Articles**: Educational content about reproductive and sexual health
+- **Cycle Tracking**: Interactive tools for monitoring menstrual cycles and fertility windows
+
+## Development Approach
+
+This project follows a component-based architecture with:
+
+- Separation of concerns between UI components and business logic
+- Context API for global state management
+- Responsive design principles throughout
+- Accessibility considerations built into UI components
+
+## Current Status
+
+The project is in active development with frontend implementation nearly complete. Backend integration is the next phase of development.
