@@ -67,6 +67,7 @@ npm run build
 
 ```
 src/
+├── data/           # Mock data
 ├── assets/         # Static assets
 ├── components/     # Reusable components
 ├── pages/          # Application pages
