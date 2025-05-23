@@ -97,14 +97,14 @@ function Services() {
       : mockServices.filter((service) => service.category === activeCategory);
 
   return (
-    <div className="min-h-screen bg-gradient-to-b from-gray-50 to-white py-16">
-      <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-        <div className="text-center mb-16">
+    <div className="min-h-screen bg-gradient-to-b from-gray-50 to-white">
+      <div className="bg-gradient-to-r from-indigo-600 to-purple-600 text-white py-16 px-4">
+        <div className="max-w-3xl mx-auto text-center">
           <motion.h1
             initial={{ opacity: 0, y: -20 }}
             animate={{ opacity: 1, y: 0 }}
             transition={{ duration: 0.5 }}
-            className="text-4xl font-extrabold text-gray-900 sm:text-5xl sm:tracking-tight lg:text-6xl"
+            className="text-4xl font-extrabold text-white sm:text-5xl sm:tracking-tight lg:text-6xl"
           >
             Our Healthcare Services
           </motion.h1>
@@ -112,13 +112,15 @@ function Services() {
             initial={{ opacity: 0, y: 20 }}
             animate={{ opacity: 1, y: 0 }}
             transition={{ duration: 0.5, delay: 0.2 }}
-            className="max-w-3xl mx-auto mt-5 text-xl text-gray-600"
+            className="max-w-3xl mx-auto mt-5 text-xl text-white"
           >
             Comprehensive gender-sensitive healthcare services designed with
             privacy, respect, and your unique reproductive health needs in mind.
           </motion.p>
         </div>
+      </div>
 
+      <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-16">
         <div className="flex flex-wrap justify-center mb-12 space-x-2">
           {Object.entries(serviceCategories).map(([key, value]) => (
             <motion.button
