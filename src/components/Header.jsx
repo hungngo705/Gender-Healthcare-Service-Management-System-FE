@@ -1,6 +1,6 @@
 import React, { useState } from "react";
 import { NavLink } from "react-router-dom";
-import logo from "../assets/logo.svg";
+import logo from "../assets/logo2.svg";
 import { Menu, X } from "lucide-react";
 
 function Header() {
@@ -11,7 +11,7 @@ function Header() {
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
         <div className="flex justify-between items-center h-20">
           <NavLink to="/" className="flex items-center">
-            <img src={logo} alt="Logo" className="h-12 w-auto cursor-pointer" />
+            <img src={logo} alt="Logo" className="h-12 w-auto cursor-pointer"/>
           </NavLink>
 
           {/* Desktop menu */}

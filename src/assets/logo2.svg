@@ -1,0 +1,28 @@
+<svg width="420" height="110" viewBox="0 0 420 110" fill="none" xmlns="http://www.w3.org/2000/svg">
+  <!-- Icon: stylized 'E' blending gender symbols and wellness motif -->
+  <g>
+    <!-- Outer circle for inclusivity -->
+    <circle cx="55" cy="55" r="38" fill="#E0F7FA" stroke="#7C4DFF" stroke-width="4"/>
+    <!-- 'E' shape -->
+    <path d="M43 37 Q55 30 67 37" stroke="#00BFAE" stroke-width="4" fill="none"/>
+    <path d="M43 55 Q55 50 67 55" stroke="#00BFAE" stroke-width="4" fill="none"/>
+    <path d="M43 73 Q55 80 67 73" stroke="#00BFAE" stroke-width="4" fill="none"/>
+    <!-- Blended gender symbols -->
+    <!-- Circle -->
+    <circle cx="55" cy="55" r="8" fill="none" stroke="#7C4DFF" stroke-width="2"/>
+    <!-- Arrow (♂) -->
+    <line x1="63" y1="47" x2="70" y2="40" stroke="#7C4DFF" stroke-width="2"/>
+    <line x1="68" y1="41" x2="70" y2="40" stroke="#7C4DFF" stroke-width="2"/>
+    <line x1="70" y1="44" x2="70" y2="40" stroke="#7C4DFF" stroke-width="2"/>
+    <!-- Cross (♀) -->
+    <line x1="55" y1="63" x2="55" y2="71" stroke="#7C4DFF" stroke-width="2"/>
+    <line x1="51" y1="67" x2="59" y2="67" stroke="#7C4DFF" stroke-width="2"/>
+    <!-- Trans symbol (⚧) -->
+    <line x1="49" y1="49" x2="42" y2="42" stroke="#7C4DFF" stroke-width="2"/>
+    <line x1="42" y1="46" x2="42" y2="42" stroke="#7C4DFF" stroke-width="2"/>
+    <line x1="45" y1="42" x2="42" y2="42" stroke="#7C4DFF" stroke-width="2"/>
+  </g>
+  <!-- Brand Text: Large, bold, clear "Everwell" -->
+  <text x="110" y="72" font-family="Segoe UI, Arial, sans-serif" font-size="64" font-weight="bold" fill="#222" letter-spacing="2">Ever<tspan fill="#00BFAE">well</tspan>
+  </text>
+</svg>
