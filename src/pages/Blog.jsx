@@ -4,24 +4,24 @@ import { Link } from "react-router-dom";
 import { motion } from "framer-motion";
 import { Search } from "lucide-react";
 
-// Dữ liệu blog nên chuyển thành file riêng
+// Blog data should be moved to a separate file
 import { blogPosts } from "../data/blogData";
 
 const categories = [
-  { id: "all", name: "Tất cả bài viết" },
-  { id: "reproductive", name: "Sức khỏe sinh sản" },
-  { id: "sexual", name: "Sức khỏe tình dục" },
-  { id: "mental", name: "Sức khỏe tinh thần" },
-  { id: "education", name: "Giáo dục giới tính" },
+  { id: "all", name: "All articles" },
+  { id: "reproductive", name: "Reproductive health" },
+  { id: "sexual", name: "Sexual health" },
+  { id: "mental", name: "Mental health" },
+  { id: "education", name: "Sex education" },
 ];
 
 function Blog() {
   const [searchTerm, setSearchTerm] = useState("");
   const [activeCategory, setActiveCategory] = useState("all");
 
-  // Lọc bài viết theo category và search term
+  // Filter blog posts by category and search term
   const filteredBlogs = blogPosts
-    .sort((a, b) => new Date(b.date) - new Date(a.date)) // Sắp xếp theo ngày mới nhất
+    .sort((a, b) => new Date(b.date) - new Date(a.date)) // Sort by newest date
     .map((blog) => ({
       ...blog,
       categoryName: categories.find((cat) => cat.id === blog.category)?.name,
@@ -47,7 +47,7 @@ function Blog() {
               transition={{ duration: 0.5 }}
               className="text-4xl font-extrabold tracking-tight sm:text-5xl"
             >
-              Trang tin sức khỏe giới tính
+              Gender Health News
             </motion.h1>
             <motion.p
               initial={{ opacity: 0, y: 20 }}
@@ -55,8 +55,8 @@ function Blog() {
               transition={{ duration: 0.5, delay: 0.2 }}
               className="mt-4 text-lg"
             >
-              Khám phá kiến thức, tin tức và hướng dẫn về sức khỏe sinh sản,
-              tình dục và giới tính từ các chuyên gia
+              Explore knowledge, news, and guidance on reproductive health, 
+              sexual health, and gender issues from experts
             </motion.p>
 
             {/* Search box */}
@@ -64,7 +64,7 @@ function Blog() {
               <div className="relative">
                 <input
                   type="text"
-                  placeholder="Tìm kiếm bài viết..."
+                  placeholder="Search articles..."
                   value={searchTerm}
                   onChange={(e) => setSearchTerm(e.target.value)}
                   className="w-full pl-5 pr-12 py-3.5 rounded-full text-gray-800 
@@ -120,7 +120,7 @@ function Blog() {
                   </div>
                   <div className="p-8 md:w-1/2 flex flex-col justify-center">
                     <div className="uppercase tracking-wide text-sm text-indigo-600 font-semibold">
-                      Bài viết nổi bật
+                      Featured Article
                     </div>
                     <h2 className="mt-2 text-2xl font-bold text-gray-900 hover:text-indigo-600 transition-colors">
                       {filteredBlogs[0].title}
@@ -145,7 +145,7 @@ function Blog() {
                         </p>
                         <p className="text-sm text-gray-500">
                           {new Date(filteredBlogs[0].date).toLocaleDateString(
-                            "vi-VN",
+                            "en-US",
                             {
                               year: "numeric",
                               month: "long",
@@ -165,7 +165,7 @@ function Blog() {
         {/* Filter status */}
         {searchTerm && (
           <p className="text-gray-600 mb-4">
-            Hiển thị {filteredBlogs.length} kết quả cho "{searchTerm}"
+            Showing {filteredBlogs.length} results for "{searchTerm}"
           </p>
         )}
 
@@ -173,10 +173,10 @@ function Blog() {
         {filteredBlogs.length === 0 ? (
           <div className="text-center py-12">
             <h3 className="text-xl font-medium text-gray-900">
-              Không tìm thấy bài viết nào
+              No articles found
             </h3>
             <p className="mt-2 text-gray-500">
-              Vui lòng thử từ khóa khác hoặc chọn danh mục khác
+              Please try another keyword or select a different category
             </p>
           </div>
         ) : (
@@ -200,10 +200,10 @@ function Blog() {
                     <div className="p-6">
                       <div className="flex items-center space-x-2 mb-2">
                         <span className="inline-block px-2 py-1 text-xs font-semibold bg-indigo-100 text-indigo-800 rounded-full">
-                          {blog.categoryName || "Sức khỏe"}
+                          {blog.categoryName || "Health"}
                         </span>
                         <span className="text-sm text-gray-500">
-                          {new Date(blog.date).toLocaleDateString("vi-VN", {
+                          {new Date(blog.date).toLocaleDateString("en-US", {
                             year: "numeric",
                             month: "long",
                             day: "numeric",
@@ -241,19 +241,19 @@ function Blog() {
         <div className="mt-16 bg-white rounded-lg shadow-lg overflow-hidden">
           <div className="md:flex">
             <div className="md:w-1/2 bg-indigo-700 p-8 text-white flex flex-col justify-center">
-              <h3 className="text-2xl font-bold mb-4">Đăng ký nhận bản tin</h3>
+              <h3 className="text-2xl font-bold mb-4">Subscribe to our newsletter</h3>
               <p className="mb-6">
-                Nhận các thông tin mới nhất về sức khỏe giới tính qua email.
-                Chúng tôi sẽ không gửi spam hay chia sẻ thông tin của bạn.
+                Get the latest information on gender health via email.
+                We won't spam or share your information.
               </p>
               <div className="flex flex-col sm:flex-row">
                 <input
                   type="email"
-                  placeholder="Email của bạn"
+                  placeholder="Your email"
                   className="px-4 py-2 w-full sm:w-auto rounded-l text-white focus:outline-none border border-gray-300 focus:ring-2 focus:ring-indigo-500 focus:border-transparent transition-colors"
                 />
                 <button className="mt-2 sm:mt-0 bg-white text-indigo-700 font-medium px-4 py-2 rounded-r hover:bg-gray-100 transition-colors">
-                  Đăng ký
+                  Subscribe
                 </button>
               </div>
             </div>
