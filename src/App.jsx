@@ -30,7 +30,7 @@ const STITesting = lazy(() =>
   import(/* webpackChunkName: "sti-testing" */ "./pages/STITesting")
 );
 const Tracking = lazy(() =>
-  import(/* webpackChunkName: "tracking" */ "./pages/Tracking.jsx")
+  import(/* webpackChunkName: "tracking" */ "./pages/Tracking")
 );
 
 function App() {
