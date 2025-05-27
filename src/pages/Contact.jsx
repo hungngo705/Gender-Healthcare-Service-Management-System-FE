@@ -103,14 +103,14 @@ function Contact() {
               title: "Hours",
               info: [
                 "Monday - Friday: 8:00 AM - 8:00 PM",
-                "Saturday - Sunday: 8:00 AM - 5:00 PM",
+                "Saturday - Sunday: 8:00 AM -5:00 PM",
               ],
             },
           ].map((item, index) => (
             <motion.div
               key={index}
               initial={{ opacity: 0, y: 50 }}
-              whileInView={{ opacity: 1, y: 0 }}
+              animate={{ opacity: 1, y: 0 }}
               transition={{ duration: 0.5, delay: index * 0.1 }}
               viewport={{ once: true }}
               className="bg-white p-6 rounded-lg shadow-md hover:shadow-lg transition-shadow text-center"
@@ -120,7 +120,7 @@ function Contact() {
                 {item.title}
               </h3>
               {item.info.map((line, i) => (
-                <p key={i} className="text-gray-600">
+                <p key={i} className="text-gray-600 text-sm">
                   {line}
                 </p>
               ))}
@@ -131,7 +131,7 @@ function Contact() {
         <div className="grid md:grid-cols-2 gap-12 items-start mb-16">
           <motion.div
             initial={{ opacity: 0, x: -50 }}
-            whileInView={{ opacity: 1, x: 0 }}
+            animate={{ opacity: 1, x: 0 }}
             transition={{ duration: 0.7 }}
             viewport={{ once: true }}
             className="bg-white p-8 rounded-xl shadow-lg"
@@ -260,7 +260,7 @@ function Contact() {
 
           <motion.div
             initial={{ opacity: 0, x: 50 }}
-            whileInView={{ opacity: 1, x: 0 }}
+            animate={{ opacity: 1, x: 0 }}
             transition={{ duration: 0.6 }}
             viewport={{ once: true }}
           >

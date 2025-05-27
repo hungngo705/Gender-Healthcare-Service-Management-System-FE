@@ -1,20 +1,22 @@
-import React, { useState } from "react";
+import React, { useRef } from "react";
 import { Link } from "react-router-dom";
 // eslint-disable-next-line no-unused-vars
 import { motion } from "framer-motion";
 import { useServices } from "../hooks/useServices";
-import mockServices from "../data/mockServices";
 import serviceFaqs from "../data/serviceFaqs";
-import serviceCategories from "../data/serviceCategories";
 
 function Services() {
-  const { services, loading, error } = useServices();
-  const [activeCategory, setActiveCategory] = useState("all");
+  const { loading, error } = useServices();
 
-  const filteredServices =
-    activeCategory === "all"
-      ? services
-      : services?.filter((service) => service.category === activeCategory);
+  // Refs for scrolling to featured services
+  const cycleTrackingRef = useRef(null);
+  const onlineConsultationsRef = useRef(null);
+  const stiTestingRef = useRef(null);
+
+  // Function to scroll to a specific service
+  const scrollToService = (ref) => {
+    ref.current?.scrollIntoView({ behavior: "smooth" });
+  };
 
   if (loading) {
     return (
@@ -89,12 +91,6 @@ function Services() {
   }
 
   // Use mock services if API data is not available
-  const displayServices =
-    services && services.length > 0
-      ? filteredServices
-      : activeCategory === "all"
-      ? mockServices
-      : mockServices.filter((service) => service.category === activeCategory);
 
   return (
     <div className="min-h-screen bg-gradient-to-b from-gray-50 to-white">
@@ -117,125 +113,460 @@ function Services() {
             Comprehensive gender-sensitive healthcare services designed with
             privacy, respect, and your unique reproductive health needs in mind.
           </motion.p>
+
+          {/* Quick navigation buttons */}
+          <div className="mt-8 flex flex-wrap justify-center gap-4">
+            <motion.button
+              initial={{ opacity: 0, y: 10 }}
+              animate={{ opacity: 1, y: 0 }}
+              transition={{ duration: 0.3, delay: 0.4 }}
+              onClick={() => scrollToService(cycleTrackingRef)}
+              className="px-5 py-2 bg-white text-indigo-600 rounded-full font-medium hover:bg-opacity-90 transition-all flex items-center"
+            >
+              <svg
+                xmlns="http://www.w3.org/2000/svg"
+                className="h-5 w-5 mr-1"
+                fill="none"
+                viewBox="0 0 24 24"
+                stroke="currentColor"
+              >
+                <path
+                  strokeLinecap="round"
+                  strokeLinejoin="round"
+                  strokeWidth={2}
+                  d="M8 7V3m8 4V3m-9 8h10M5 21h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z"
+                />
+              </svg>
+              Cycle Tracking
+            </motion.button>
+            <motion.button
+              initial={{ opacity: 0, y: 10 }}
+              animate={{ opacity: 1, y: 0 }}
+              transition={{ duration: 0.3, delay: 0.5 }}
+              onClick={() => scrollToService(onlineConsultationsRef)}
+              className="px-5 py-2 bg-white text-indigo-600 rounded-full font-medium hover:bg-opacity-90 transition-all flex items-center"
+            >
+              <svg
+                xmlns="http://www.w3.org/2000/svg"
+                className="h-5 w-5 mr-1"
+                fill="none"
+                viewBox="0 0 24 24"
+                stroke="currentColor"
+              >
+                <path
+                  strokeLinecap="round"
+                  strokeLinejoin="round"
+                  strokeWidth={2}
+                  d="M8 12h.01M12 12h.01M16 12h.01M21 12c0 4.418-4.03 8-9 8a9.863 9.863 0 01-4.255-.949L3 20l1.395-3.72C3.512 15.042 3 13.574 3 12c0-4.418 4.03-8 9-8s9 3.582 9 8z"
+                />
+              </svg>
+              Online Consultations
+            </motion.button>
+            <motion.button
+              initial={{ opacity: 0, y: 10 }}
+              animate={{ opacity: 1, y: 0 }}
+              transition={{ duration: 0.3, delay: 0.6 }}
+              onClick={() => scrollToService(stiTestingRef)}
+              className="px-5 py-2 bg-white text-indigo-600 rounded-full font-medium hover:bg-opacity-90 transition-all flex items-center"
+            >
+              <svg
+                xmlns="http://www.w3.org/2000/svg"
+                className="h-5 w-5 mr-1"
+                fill="none"
+                viewBox="0 0 24 24"
+                stroke="currentColor"
+              >
+                <path
+                  strokeLinecap="round"
+                  strokeLinejoin="round"
+                  strokeWidth={2}
+                  d="M9 12l2 2 4-4m5.618-4.016A11.955 11.955 0 0112 2.944a11.955 11.955 0 01-8.618 3.04A12.02 12.02 0 003 9c0 5.591 3.824 10.29 9 11.622 5.176-1.332 9-6.03 9-11.622 0-1.042-.133-2.052-.382-3.016z"
+                />
+              </svg>
+              STI Testing
+            </motion.button>
+          </div>
         </div>
       </div>
 
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-16">
-        <div className="flex flex-wrap justify-center mb-12 space-x-2">
-          {Object.entries(serviceCategories).map(([key, value]) => (
-            <motion.button
-              key={key}
-              onClick={() => setActiveCategory(key)}
-              className={`px-6 py-2 rounded-full text-sm font-medium transition-all duration-300 m-2
-                ${
-                  activeCategory === key
-                    ? "bg-indigo-600 text-white shadow-md"
-                    : "bg-gray-100 text-gray-700 hover:bg-gray-200"
-                }`}
-              whileHover={{ scale: 1.05 }}
-              whileTap={{ scale: 0.95 }}
-            >
-              {value}
-            </motion.button>
-          ))}
-        </div>
+        {/* Service Plans - Replacing service cards */}
+        <div className="mb-16">
+          <motion.h2
+            initial={{ opacity: 0, y: 20 }}
+            animate={{ opacity: 1, y: 0 }}
+            transition={{ duration: 0.5 }}
+            className="text-3xl font-bold text-gray-900 text-center mb-4"
+          >
+            Our Service Plans
+          </motion.h2>
+          <motion.p
+            initial={{ opacity: 0, y: 20 }}
+            animate={{ opacity: 1, y: 0 }}
+            transition={{ duration: 0.5, delay: 0.1 }}
+            className="text-gray-600 text-center max-w-3xl mx-auto mb-12"
+          >
+            Choose the plan that best fits your healthcare needs. All plans
+            include access to our secure platform and personalized care.
+          </motion.p>
 
-        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8 mb-12">
-          {displayServices?.map((service) => (
+          <div className="grid grid-cols-1 md:grid-cols-3 gap-8">
+            {/* Basic Plan */}
             <motion.div
-              key={service.id}
               initial={{ opacity: 0, y: 20 }}
               animate={{ opacity: 1, y: 0 }}
-              transition={{ duration: 0.5 }}
+              transition={{ duration: 0.5, delay: 0.2 }}
               whileHover={{
-                y: -10,
+                y: -8,
                 boxShadow:
                   "0 20px 25px -5px rgba(0, 0, 0, 0.1), 0 10px 10px -5px rgba(0, 0, 0, 0.04)",
               }}
-              className="bg-white rounded-xl overflow-hidden shadow-md hover:shadow-xl transition-all duration-300"
+              className="bg-white rounded-xl overflow-hidden shadow-md hover:shadow-xl transition-all duration-300 border border-gray-100"
             >
-              {service.imageUrl && (
-                <div className="h-48 overflow-hidden">
-                  <img
-                    src={service.imageUrl}
-                    alt={service.name}
-                    className="w-full h-full object-cover transition-transform duration-500 hover:scale-110"
-                  />
-                </div>
-              )}
-              <div className="p-6">
-                {service.category && (
-                  <span className="inline-block px-3 py-1 text-xs font-semibold bg-indigo-100 text-indigo-800 rounded-full mb-3">
-                    {serviceCategories[service.category] || service.category}
-                  </span>
-                )}
-                <h3 className="text-xl font-bold text-gray-900 mb-3">
-                  {service.name}
+              <div className="p-6 border-b border-gray-100">
+                <h3 className="text-2xl font-bold text-gray-900 mb-2">
+                  Basic Care
                 </h3>
-                <p className="text-gray-600 mb-4">{service.description}</p>
-                {service.features && (
-                  <div className="mb-4">
-                    <h4 className="text-sm font-semibold text-gray-700 mb-2">
-                      Key Features:
-                    </h4>
-                    <ul className="space-y-1">
-                      {service.features.map((feature, index) => (
-                        <li
-                          key={index}
-                          className="flex items-center text-sm text-gray-600"
-                        >
-                          <svg
-                            className="h-4 w-4 text-green-500 mr-2"
-                            xmlns="http://www.w3.org/2000/svg"
-                            viewBox="0 0 20 20"
-                            fill="currentColor"
-                          >
-                            <path
-                              fillRule="evenodd"
-                              d="M10 18a8 8 0 100-16 8 8 0 000 16zm3.707-9.293a1 1 0 00-1.414-1.414L9 10.586 7.707 9.293a1 1 0 00-1.414 1.414l2 2a1 1 0 001.414 0l4-4z"
-                              clipRule="evenodd"
-                            />
-                          </svg>
-                          {feature}
-                        </li>
-                      ))}
-                    </ul>
-                  </div>
-                )}
-                <div className="flex justify-between items-center">
-                  {service.price && (
-                    <span className="text-gray-700 font-semibold">
-                      {typeof service.price === "number"
-                        ? `$${service.price}`
-                        : service.price}
-                    </span>
-                  )}
-                  <Link
-                    to={`/services/${service.id}`}
-                    className="inline-flex items-center font-medium text-indigo-600 hover:text-indigo-800 transition-colors"
-                  >
-                    Learn More
+                <div className="flex items-baseline mb-4">
+                  <span className="text-3xl font-bold text-indigo-600">
+                    $29
+                  </span>
+                  <span className="text-gray-500 ml-2">/month</span>
+                </div>
+                <p className="text-gray-600 mb-4">
+                  Essential services for your regular reproductive health
+                  monitoring.
+                </p>
+              </div>
+              <div className="p-6">
+                <ul className="space-y-2 mb-6">
+                  <li className="flex items-center text-sm text-gray-600">
                     <svg
-                      className="ml-1 h-5 w-5"
-                      xmlns="http://www.w3.org/2000/svg"
-                      viewBox="0 0 20 20"
+                      className="h-5 w-5 text-green-500 mr-2"
                       fill="currentColor"
+                      viewBox="0 0 20 20"
                     >
                       <path
                         fillRule="evenodd"
-                        d="M12.293 5.293a1 1 0 011.414 0l4 4a1 1 0 010 1.414l-4 4a1 1 0 01-1.414-1.414L14.586 11H3a1 1 0 110-2h11.586l-2.293-2.293a1 1 0 010-1.414z"
+                        d="M10 18a8 8 0 100-16 8 8 0 000 16zm3.707-9.293a1 1 0 00-1.414-1.414L9 10.586 7.707 9.293a1 1 0 00-1.414 1.414l2 2a1 1 0 001.414 0l4-4z"
                         clipRule="evenodd"
-                      />
+                      ></path>
                     </svg>
-                  </Link>
-                </div>
+                    Basic Cycle Tracking
+                  </li>
+                  <li className="flex items-center text-sm text-gray-600">
+                    <svg
+                      className="h-5 w-5 text-green-500 mr-2"
+                      fill="currentColor"
+                      viewBox="0 0 20 20"
+                    >
+                      <path
+                        fillRule="evenodd"
+                        d="M10 18a8 8 0 100-16 8 8 0 000 16zm3.707-9.293a1 1 0 00-1.414-1.414L9 10.586 7.707 9.293a1 1 0 00-1.414 1.414l2 2a1 1 0 001.414 0l4-4z"
+                        clipRule="evenodd"
+                      ></path>
+                    </svg>
+                    Monthly Online Consultation
+                  </li>
+                  <li className="flex items-center text-sm text-gray-600">
+                    <svg
+                      className="h-5 w-5 text-green-500 mr-2"
+                      fill="currentColor"
+                      viewBox="0 0 20 20"
+                    >
+                      <path
+                        fillRule="evenodd"
+                        d="M10 18a8 8 0 100-16 8 8 0 000 16zm3.707-9.293a1 1 0 00-1.414-1.414L9 10.586 7.707 9.293a1 1 0 00-1.414 1.414l2 2a1 1 0 001.414 0l4-4z"
+                        clipRule="evenodd"
+                      ></path>
+                    </svg>
+                    Educational Resources
+                  </li>
+                  <li className="flex items-center text-sm text-gray-600">
+                    <svg
+                      className="h-5 w-5 text-green-500 mr-2"
+                      fill="currentColor"
+                      viewBox="0 0 20 20"
+                    >
+                      <path
+                        fillRule="evenodd"
+                        d="M10 18a8 8 0 100-16 8 8 0 000 16zm3.707-9.293a1 1 0 00-1.414-1.414L9 10.586 7.707 9.293a1 1 0 00-1.414 1.414l2 2a1 1 0 001.414 0l4-4z"
+                        clipRule="evenodd"
+                      ></path>
+                    </svg>
+                    Community Support
+                  </li>
+                </ul>
+                <Link
+                  to="/signup?plan=basic"
+                  className="inline-flex items-center justify-center w-full px-4 py-3 border border-indigo-600 text-base font-medium rounded-md text-indigo-600 bg-white hover:bg-indigo-50 transition-colors"
+                >
+                  Get Started
+                  <svg
+                    className="ml-2 h-4 w-4"
+                    viewBox="0 0 20 20"
+                    fill="currentColor"
+                  >
+                    <path
+                      fillRule="evenodd"
+                      d="M12.293 5.293a1 1 0 011.414 0l4 4a1 1 0 010 1.414l-4 4a1 1 0 01-1.414-1.414L14.586 11H3a1 1 0 110-2h11.586l-2.293-2.293a1 1 0 010-1.414z"
+                      clipRule="evenodd"
+                    />
+                  </svg>
+                </Link>
               </div>
             </motion.div>
-          ))}
+
+            {/* Premium Plan */}
+            <motion.div
+              initial={{ opacity: 0, y: 20 }}
+              animate={{ opacity: 1, y: 0 }}
+              transition={{ duration: 0.5, delay: 0.3 }}
+              whileHover={{
+                y: -8,
+                boxShadow:
+                  "0 20px 25px -5px rgba(0, 0, 0, 0.1), 0 10px 10px -5px rgba(0, 0, 0, 0.04)",
+              }}
+              className="bg-gradient-to-b from-indigo-50 to-white rounded-xl overflow-hidden shadow-lg hover:shadow-xl transition-all duration-300 border-2 border-indigo-500 relative transform scale-105 md:scale-110 z-10"
+            >
+              <div className="absolute top-0 left-0 right-0 bg-indigo-500 text-white text-center text-sm py-1 font-medium">
+                Most Popular
+              </div>
+              <div className="p-6 border-b border-indigo-100 mt-6">
+                <h3 className="text-2xl font-bold text-gray-900 mb-2">
+                  Premium Care
+                </h3>
+                <div className="flex items-baseline mb-4">
+                  <span className="text-3xl font-bold text-indigo-600">
+                    $49
+                  </span>
+                  <span className="text-gray-500 ml-2">/month</span>
+                </div>
+                <p className="text-gray-600 mb-4">
+                  Comprehensive care with advanced features and priority
+                  support.
+                </p>
+              </div>
+              <div className="p-6">
+                <ul className="space-y-2 mb-6">
+                  <li className="flex items-center text-sm text-gray-600">
+                    <svg
+                      className="h-5 w-5 text-green-500 mr-2"
+                      fill="currentColor"
+                      viewBox="0 0 20 20"
+                    >
+                      <path
+                        fillRule="evenodd"
+                        d="M10 18a8 8 0 100-16 8 8 0 000 16zm3.707-9.293a1 1 0 00-1.414-1.414L9 10.586 7.707 9.293a1 1 0 00-1.414 1.414l2 2a1 1 0 001.414 0l4-4z"
+                        clipRule="evenodd"
+                      ></path>
+                    </svg>
+                    <strong>Advanced</strong> Cycle Tracking
+                  </li>
+                  <li className="flex items-center text-sm text-gray-600">
+                    <svg
+                      className="h-5 w-5 text-green-500 mr-2"
+                      fill="currentColor"
+                      viewBox="0 0 20 20"
+                    >
+                      <path
+                        fillRule="evenodd"
+                        d="M10 18a8 8 0 100-16 8 8 0 000 16zm3.707-9.293a1 1 0 00-1.414-1.414L9 10.586 7.707 9.293a1 1 0 00-1.414 1.414l2 2a1 1 0 001.414 0l4-4z"
+                        clipRule="evenodd"
+                      ></path>
+                    </svg>
+                    <strong>Unlimited</strong> Online Consultations
+                  </li>
+                  <li className="flex items-center text-sm text-gray-600">
+                    <svg
+                      className="h-5 w-5 text-green-500 mr-2"
+                      fill="currentColor"
+                      viewBox="0 0 20 20"
+                    >
+                      <path
+                        fillRule="evenodd"
+                        d="M10 18a8 8 0 100-16 8 8 0 000 16zm3.707-9.293a1 1 0 00-1.414-1.414L9 10.586 7.707 9.293a1 1 0 00-1.414 1.414l2 2a1 1 0 001.414 0l4-4z"
+                        clipRule="evenodd"
+                      ></path>
+                    </svg>
+                    Quarterly STI Testing
+                  </li>
+                  <li className="flex items-center text-sm text-gray-600">
+                    <svg
+                      className="h-5 w-5 text-green-500 mr-2"
+                      fill="currentColor"
+                      viewBox="0 0 20 20"
+                    >
+                      <path
+                        fillRule="evenodd"
+                        d="M10 18a8 8 0 100-16 8 8 0 000 16zm3.707-9.293a1 1 0 00-1.414-1.414L9 10.586 7.707 9.293a1 1 0 00-1.414 1.414l2 2a1 1 0 001.414 0l4-4z"
+                        clipRule="evenodd"
+                      ></path>
+                    </svg>
+                    Comprehensive STI Treatment
+                  </li>
+                  <li className="flex items-center text-sm text-gray-600">
+                    <svg
+                      className="h-5 w-5 text-green-500 mr-2"
+                      fill="currentColor"
+                      viewBox="0 0 20 20"
+                    >
+                      <path
+                        fillRule="evenodd"
+                        d="M10 18a8 8 0 100-16 8 8 0 000 16zm3.707-9.293a1 1 0 00-1.414-1.414L9 10.586 7.707 9.293a1 1 0 00-1.414 1.414l2 2a1 1 0 001.414 0l4-4z"
+                        clipRule="evenodd"
+                      ></path>
+                    </svg>
+                    Priority Support 24/7
+                  </li>
+                  <li className="flex items-center text-sm text-gray-600">
+                    <svg
+                      className="h-5 w-5 text-green-500 mr-2"
+                      fill="currentColor"
+                      viewBox="0 0 20 20"
+                    >
+                      <path
+                        fillRule="evenodd"
+                        d="M10 18a8 8 0 100-16 8 8 0 000 16zm3.707-9.293a1 1 0 00-1.414-1.414L9 10.586 7.707 9.293a1 1 0 00-1.414 1.414l2 2a1 1 0 001.414 0l4-4z"
+                        clipRule="evenodd"
+                      ></path>
+                    </svg>
+                    Personalized Health Plans
+                  </li>
+                </ul>
+                <Link
+                  to="/signup?plan=premium"
+                  className="inline-flex items-center justify-center w-full px-4 py-3 border border-transparent text-base font-medium rounded-md text-white bg-indigo-600 hover:bg-indigo-700 transition-colors"
+                >
+                  Get Started
+                  <svg
+                    className="ml-2 h-4 w-4"
+                    viewBox="0 0 20 20"
+                    fill="currentColor"
+                  >
+                    <path
+                      fillRule="evenodd"
+                      d="M12.293 5.293a1 1 0 011.414 0l4 4a1 1 0 010 1.414l-4 4a1 1 0 01-1.414-1.414L14.586 11H3a1 1 0 110-2h11.586l-2.293-2.293a1 1 0 010-1.414z"
+                      clipRule="evenodd"
+                    />
+                  </svg>
+                </Link>
+              </div>
+            </motion.div>
+
+            {/* Family Plan */}
+            <motion.div
+              initial={{ opacity: 0, y: 20 }}
+              animate={{ opacity: 1, y: 0 }}
+              transition={{ duration: 0.5, delay: 0.4 }}
+              whileHover={{
+                y: -8,
+                boxShadow:
+                  "0 20px 25px -5px rgba(0, 0, 0, 0.1), 0 10px 10px -5px rgba(0, 0, 0, 0.04)",
+              }}
+              className="bg-white rounded-xl overflow-hidden shadow-md hover:shadow-xl transition-all duration-300 border border-gray-100"
+            >
+              <div className="p-6 border-b border-gray-100">
+                <h3 className="text-2xl font-bold text-gray-900 mb-2">
+                  Family Care
+                </h3>
+                <div className="flex items-baseline mb-4">
+                  <span className="text-3xl font-bold text-indigo-600">
+                    $79
+                  </span>
+                  <span className="text-gray-500 ml-2">/month</span>
+                </div>
+                <p className="text-gray-600 mb-4">
+                  Complete healthcare for the whole family with enhanced
+                  features.
+                </p>
+              </div>
+              <div className="p-6">
+                <ul className="space-y-2 mb-6">
+                  <li className="flex items-center text-sm text-gray-600">
+                    <svg
+                      className="h-5 w-5 text-green-500 mr-2"
+                      fill="currentColor"
+                      viewBox="0 0 20 20"
+                    >
+                      <path
+                        fillRule="evenodd"
+                        d="M10 18a8 8 0 100-16 8 8 0 000 16zm3.707-9.293a1 1 0 00-1.414-1.414L9 10.586 7.707 9.293a1 1 0 00-1.414 1.414l2 2a1 1 0 001.414 0l4-4z"
+                        clipRule="evenodd"
+                      ></path>
+                    </svg>
+                    Coverage for up to 4 family members
+                  </li>
+                  <li className="flex items-center text-sm text-gray-600">
+                    <svg
+                      className="h-5 w-5 text-green-500 mr-2"
+                      fill="currentColor"
+                      viewBox="0 0 20 20"
+                    >
+                      <path
+                        fillRule="evenodd"
+                        d="M10 18a8 8 0 100-16 8 8 0 000 16zm3.707-9.293a1 1 0 00-1.414-1.414L9 10.586 7.707 9.293a1 1 0 00-1.414 1.414l2 2a1 1 0 001.414 0l4-4z"
+                        clipRule="evenodd"
+                      ></path>
+                    </svg>
+                    All Premium features included
+                  </li>
+                  <li className="flex items-center text-sm text-gray-600">
+                    <svg
+                      className="h-5 w-5 text-green-500 mr-2"
+                      fill="currentColor"
+                      viewBox="0 0 20 20"
+                    >
+                      <path
+                        fillRule="evenodd"
+                        d="M10 18a8 8 0 100-16 8 8 0 000 16zm3.707-9.293a1 1 0 00-1.414-1.414L9 10.586 7.707 9.293a1 1 0 00-1.414 1.414l2 2a1 1 0 001.414 0l4-4z"
+                        clipRule="evenodd"
+                      ></path>
+                    </svg>
+                    Family health analytics
+                  </li>
+                  <li className="flex items-center text-sm text-gray-600">
+                    <svg
+                      className="h-5 w-5 text-green-500 mr-2"
+                      fill="currentColor"
+                      viewBox="0 0 20 20"
+                    >
+                      <path
+                        fillRule="evenodd"
+                        d="M10 18a8 8 0 100-16 8 8 0 000 16zm3.707-9.293a1 1 0 00-1.414-1.414L9 10.586 7.707 9.293a1 1 0 00-1.414 1.414l2 2a1 1 0 001.414 0l4-4z"
+                        clipRule="evenodd"
+                      ></path>
+                    </svg>
+                    Dedicated family care specialist
+                  </li>
+                </ul>
+                <Link
+                  to="/signup?plan=family"
+                  className="inline-flex items-center justify-center w-full px-4 py-3 border border-indigo-600 text-base font-medium rounded-md text-indigo-600 bg-white hover:bg-indigo-50 transition-colors"
+                >
+                  Get Started
+                  <svg
+                    className="ml-2 h-4 w-4"
+                    viewBox="0 0 20 20"
+                    fill="currentColor"
+                  >
+                    <path
+                      fillRule="evenodd"
+                      d="M12.293 5.293a1 1 0 011.414 0l4 4a1 1 0 010 1.414l-4 4a1 1 0 01-1.414-1.414L14.586 11H3a1 1 0 110-2h11.586l-2.293-2.293a1 1 0 010-1.414z"
+                      clipRule="evenodd"
+                    />
+                  </svg>
+                </Link>
+              </div>
+            </motion.div>
+          </div>
         </div>
 
         {/* Featured Service: Cycle Tracking */}
-        <div className="mt-16 bg-indigo-900 text-white rounded-2xl overflow-hidden shadow-xl">
+        <div
+          ref={cycleTrackingRef}
+          className="mt-16 pt-6 bg-indigo-900 text-white rounded-2xl overflow-hidden shadow-xl scroll-mt-24"
+        >
           <div className="grid md:grid-cols-2">
             <div className="p-10 flex flex-col justify-center">
               <h2 className="text-3xl font-bold mb-4">
@@ -330,8 +661,108 @@ function Services() {
           </div>
         </div>
 
-        {/* STI Testing Featured Service */}
-        <div className="mt-16 bg-gradient-to-r from-purple-800 to-indigo-900 text-white rounded-2xl overflow-hidden shadow-xl">
+        {/* NEW: Online Consultations Featured Service */}
+        <div
+          ref={onlineConsultationsRef}
+          className="mt-16 pt-6 bg-gradient-to-r from-blue-700 to-indigo-800 text-white rounded-2xl overflow-hidden shadow-xl scroll-mt-24"
+        >
+          <div className="grid md:grid-cols-2">
+            <div className="hidden md:block">
+              <img
+                src="https://images.unsplash.com/photo-1587614387466-0a72ca909e16?ixlib=rb-1.2.1&auto=format&fit=crop&h=500&q=80"
+                alt="Online Consultations"
+                className="w-full h-full object-cover"
+              />
+            </div>
+            <div className="p-10 flex flex-col justify-center">
+              <h2 className="text-3xl font-bold mb-4">Online Consultations</h2>
+              <p className="mb-6">
+                Connect with healthcare professionals from the comfort of your
+                home through secure video consultations for personalized advice
+                and care.
+              </p>
+              <ul className="mb-8 space-y-2">
+                <li className="flex items-start">
+                  <svg
+                    className="h-6 w-6 text-blue-300 mr-2"
+                    xmlns="http://www.w3.org/2000/svg"
+                    fill="none"
+                    viewBox="0 0 24 24"
+                    stroke="currentColor"
+                  >
+                    <path
+                      strokeLinecap="round"
+                      strokeLinejoin="round"
+                      strokeWidth={2}
+                      d="M5 13l4 4L19 7"
+                    />
+                  </svg>
+                  <span>
+                    Private video consultation with licensed professionals
+                  </span>
+                </li>
+                <li className="flex items-start">
+                  <svg
+                    className="h-6 w-6 text-blue-300 mr-2"
+                    xmlns="http://www.w3.org/2000/svg"
+                    fill="none"
+                    viewBox="0 0 24 24"
+                    stroke="currentColor"
+                  >
+                    <path
+                      strokeLinecap="round"
+                      strokeLinejoin="round"
+                      strokeWidth={2}
+                      d="M5 13l4 4L19 7"
+                    />
+                  </svg>
+                  <span>Discuss sensitive health concerns privately</span>
+                </li>
+                <li className="flex items-start">
+                  <svg
+                    className="h-6 w-6 text-blue-300 mr-2"
+                    xmlns="http://www.w3.org/2000/svg"
+                    fill="none"
+                    viewBox="0 0 24 24"
+                    stroke="currentColor"
+                  >
+                    <path
+                      strokeLinecap="round"
+                      strokeLinejoin="round"
+                      strokeWidth={2}
+                      d="M5 13l4 4L19 7"
+                    />
+                  </svg>
+                  <span>Receive prescriptions and follow-up care plans</span>
+                </li>
+              </ul>
+              <Link
+                to="/appointments"
+                className="inline-flex items-center px-6 py-3 border border-transparent text-base font-medium rounded-md text-indigo-900 bg-white hover:bg-indigo-50 transition-colors self-start"
+              >
+                Book a Consultation
+                <svg
+                  className="ml-2 h-5 w-5"
+                  xmlns="http://www.w3.org/2000/svg"
+                  viewBox="0 0 20 20"
+                  fill="currentColor"
+                >
+                  <path
+                    fillRule="evenodd"
+                    d="M10.293 5.293a1 1 0 011.414 0l4 4a1 1 0 010 1.414l-4 4a1 1 0 01-1.414-1.414L12.586 11H5a1 1 0 110-2h7.586l-2.293-2.293a1 1 0 010-1.414z"
+                    clipRule="evenodd"
+                  />
+                </svg>
+              </Link>
+            </div>
+          </div>
+        </div>
+
+        {/* STI Testing Featured Service - Updated with ref */}
+        <div
+          ref={stiTestingRef}
+          className="mt-16 pt-6 bg-gradient-to-r from-purple-800 to-indigo-900 text-white rounded-2xl overflow-hidden shadow-xl scroll-mt-24"
+        >
           <div className="grid md:grid-cols-2">
             <div className="hidden md:block">
               <img
@@ -423,7 +854,7 @@ function Services() {
           </div>
         </div>
 
-        {/* FAQ Section */}
+        {/* FAQ Section - remains unchanged */}
         <div className="mt-16">
           <h2 className="text-2xl font-bold text-gray-900 mb-8 text-center">
             Frequently Asked Questions
@@ -449,7 +880,7 @@ function Services() {
           </div>
         </div>
 
-        {/* Call to Action */}
+        {/* Call to Action - remains unchanged */}
         <div className="mt-16 text-center">
           <h2 className="text-3xl font-bold text-gray-900 mb-4">
             Ready to Take Control of Your Reproductive Health?
