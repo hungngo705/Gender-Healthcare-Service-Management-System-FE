@@ -30,6 +30,9 @@ const BlogDetail = lazy(() =>
 const STITesting = lazy(() =>
   import(/* webpackChunkName: "sti-testing" */ "./pages/STITesting")
 );
+const Tracking = lazy(() =>
+  import(/* webpackChunkName: "tracking" */ "./pages/Tracking.jsx")
+);
 
 function App() {
   // Using AuthContext to get authentication state
@@ -51,6 +54,7 @@ function App() {
           <Route path="blog" element={<Blog />} />
           <Route path="blog/:id" element={<BlogDetail />} />
           <Route path="services/sti-testing" element={<STITesting />} />
+          <Route path="services/tracking" element={<Tracking />} />
         </Route>
 
         {/* Các trang yêu cầu đăng nhập */}
