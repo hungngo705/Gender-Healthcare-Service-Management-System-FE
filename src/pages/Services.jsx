@@ -631,9 +631,9 @@ function Services() {
                   </svg>
                   <span>Health insights based on your tracking history</span>
                 </li>
-              </ul>
+              </ul>{" "}
               <Link
-                to="/cycle-tracker"
+                to="/services/tracking"
                 className="inline-flex items-center px-6 py-3 border border-transparent text-base font-medium rounded-md text-indigo-900 bg-white hover:bg-indigo-50 transition-colors self-start"
               >
                 Try Cycle Tracker

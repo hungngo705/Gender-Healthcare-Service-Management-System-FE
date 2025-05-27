@@ -3,7 +3,7 @@ const users = [
     id: 1,
     name: "Alex Johnson",
     email: "alex@example.com",
-    password: "password123", 
+    password: "123", 
     role: "patient",
     gender: "female",
     birthday: "1990-05-15",

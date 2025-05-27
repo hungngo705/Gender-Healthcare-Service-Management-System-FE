@@ -10,7 +10,6 @@ function ProtectedRoute({ isLoggedIn, children }) {
     isLoggedIn !== undefined ? isLoggedIn : isAuthenticated;
 
   if (!isUserLoggedIn) {
-    // Nếu chưa đăng nhập, chuyển hướng về trang đăng nhập
     return <Navigate to="/login" replace />;
   }
 
