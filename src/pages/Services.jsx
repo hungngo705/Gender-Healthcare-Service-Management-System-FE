@@ -565,9 +565,16 @@ function Services() {
         {/* Featured Service: Cycle Tracking */}
         <div
           ref={cycleTrackingRef}
-          className="mt-16 pt-6 bg-indigo-900 text-white rounded-2xl overflow-hidden shadow-xl scroll-mt-24"
+          className="mt-16 bg-indigo-900 text-white rounded-2xl overflow-hidden shadow-xl scroll-mt-24"
         >
           <div className="grid md:grid-cols-2">
+            <div className="hidden md:block">
+              <img
+                src="https://images.unsplash.com/photo-1506784365847-bbad939e9335?ixlib=rb-1.2.1&auto=format&fit=crop&h=500&q=80"
+                alt="Cycle Tracking"
+                className="w-full h-full object-cover"
+              />
+            </div>
             <div className="p-10 flex flex-col justify-center">
               <h2 className="text-3xl font-bold mb-4">
                 Cycle Tracking Service
@@ -651,20 +658,13 @@ function Services() {
                 </svg>
               </Link>
             </div>
-            <div className="hidden md:block">
-              <img
-                src="https://images.unsplash.com/photo-1506784365847-bbad939e9335?ixlib=rb-1.2.1&auto=format&fit=crop&h=500&q=80"
-                alt="Cycle Tracking"
-                className="w-full h-full object-cover"
-              />
-            </div>
           </div>
         </div>
 
         {/* NEW: Online Consultations Featured Service */}
         <div
           ref={onlineConsultationsRef}
-          className="mt-16 pt-6 bg-gradient-to-r from-blue-700 to-indigo-800 text-white rounded-2xl overflow-hidden shadow-xl scroll-mt-24"
+          className="mt-16 bg-gradient-to-r from-blue-700 to-indigo-800 text-white rounded-2xl overflow-hidden shadow-xl scroll-mt-24"
         >
           <div className="grid md:grid-cols-2">
             <div className="hidden md:block">
@@ -737,7 +737,7 @@ function Services() {
                 </li>
               </ul>
               <Link
-                to="/appointments"
+                to="/services/appointments"
                 className="inline-flex items-center px-6 py-3 border border-transparent text-base font-medium rounded-md text-indigo-900 bg-white hover:bg-indigo-50 transition-colors self-start"
               >
                 Book a Consultation
@@ -761,7 +761,7 @@ function Services() {
         {/* STI Testing Featured Service - Updated with ref */}
         <div
           ref={stiTestingRef}
-          className="mt-16 pt-6 bg-gradient-to-r from-purple-800 to-indigo-900 text-white rounded-2xl overflow-hidden shadow-xl scroll-mt-24"
+          className="mt-16 bg-gradient-to-r from-purple-800 to-indigo-900 text-white rounded-2xl overflow-hidden shadow-xl scroll-mt-24"
         >
           <div className="grid md:grid-cols-2">
             <div className="hidden md:block">

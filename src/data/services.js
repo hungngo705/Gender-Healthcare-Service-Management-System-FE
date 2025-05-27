@@ -5,7 +5,7 @@ const services = [
     description:
       "Expert advice on reproductive health issues, family planning, and contraception methods.",
     icon: "fas fa-user-md",
-    link: "/services/reproductive-health",
+    link: "/services/tracking",
   },
   {
     id: 2,
@@ -21,7 +21,7 @@ const services = [
     description:
       "Professional counseling services focused on gender-specific mental health concerns.",
     icon: "fas fa-brain",
-    link: "/services/mental-health",
+    link: "/services/appointments",
   },
 ];
 
