@@ -23,14 +23,6 @@ const services = [
     icon: "fas fa-brain",
     link: "/services/mental-health",
   },
-  {
-    id: 4,
-    title: "LGBTQ+ Healthcare",
-    description:
-      "Specialized healthcare services designed for the unique needs of the LGBTQ+ community.",
-    icon: "fas fa-heart",
-    link: "/services/lgbtq-healthcare",
-  },
 ];
 
 export default services;

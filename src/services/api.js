@@ -3,50 +3,34 @@
 
 import apiClient from "../utils/axiosConfig";
 
-// Simulated data
+// Simulated data with 3 main services as shown in the image
 const servicesData = [
   {
     id: 1,
-    name: "Menstrual Cycle Tracking",
-    description:
-      "Track, predict, and manage your menstrual cycles for better reproductive health.",
+    name: "Cycle Tracking",
+    description: "Monitor and manage your menstrual cycle effectively",
     details:
-      "Our menstrual cycle tracking service helps you monitor your periods, predict ovulation and fertile windows, and receive timely reminders. The platform is designed to support individual health needs, offering insights and guidance tailored to your reproductive health journey.",
+      "Monitor your menstrual cycle, receive predictions for ovulation periods, fertility windows, and set reminders for birth control. Our smart algorithms adapt to your unique patterns.",
+    icon: "calendar",
+    image: "https://images.unsplash.com/photo-1576765608535-5f04d1e3f289?ixlib=rb-1.2.1&auto=format&fit=crop&q=80&w=2080&h=1200",
   },
   {
     id: 2,
-    name: "Mental Health",
-    description: "Gender-affirming mental health services and counseling.",
+    name: "Online Consultations",
+    description: "Private video consultations with healthcare experts",
     details:
-      "Our mental health services include individual therapy, group counseling, and psychiatric care. We provide a safe and affirming environment for all patients to address their mental health needs.",
+      "Schedule private video consultations with our healthcare experts for personalized advice on reproductive health, sexual education, and any concerns you may have.",
+    icon: "message-circle",
+    image: "https://images.unsplash.com/photo-1527689368864-3a821dbccc34?ixlib=rb-1.2.1&auto=format&fit=crop&q=80&w=2070&h=1200",
   },
   {
     id: 3,
-    name: "Reproductive Health",
-    description: "Specialized reproductive health services for all genders.",
+    name: "STI Testing Services",
+    description: "Confidential testing and follow-up care",
     details:
-      "We offer comprehensive reproductive healthcare including family planning, STI testing and treatment, and reproductive health education. Our services are designed to be inclusive and respectful of all gender identities.",
-  },
-  {
-    id: 4,
-    name: "Hormone Therapy",
-    description: "Specialized hormone replacement therapy and management.",
-    details:
-      "Our hormone therapy services include comprehensive assessment, prescription, and ongoing monitoring of hormone treatments. We follow the latest evidence-based protocols and individualize care based on patient needs and goals.",
-  },
-  {
-    id: 5,
-    name: "Preventive Care",
-    description: "Gender-specific preventive care and screenings.",
-    details:
-      "We offer a range of preventive healthcare services including screenings, vaccinations, and health education. Our preventive care is tailored to address gender-specific health risks and needs.",
-  },
-  {
-    id: 6,
-    name: "Support Groups",
-    description: "Community support groups for various healthcare needs.",
-    details:
-      "Our support groups provide a space for individuals to connect with others who share similar experiences. Groups are facilitated by trained professionals and cover a variety of topics related to health and well-being.",
+      "Order confidential STI tests, book appointments at nearby clinics, and receive your results securely through our platform, with follow-up care options if needed.",
+    icon: "shield",
+    image: "https://images.unsplash.com/photo-1576091160550-2173dba999ef?ixlib=rb-1.2.1&auto=format&fit=crop&q=80&w=2070&h=1200",
   },
 ];
 

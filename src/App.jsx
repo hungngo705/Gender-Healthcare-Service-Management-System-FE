@@ -1,9 +1,10 @@
 import { Routes, Route, Navigate } from "react-router-dom";
-import { lazy, Suspense, useState } from "react";
+import { lazy, Suspense } from "react";
 import "./App.css";
 import Layout from "./components/Layout";
 import ProtectedRoute from "./components/ProtectedRoute";
 import LoadingSpinner from "./components/LoadingSpinner";
+import { useAuth } from "./contexts/AuthContext";
 
 // Lazy load all page components with named chunks for better debugging
 const Login = lazy(() =>
@@ -26,20 +27,19 @@ const Blog = lazy(() => import(/* webpackChunkName: "blog" */ "./pages/Blog"));
 const BlogDetail = lazy(() =>
   import(/* webpackChunkName: "blog-detail" */ "./pages/BlogDetail")
 );
+const STITesting = lazy(() =>
+  import(/* webpackChunkName: "sti-testing" */ "./pages/STITesting")
+);
 
 function App() {
-  // Đây là trạng thái đơn giản để kiểm tra xem người dùng đã đăng nhập hay chưa
-  // Trong thực tế, bạn sẽ sử dụng Context API hoặc Redux để quản lý trạng thái đăng nhập
-  const [isLoggedIn, setIsLoggedIn] = useState(false);
+  // Using AuthContext to get authentication state
+  const { isAuthenticated } = useAuth();
 
   return (
     <Suspense fallback={<LoadingSpinner />}>
       <Routes>
         {/* Auth routes */}
-        <Route
-          path="/login"
-          element={<Login setIsLoggedIn={setIsLoggedIn} />}
-        />
+        <Route path="/login" element={<Login />} />
         <Route path="/signup" element={<Signup />} />
 
         {/* Các trang công khai có thể xem mà không cần đăng nhập */}
@@ -50,13 +50,14 @@ function App() {
           <Route path="contact" element={<Contact />} />
           <Route path="blog" element={<Blog />} />
           <Route path="blog/:id" element={<BlogDetail />} />
+          <Route path="services/sti-testing" element={<STITesting />} />
         </Route>
 
         {/* Các trang yêu cầu đăng nhập */}
         <Route
           path="/protected"
           element={
-            <ProtectedRoute isLoggedIn={isLoggedIn}>
+            <ProtectedRoute isLoggedIn={isAuthenticated}>
               <Layout />
             </ProtectedRoute>
           }
