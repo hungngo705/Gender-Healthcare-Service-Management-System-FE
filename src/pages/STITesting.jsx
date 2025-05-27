@@ -391,7 +391,7 @@ function STITesting() {
             {/* Comprehensive STI Test */}
             <div className="bg-indigo-50 rounded-xl shadow-lg overflow-hidden border-2 border-indigo-500 hover:shadow-xl transition-shadow transform scale-105">
               <div className="absolute inset-x-0 -top-4 flex justify-center">
-                <span className="inline-block px-4 py-1 rounded-full bg-indigo-600 text-white text-xs font-semibold uppercase tracking-wider">
+                <span className="inline-block px-4 py-3 rounded-full bg-indigo-600 text-white text-xs font-semibold uppercase tracking-wider">
                   Most Popular
                 </span>
               </div>
