@@ -6,7 +6,7 @@ const bannerSlides = [
     description:
       "Tiếp cận các dịch vụ sức khỏe sinh sản toàn diện, nguồn thông tin giáo dục và xét nghiệm bảo mật với sự riêng tư và tôn trọng.",
     buttonText: "Đặt Lịch Tư Vấn",
-    buttonLink: "/contact",
+    buttonLink: "/",
     image:
       "https://images.unsplash.com/photo-1576091160550-2173dba999ef?ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D&auto=format&fit=crop&w=1470&q=80",
   },
