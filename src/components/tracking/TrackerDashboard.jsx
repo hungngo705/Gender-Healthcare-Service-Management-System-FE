@@ -2,7 +2,6 @@ import React, { useState } from "react";
 import HeroSection from "./HeroSection";
 import TabNavigator from "./TabNavigator";
 import TabContent from "./TabContent";
-import Breadcrumbs from "./Breadcrumbs";
 import CallToAction from "./CallToAction";
 
 const TrackerDashboard = () => {
@@ -10,9 +9,6 @@ const TrackerDashboard = () => {
 
   return (
     <div className="min-h-screen bg-gradient-to-b from-gray-50 to-white">
-      {/* Breadcrumb Navigation */}
-      <Breadcrumbs />
-
       {/* Hero Section */}
       <HeroSection />
 
