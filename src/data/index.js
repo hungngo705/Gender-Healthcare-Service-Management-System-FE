@@ -1,7 +1,7 @@
 import services from "./services";
 import consultants from "./consultants";
 import testimonials from "./testimonials";
-import blogPosts from "./blogPosts";
+import blogData from "./blogData";
 import bannerSlides from "./bannerSlides";
 import mockServices from "./mockServices";
 import serviceFaqs from "./serviceFaqs";
@@ -11,7 +11,7 @@ export {
   services,
   consultants,
   testimonials,
-  blogPosts,
+  blogData,
   bannerSlides,
   mockServices,
   serviceFaqs,

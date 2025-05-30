@@ -24,7 +24,7 @@ function Services() {
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
           <div className="text-center">
             <h1 className="text-4xl font-bold text-gray-900 mb-6">
-              Our Healthcare Services
+              Dịch Vụ Y Tế Của Chúng Tôi
             </h1>
             <div className="flex items-center justify-center space-x-2 mt-8">
               <div
@@ -41,7 +41,7 @@ function Services() {
               ></div>
             </div>
             <p className="mt-4 text-lg text-gray-600">
-              Loading our services...
+              Đang tải dịch vụ...
             </p>
           </div>
         </div>
@@ -55,7 +55,7 @@ function Services() {
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
           <div className="text-center">
             <h1 className="text-4xl font-bold text-gray-900 mb-6">
-              Our Healthcare Services
+              Dịch Vụ Y Tế Của Chúng Tôi
             </h1>
             <div className="bg-red-50 border-l-4 border-red-500 p-4 rounded-md max-w-2xl mx-auto">
               <div className="flex">
@@ -82,7 +82,7 @@ function Services() {
               onClick={() => window.location.reload()}
               className="mt-6 inline-flex items-center px-4 py-2 border border-transparent text-base font-medium rounded-md shadow-sm text-white bg-indigo-600 hover:bg-indigo-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-indigo-500"
             >
-              Try Again
+              Thử Lại
             </button>
           </div>
         </div>
@@ -102,7 +102,7 @@ function Services() {
             transition={{ duration: 0.5 }}
             className="text-4xl font-extrabold text-white sm:text-5xl sm:tracking-tight lg:text-6xl"
           >
-            Our Healthcare Services
+            Dịch Vụ Y Tế Của Chúng Tôi
           </motion.h1>
           <motion.p
             initial={{ opacity: 0, y: 20 }}
@@ -110,8 +110,8 @@ function Services() {
             transition={{ duration: 0.5, delay: 0.2 }}
             className="max-w-3xl mx-auto mt-5 text-xl text-white"
           >
-            Comprehensive gender-sensitive healthcare services designed with
-            privacy, respect, and your unique reproductive health needs in mind.
+            Dịch vụ chăm sóc sức khỏe nhạy cảm với giới tính được thiết kế với
+            sự riêng tư, tôn trọng và phù hợp với nhu cầu sức khỏe sinh sản độc đáo của bạn.
           </motion.p>
 
           {/* Quick navigation buttons */}
@@ -137,7 +137,7 @@ function Services() {
                   d="M8 7V3m8 4V3m-9 8h10M5 21h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z"
                 />
               </svg>
-              Cycle Tracking
+              Theo Dõi Chu Kỳ
             </motion.button>
             <motion.button
               initial={{ opacity: 0, y: 10 }}
@@ -160,7 +160,7 @@ function Services() {
                   d="M8 12h.01M12 12h.01M16 12h.01M21 12c0 4.418-4.03 8-9 8a9.863 9.863 0 01-4.255-.949L3 20l1.395-3.72C3.512 15.042 3 13.574 3 12c0-4.418 4.03-8 9-8s9 3.582 9 8z"
                 />
               </svg>
-              Online Consultations
+              Tư Vấn Trực Tuyến
             </motion.button>
             <motion.button
               initial={{ opacity: 0, y: 10 }}
@@ -183,7 +183,7 @@ function Services() {
                   d="M9 12l2 2 4-4m5.618-4.016A11.955 11.955 0 0112 2.944a11.955 11.955 0 01-8.618 3.04A12.02 12.02 0 003 9c0 5.591 3.824 10.29 9 11.622 5.176-1.332 9-6.03 9-11.622 0-1.042-.133-2.052-.382-3.016z"
                 />
               </svg>
-              STI Testing
+              Xét Nghiệm STI
             </motion.button>
           </div>
         </div>
@@ -198,7 +198,7 @@ function Services() {
             transition={{ duration: 0.5 }}
             className="text-3xl font-bold text-gray-900 text-center mb-4"
           >
-            Our Service Plans
+            Gói Dịch Vụ Của Chúng Tôi
           </motion.h2>
           <motion.p
             initial={{ opacity: 0, y: 20 }}
@@ -206,8 +206,8 @@ function Services() {
             transition={{ duration: 0.5, delay: 0.1 }}
             className="text-gray-600 text-center max-w-3xl mx-auto mb-12"
           >
-            Choose the plan that best fits your healthcare needs. All plans
-            include access to our secure platform and personalized care.
+            Chọn gói dịch vụ phù hợp nhất với nhu cầu chăm sóc sức khỏe của bạn. Tất cả các gói
+            đều bao gồm quyền truy cập vào nền tảng bảo mật và chăm sóc cá nhân hóa.
           </motion.p>
 
           <div className="grid grid-cols-1 md:grid-cols-3 gap-8">
@@ -225,17 +225,16 @@ function Services() {
             >
               <div className="p-6 border-b border-gray-100">
                 <h3 className="text-2xl font-bold text-gray-900 mb-2">
-                  Basic Care
+                  Chăm Sóc Cơ Bản
                 </h3>
                 <div className="flex items-baseline mb-4">
                   <span className="text-3xl font-bold text-indigo-600">
-                    $29
+                    600K
                   </span>
-                  <span className="text-gray-500 ml-2">/month</span>
+                  <span className="text-gray-500 ml-2">/tháng</span>
                 </div>
                 <p className="text-gray-600 mb-4">
-                  Essential services for your regular reproductive health
-                  monitoring.
+                  Dịch vụ cơ bản cho việc theo dõi sức khỏe sinh sản thường xuyên của bạn.
                 </p>
               </div>
               <div className="p-6">
@@ -252,7 +251,7 @@ function Services() {
                         clipRule="evenodd"
                       ></path>
                     </svg>
-                    Basic Cycle Tracking
+                    Theo Dõi Chu Kỳ Cơ Bản
                   </li>
                   <li className="flex items-center text-sm text-gray-600">
                     <svg
@@ -266,7 +265,7 @@ function Services() {
                         clipRule="evenodd"
                       ></path>
                     </svg>
-                    Monthly Online Consultation
+                    Tư Vấn Trực Tuyến Hàng Tháng
                   </li>
                   <li className="flex items-center text-sm text-gray-600">
                     <svg
@@ -280,7 +279,7 @@ function Services() {
                         clipRule="evenodd"
                       ></path>
                     </svg>
-                    Educational Resources
+                    Tài Liệu Giáo Dục
                   </li>
                   <li className="flex items-center text-sm text-gray-600">
                     <svg
@@ -294,14 +293,14 @@ function Services() {
                         clipRule="evenodd"
                       ></path>
                     </svg>
-                    Community Support
+                    Hỗ Trợ Cộng Đồng
                   </li>
                 </ul>
                 <Link
                   to="/signup?plan=basic"
                   className="inline-flex items-center justify-center w-full px-4 py-3 border border-indigo-600 text-base font-medium rounded-md text-indigo-600 bg-white hover:bg-indigo-50 transition-colors"
                 >
-                  Get Started
+                  Bắt Đầu
                   <svg
                     className="ml-2 h-4 w-4"
                     viewBox="0 0 20 20"
@@ -330,21 +329,20 @@ function Services() {
               className="bg-gradient-to-b from-indigo-50 to-white rounded-xl overflow-hidden shadow-lg hover:shadow-xl transition-all duration-300 border-2 border-indigo-500 relative transform scale-105 md:scale-110 z-10"
             >
               <div className="absolute top-0 left-0 right-0 bg-indigo-500 text-white text-center text-sm py-1 font-medium">
-                Most Popular
+                Phổ Biến Nhất
               </div>
               <div className="p-6 border-b border-indigo-100 mt-6">
                 <h3 className="text-2xl font-bold text-gray-900 mb-2">
-                  Premium Care
+                  Chăm Sóc Cao Cấp
                 </h3>
                 <div className="flex items-baseline mb-4">
                   <span className="text-3xl font-bold text-indigo-600">
-                    $49
+                    990K
                   </span>
-                  <span className="text-gray-500 ml-2">/month</span>
+                  <span className="text-gray-500 ml-2">/tháng</span>
                 </div>
                 <p className="text-gray-600 mb-4">
-                  Comprehensive care with advanced features and priority
-                  support.
+                  Chăm sóc toàn diện với các tính năng nâng cao và hỗ trợ ưu tiên.
                 </p>
               </div>
               <div className="p-6">
@@ -361,7 +359,7 @@ function Services() {
                         clipRule="evenodd"
                       ></path>
                     </svg>
-                    <strong>Advanced</strong> Cycle Tracking
+                    <strong>Nâng Cao</strong> Theo Dõi Chu Kỳ
                   </li>
                   <li className="flex items-center text-sm text-gray-600">
                     <svg
@@ -375,7 +373,7 @@ function Services() {
                         clipRule="evenodd"
                       ></path>
                     </svg>
-                    <strong>Unlimited</strong> Online Consultations
+                    <strong>Không giới hạn</strong> Tư Vấn Trực Tuyến
                   </li>
                   <li className="flex items-center text-sm text-gray-600">
                     <svg
@@ -389,7 +387,7 @@ function Services() {
                         clipRule="evenodd"
                       ></path>
                     </svg>
-                    Quarterly STI Testing
+                    Xét Nghiệm STI Hàng Quý
                   </li>
                   <li className="flex items-center text-sm text-gray-600">
                     <svg
@@ -403,7 +401,7 @@ function Services() {
                         clipRule="evenodd"
                       ></path>
                     </svg>
-                    Comprehensive STI Treatment
+                    Điều Trị STI Toàn Diện
                   </li>
                   <li className="flex items-center text-sm text-gray-600">
                     <svg
@@ -417,7 +415,7 @@ function Services() {
                         clipRule="evenodd"
                       ></path>
                     </svg>
-                    Priority Support 24/7
+                    Hỗ Trợ Ưu Tiên 24/7
                   </li>
                   <li className="flex items-center text-sm text-gray-600">
                     <svg
@@ -431,14 +429,14 @@ function Services() {
                         clipRule="evenodd"
                       ></path>
                     </svg>
-                    Personalized Health Plans
+                    Kế Hoạch Sức Khỏe Cá Nhân Hóa
                   </li>
                 </ul>
                 <Link
                   to="/signup?plan=premium"
                   className="inline-flex items-center justify-center w-full px-4 py-3 border border-transparent text-base font-medium rounded-md text-white bg-indigo-600 hover:bg-indigo-700 transition-colors"
                 >
-                  Get Started
+                  Bắt Đầu
                   <svg
                     className="ml-2 h-4 w-4"
                     viewBox="0 0 20 20"
@@ -468,17 +466,16 @@ function Services() {
             >
               <div className="p-6 border-b border-gray-100">
                 <h3 className="text-2xl font-bold text-gray-900 mb-2">
-                  Family Care
+                  Chăm Sóc Gia Đình
                 </h3>
                 <div className="flex items-baseline mb-4">
                   <span className="text-3xl font-bold text-indigo-600">
-                    $79
+                    1.590K
                   </span>
-                  <span className="text-gray-500 ml-2">/month</span>
+                  <span className="text-gray-500 ml-2">/tháng</span>
                 </div>
                 <p className="text-gray-600 mb-4">
-                  Complete healthcare for the whole family with enhanced
-                  features.
+                  Chăm sóc sức khỏe toàn diện cho cả gia đình với các tính năng nâng cao.
                 </p>
               </div>
               <div className="p-6">
@@ -495,7 +492,7 @@ function Services() {
                         clipRule="evenodd"
                       ></path>
                     </svg>
-                    Coverage for up to 4 family members
+                    Bao gồm tối đa 4 thành viên gia đình
                   </li>
                   <li className="flex items-center text-sm text-gray-600">
                     <svg
@@ -509,7 +506,7 @@ function Services() {
                         clipRule="evenodd"
                       ></path>
                     </svg>
-                    All Premium features included
+                    Bao gồm tất cả tính năng của gói Cao Cấp
                   </li>
                   <li className="flex items-center text-sm text-gray-600">
                     <svg
@@ -523,7 +520,7 @@ function Services() {
                         clipRule="evenodd"
                       ></path>
                     </svg>
-                    Family health analytics
+                    Phân tích sức khỏe gia đình
                   </li>
                   <li className="flex items-center text-sm text-gray-600">
                     <svg
@@ -537,14 +534,14 @@ function Services() {
                         clipRule="evenodd"
                       ></path>
                     </svg>
-                    Dedicated family care specialist
+                    Chuyên gia chăm sóc gia đình riêng
                   </li>
                 </ul>
                 <Link
                   to="/signup?plan=family"
                   className="inline-flex items-center justify-center w-full px-4 py-3 border border-indigo-600 text-base font-medium rounded-md text-indigo-600 bg-white hover:bg-indigo-50 transition-colors"
                 >
-                  Get Started
+                  Bắt Đầu
                   <svg
                     className="ml-2 h-4 w-4"
                     viewBox="0 0 20 20"
@@ -571,18 +568,17 @@ function Services() {
             <div className="hidden md:block">
               <img
                 src="https://images.unsplash.com/photo-1506784365847-bbad939e9335?ixlib=rb-1.2.1&auto=format&fit=crop&h=500&q=80"
-                alt="Cycle Tracking"
+                alt="Theo Dõi Chu Kỳ"
                 className="w-full h-full object-cover"
               />
             </div>
             <div className="p-10 flex flex-col justify-center">
               <h2 className="text-3xl font-bold mb-4">
-                Cycle Tracking Service
+                Dịch Vụ Theo Dõi Chu Kỳ
               </h2>
               <p className="mb-6">
-                Our advanced cycle tracking service helps you monitor your
-                menstrual cycle, predict ovulation periods, and set reminders
-                for birth control and health checks.
+                Dịch vụ theo dõi chu kỳ tiên tiến của chúng tôi giúp bạn theo dõi chu kỳ kinh nguyệt, 
+                dự đoán thời kỳ rụng trứng và thiết lập nhắc nhở về biện pháp tránh thai và kiểm tra sức khỏe.
               </p>
               <ul className="mb-8 space-y-2">
                 <li className="flex items-start">
@@ -601,7 +597,7 @@ function Services() {
                     />
                   </svg>{" "}
                   <span>
-                    Personalized predictions based on your unique cycle
+                    Dự đoán cá nhân hóa dựa trên chu kỳ độc đáo của bạn
                   </span>
                 </li>
                 <li className="flex items-start">
@@ -619,7 +615,7 @@ function Services() {
                       d="M5 13l4 4L19 7"
                     />
                   </svg>
-                  <span>Reminders for medications and appointments</span>
+                  <span>Nhắc nhở về thuốc và lịch hẹn</span>
                 </li>
                 <li className="flex items-start">
                   <svg
@@ -636,14 +632,14 @@ function Services() {
                       d="M5 13l4 4L19 7"
                     />
                   </svg>
-                  <span>Health insights based on your tracking history</span>
+                  <span>Thông tin sức khỏe dựa trên lịch sử theo dõi của bạn</span>
                 </li>
               </ul>{" "}
               <Link
                 to="/services/tracking"
                 className="inline-flex items-center px-6 py-3 border border-transparent text-base font-medium rounded-md text-indigo-900 bg-white hover:bg-indigo-50 transition-colors self-start"
               >
-                Try Cycle Tracker
+                Dùng Thử Theo Dõi Chu Kỳ
                 <svg
                   className="ml-2 h-5 w-5"
                   xmlns="http://www.w3.org/2000/svg"
@@ -670,16 +666,15 @@ function Services() {
             <div className="hidden md:block">
               <img
                 src="https://images.unsplash.com/photo-1587614387466-0a72ca909e16?ixlib=rb-1.2.1&auto=format&fit=crop&h=500&q=80"
-                alt="Online Consultations"
+                alt="Tư Vấn Trực Tuyến"
                 className="w-full h-full object-cover"
               />
             </div>
             <div className="p-10 flex flex-col justify-center">
-              <h2 className="text-3xl font-bold mb-4">Online Consultations</h2>
+              <h2 className="text-3xl font-bold mb-4">Tư Vấn Trực Tuyến</h2>
               <p className="mb-6">
-                Connect with healthcare professionals from the comfort of your
-                home through secure video consultations for personalized advice
-                and care.
+                Kết nối với các chuyên gia y tế từ sự thoải mái của ngôi nhà bạn
+                thông qua các buổi tư vấn video bảo mật để nhận lời khuyên và chăm sóc cá nhân hóa.
               </p>
               <ul className="mb-8 space-y-2">
                 <li className="flex items-start">
@@ -698,7 +693,7 @@ function Services() {
                     />
                   </svg>
                   <span>
-                    Private video consultation with licensed professionals
+                    Tư vấn video riêng tư với các chuyên gia có giấy phép
                   </span>
                 </li>
                 <li className="flex items-start">
@@ -716,7 +711,7 @@ function Services() {
                       d="M5 13l4 4L19 7"
                     />
                   </svg>
-                  <span>Discuss sensitive health concerns privately</span>
+                  <span>Thảo luận các vấn đề sức khỏe nhạy cảm một cách riêng tư</span>
                 </li>
                 <li className="flex items-start">
                   <svg
@@ -733,14 +728,14 @@ function Services() {
                       d="M5 13l4 4L19 7"
                     />
                   </svg>
-                  <span>Receive prescriptions and follow-up care plans</span>
+                  <span>Nhận đơn thuốc và kế hoạch chăm sóc tiếp theo</span>
                 </li>
               </ul>
               <Link
                 to="/services/appointments"
                 className="inline-flex items-center px-6 py-3 border border-transparent text-base font-medium rounded-md text-indigo-900 bg-white hover:bg-indigo-50 transition-colors self-start"
               >
-                Book a Consultation
+                Đặt Lịch Tư Vấn
                 <svg
                   className="ml-2 h-5 w-5"
                   xmlns="http://www.w3.org/2000/svg"
@@ -767,17 +762,17 @@ function Services() {
             <div className="hidden md:block">
               <img
                 src="https://images.unsplash.com/photo-1576091160399-112ba8d25d1d?ixlib=rb-1.2.1&auto=format&fit=crop&h=500&q=80"
-                alt="STI Testing"
+                alt="Xét Nghiệm STI"
                 className="w-full h-full object-cover"
               />
             </div>
             <div className="p-10 flex flex-col justify-center">
               <h2 className="text-3xl font-bold mb-4">
-                Confidential STI Testing
+                Xét Nghiệm STI Bảo Mật
               </h2>
               <p className="mb-6">
-                Our STI testing services provide confidential testing, secure
-                results delivery, and comprehensive treatment options if needed.
+                Dịch vụ xét nghiệm STI của chúng tôi cung cấp xét nghiệm bảo mật, 
+                gửi kết quả an toàn và các tùy chọn điều trị toàn diện nếu cần.
               </p>
               <ul className="mb-8 space-y-2">
                 <li className="flex items-start">
@@ -795,7 +790,7 @@ function Services() {
                       d="M5 13l4 4L19 7"
                     />
                   </svg>
-                  <span>Complete privacy throughout the testing process</span>
+                  <span>Hoàn toàn riêng tư trong suốt quá trình xét nghiệm</span>
                 </li>
                 <li className="flex items-start">
                   <svg
@@ -812,7 +807,7 @@ function Services() {
                       d="M5 13l4 4L19 7"
                     />
                   </svg>
-                  <span>Secure online results delivery</span>
+                  <span>Nhận kết quả bảo mật qua hệ thống trực tuyến</span>
                 </li>
                 <li className="flex items-start">
                   <svg
@@ -829,14 +824,14 @@ function Services() {
                       d="M5 13l4 4L19 7"
                     />
                   </svg>
-                  <span>Optional follow-up treatment and care</span>
+                  <span>Tùy chọn điều trị và chăm sóc tiếp theo</span>
                 </li>
               </ul>
               <Link
                 to="/services/sti-testing"
                 className="inline-flex items-center px-6 py-3 border border-transparent text-base font-medium rounded-md text-indigo-900 bg-white hover:bg-indigo-50 transition-colors self-start"
               >
-                Book STI Testing
+                Đặt Lịch Xét Nghiệm STI
                 <svg
                   className="ml-2 h-5 w-5"
                   xmlns="http://www.w3.org/2000/svg"
@@ -857,7 +852,7 @@ function Services() {
         {/* FAQ Section - remains unchanged */}
         <div className="mt-16">
           <h2 className="text-2xl font-bold text-gray-900 mb-8 text-center">
-            Frequently Asked Questions
+            Câu Hỏi Thường Gặp
           </h2>
           <div className="max-w-3xl mx-auto">
             {serviceFaqs.map((faq, index) => (
@@ -883,24 +878,24 @@ function Services() {
         {/* Call to Action - remains unchanged */}
         <div className="mt-16 text-center">
           <h2 className="text-3xl font-bold text-gray-900 mb-4">
-            Ready to Take Control of Your Reproductive Health?
+            Sẵn Sàng Kiểm Soát Sức Khỏe Sinh Sản Của Bạn?
           </h2>
           <p className="max-w-2xl mx-auto text-xl text-gray-600 mb-8">
-            Start tracking your cycle, book a consultation with our healthcare
-            professionals, or schedule an STI test today.
+            Bắt đầu theo dõi chu kỳ, đặt lịch tư vấn với các chuyên gia y tế của chúng tôi,
+            hoặc đặt lịch xét nghiệm STI ngay hôm nay.
           </p>
           <div className="flex flex-col sm:flex-row justify-center gap-4">
             <Link
               to="/appointment"
               className="inline-flex items-center justify-center px-6 py-3 border border-transparent text-base font-medium rounded-md text-white bg-indigo-600 hover:bg-indigo-700 transition-colors"
             >
-              Book Appointment
+              Đặt Lịch Hẹn
             </Link>
             <Link
               to="/cycle-tracker"
               className="inline-flex items-center justify-center px-6 py-3 border border-indigo-600 text-base font-medium rounded-md text-indigo-600 bg-white hover:bg-indigo-50 transition-colors"
             >
-              Try Cycle Tracker
+              Dùng Thử Theo Dõi Chu Kỳ
             </Link>
           </div>
         </div>

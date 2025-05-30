@@ -1,25 +1,25 @@
 const services = [
   {
     id: 1,
-    title: "Reproductive Health Consultation",
+    title: "Tư Vấn Sức Khỏe Sinh Sản",
     description:
-      "Expert advice on reproductive health issues, family planning, and contraception methods.",
+      "Lời khuyên chuyên môn về các vấn đề sức khỏe sinh sản, kế hoạch hóa gia đình và các phương pháp tránh thai.",
     icon: "fas fa-user-md",
     link: "/services/tracking",
   },
   {
     id: 2,
-    title: "STI Testing & Treatment",
+    title: "Xét Nghiệm & Điều Trị STI",
     description:
-      "Confidential testing for sexually transmitted infections with quick results and treatment options.",
+      "Xét nghiệm bảo mật các bệnh lây truyền qua đường tình dục với kết quả nhanh chóng và các lựa chọn điều trị.",
     icon: "fas fa-vial",
     link: "/services/sti-testing",
   },
   {
     id: 3,
-    title: "Mental Health Support",
+    title: "Hỗ Trợ Sức Khỏe Tâm Thần",
     description:
-      "Professional counseling services focused on gender-specific mental health concerns.",
+      "Dịch vụ tư vấn chuyên nghiệp tập trung vào các vấn đề sức khỏe tâm thần liên quan đến giới tính.",
     icon: "fas fa-brain",
     link: "/services/appointments",
   },

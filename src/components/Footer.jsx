@@ -16,10 +16,11 @@ function Footer() {
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-8">
           {/* Column 1 - About */}
           <div>
-            <h3 className="text-white text-lg font-bold mb-4">About Us</h3>
+            <h3 className="text-white text-lg font-bold mb-4">Về Chúng Tôi</h3>
             <p className="mb-4">
-              Gender Healthcare Service Management System provides comprehensive
-              healthcare solutions tailored for gender-specific needs.
+              Hệ thống Quản lý Dịch vụ Chăm sóc Sức khỏe Giới tính cung cấp các 
+              giải pháp chăm sóc sức khỏe toàn diện được thiết kế phù hợp với 
+              nhu cầu riêng biệt của từng giới tính.
             </p>
             <div className="flex space-x-4">
               <a
@@ -45,14 +46,14 @@ function Footer() {
 
           {/* Column 2 - Quick Links */}
           <div>
-            <h3 className="text-white text-lg font-bold mb-4">Quick Links</h3>
+            <h3 className="text-white text-lg font-bold mb-4">Liên Kết Nhanh</h3>
             <ul className="space-y-2">
               <li>
                 <NavLink
                   to="/"
                   className="hover:text-white transition-colors duration-300"
                 >
-                  Home
+                  Trang Chủ
                 </NavLink>
               </li>
               <li>
@@ -60,7 +61,7 @@ function Footer() {
                   to="/services"
                   className="hover:text-white transition-colors duration-300"
                 >
-                  Services
+                  Dịch Vụ
                 </NavLink>
               </li>
               <li>
@@ -68,7 +69,7 @@ function Footer() {
                   to="/about"
                   className="hover:text-white transition-colors duration-300"
                 >
-                  About
+                  Giới Thiệu
                 </NavLink>
               </li>
               <li>
@@ -76,7 +77,7 @@ function Footer() {
                   to="/contact"
                   className="hover:text-white transition-colors duration-300"
                 >
-                  Contact
+                  Liên Hệ
                 </NavLink>
               </li>
               <li>
@@ -84,7 +85,7 @@ function Footer() {
                   to="/blog"
                   className="hover:text-white transition-colors duration-300"
                 >
-                  Blog
+                  Bài Viết
                 </NavLink>
               </li>
             </ul>
@@ -92,14 +93,14 @@ function Footer() {
 
           {/* Column 3 - Services */}
           <div>
-            <h3 className="text-white text-lg font-bold mb-4">Our Services</h3>
+            <h3 className="text-white text-lg font-bold mb-4">Dịch Vụ Của Chúng Tôi</h3>
             <ul className="space-y-2">
               <li>
                 <NavLink
                   to="/services/maternal-health"
                   className="hover:text-white transition-colors duration-300"
                 >
-                  Maternal Health
+                  Sức Khỏe Bà Mẹ
                 </NavLink>
               </li>
               <li>
@@ -107,7 +108,7 @@ function Footer() {
                   to="/services/reproductive-health"
                   className="hover:text-white transition-colors duration-300"
                 >
-                  Reproductive Health
+                  Sức Khỏe Sinh Sản
                 </NavLink>
               </li>
               <li>
@@ -115,7 +116,7 @@ function Footer() {
                   to="/services/pediatric-care"
                   className="hover:text-white transition-colors duration-300"
                 >
-                  Pediatric Care
+                  Chăm Sóc Nhi Khoa
                 </NavLink>
               </li>
               <li>
@@ -123,7 +124,7 @@ function Footer() {
                   to="/services/womens-wellness"
                   className="hover:text-white transition-colors duration-300"
                 >
-                  Women's Wellness
+                  Sức Khỏe Phụ Nữ
                 </NavLink>
               </li>
               <li>
@@ -131,7 +132,7 @@ function Footer() {
                   to="/services/mens-wellness"
                   className="hover:text-white transition-colors duration-300"
                 >
-                  Men's Wellness
+                  Sức Khỏe Nam Giới
                 </NavLink>
               </li>
             </ul>
@@ -139,11 +140,11 @@ function Footer() {
 
           {/* Column 4 - Contact */}
           <div>
-            <h3 className="text-white text-lg font-bold mb-4">Contact Us</h3>
+            <h3 className="text-white text-lg font-bold mb-4">Liên Hệ Chúng Tôi</h3>
             <ul className="space-y-3">
               <li className="flex items-start space-x-3">
                 <MapPin size={20} className="flex-shrink-0 mt-1" />
-                <span>123 Healthcare Avenue, Medical District, City</span>
+                <span>số 7 Đ. D1, Long Thạnh Mỹ, Thủ Đức, Hồ Chí Minh </span>
               </li>
               <li className="flex items-center space-x-3">
                 <Phone size={20} className="flex-shrink-0" />
@@ -162,8 +163,8 @@ function Footer() {
       <div className="border-t border-gray-800">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-6 flex flex-col md:flex-row justify-between items-center">
           <p>
-            &copy; {new Date().getFullYear()} Gender Healthcare Service
-            Management System. All rights reserved.
+            &copy; {new Date().getFullYear()} Hệ thống Quản lý Dịch vụ Chăm sóc Sức khỏe Giới tính.
+            Đã đăng ký bản quyền.
           </p>
           <div className="mt-4 md:mt-0">
             <ul className="flex space-x-6">
@@ -172,7 +173,7 @@ function Footer() {
                   to="/terms"
                   className="text-sm hover:text-white transition-colors duration-300"
                 >
-                  Terms of Service
+                  Điều Khoản Dịch Vụ
                 </NavLink>
               </li>
               <li>
@@ -180,7 +181,7 @@ function Footer() {
                   to="/privacy"
                   className="text-sm hover:text-white transition-colors duration-300"
                 >
-                  Privacy Policy
+                  Chính Sách Bảo Mật
                 </NavLink>
               </li>
             </ul>

@@ -1,202 +1,202 @@
-export const blogPosts = [
+export const blogData = [
   {
     id: "1",
-    title: "How to treat male infertility? 6 effective ways to treat male infertility",
+    title: "Cách điều trị vô sinh nam? 6 phương pháp điều trị vô sinh nam hiệu quả",
     date: "2024-05-01",
     category: "reproductive",
-    categoryName: "Reproductive Health",
-    author: "PhD. MD. Nguyen Van A",
+    categoryName: "Sức Khỏe Sinh Sản",
+    author: "TS. BS. Nguyễn Văn A",
     authorImg: "https://randomuser.me/api/portraits/men/32.jpg",
     img: "https://cdn.diag.vn/2025/05/61cafd1b-lieu-phap-hormone-giup-cai-thien-kha-nang-san-xuat-tinh-trung-va-ty-le-thu-thai-tu-nhien.jpg",
     excerpt:
-      "Male infertility is a condition where men cannot impregnate their partner after 12 months of regular sexual intercourse without using contraception. Depending on the cause of infertility, doctors will prescribe appropriate male infertility treatment methods.",
+      "Vô sinh nam là tình trạng nam giới không thể làm cho đối tác mang thai sau 12 tháng quan hệ tình dục đều đặn mà không sử dụng biện pháp tránh thai. Tùy theo nguyên nhân gây vô sinh, bác sĩ sẽ chỉ định phương pháp điều trị vô sinh nam phù hợp.",
     readingTime: "8",
     content: `
-How to treat male infertility? 6 effective ways to treat male infertility
+Cách điều trị vô sinh nam? 6 phương pháp điều trị vô sinh nam hiệu quả
 
-Male infertility is an increasingly common condition that significantly affects psychology and family happiness. According to statistics, male infertility accounts for about 40-50% of infertility cases in couples. So how is male infertility treated and what are the effective male infertility treatment methods available today?
+Vô sinh nam là tình trạng ngày càng phổ biến và ảnh hưởng không nhỏ đến tâm lý và hạnh phúc gia đình. Theo thống kê, vô sinh nam chiếm khoảng 40-50% trong các trường hợp vô sinh ở các cặp vợ chồng. Vậy vô sinh nam điều trị như thế nào và những phương pháp điều trị vô sinh nam hiệu quả hiện nay là gì?
 
-1. Using medication
+1. Sử dụng thuốc
 
-In many cases, male infertility is caused by hormonal disorders or genital tract infections. Doctors may prescribe antibiotics, hormone-regulating drugs, or vitamin and mineral supplements to improve sperm quality and quantity.
+Trong nhiều trường hợp, vô sinh nam do rối loạn hormone hoặc nhiễm trùng đường sinh dục. Bác sĩ có thể kê đơn kháng sinh, thuốc điều hòa hormone, hoặc thực phẩm chức năng bổ sung vitamin, khoáng chất để cải thiện chất lượng và số lượng tinh trùng.
 
-2. Lifestyle and diet changes
+2. Thay đổi lối sống và chế độ ăn uống
 
-A scientific diet rich in protein, vitamins C, E, zinc, selenium combined with regular physical exercise helps enhance reproductive health. Avoiding stimulants like alcohol, tobacco, and reducing stress also helps improve sperm quality.
+Chế độ ăn khoa học giàu protein, vitamin C, E, kẽm, selen kết hợp với tập thể dục thường xuyên giúp tăng cường sức khỏe sinh sản. Tránh các chất kích thích như rượu, thuốc lá, giảm stress cũng giúp cải thiện chất lượng tinh trùng.
 
-3. Surgical treatment
+3. Điều trị bằng phẫu thuật
 
-Some cases of male infertility due to vas deferens obstruction, varicocele, or congenital abnormalities can be treated with surgery. This method yields high effectiveness if performed with the right indication and technique.
+Một số trường hợp vô sinh nam do tắc ống dẫn tinh, giãn tĩnh mạch thừng tinh, hoặc dị tật bẩm sinh có thể điều trị bằng phẫu thuật. Phương pháp này mang lại hiệu quả cao nếu được thực hiện đúng chỉ định và kỹ thuật.
 
-4. Assisted reproduction with IUI technique
+4. Hỗ trợ sinh sản bằng kỹ thuật IUI
 
-Intrauterine insemination (IUI) is a common assisted reproductive technique, applied for cases of weak sperm, low count, or abnormal cervix in the wife. Sperm will be washed and selected before being injected into the uterus.
+Bơm tinh trùng vào buồng tử cung (IUI) là kỹ thuật hỗ trợ sinh sản phổ biến, áp dụng cho các trường hợp tinh trùng yếu, ít, hoặc cổ tử cung bất thường ở vợ. Tinh trùng sẽ được rửa và chọn lọc trước khi bơm vào tử cung.
 
-5. In vitro fertilization (IVF/ICSI)
+5. Thụ tinh trong ống nghiệm (IVF/ICSI)
 
-When the above methods are ineffective, in vitro fertilization is the optimal solution. In particular, ICSI technique (injecting sperm into the egg cytoplasm) helps increase the chances of conception for cases with very weak or abnormal sperm.
+Khi các phương pháp trên không hiệu quả, thụ tinh trong ống nghiệm là giải pháp tối ưu. Đặc biệt, kỹ thuật ICSI (tiêm tinh trùng vào bào tương trứng) giúp tăng khả năng thụ thai cho các trường hợp tinh trùng rất yếu hoặc bất thường.
 
-6. Psychological therapy and counseling
+6. Liệu pháp tâm lý và tư vấn
 
-Prolonged stress and anxiety can reduce sperm quality. Therefore, couples should maintain an optimistic attitude, ready to share with doctors and relatives to get the best psychological support during treatment.
+Stress và lo lắng kéo dài có thể làm giảm chất lượng tinh trùng. Do đó, các cặp vợ chồng nên duy trì tâm lý lạc quan, sẵn sàng chia sẻ với bác sĩ và người thân để được hỗ trợ tâm lý tốt nhất trong quá trình điều trị.
 
-Conclusion:
-Male infertility treatment requires coordination between medical expertise, lifestyle changes, and patience from both spouses. Early detection and examination at reputable specialized facilities will help increase the success rate and bring happiness to many families.
+Kết luận:
+Điều trị vô sinh nam đòi hỏi sự phối hợp giữa chuyên môn y tế, thay đổi lối sống, và sự kiên nhẫn của cả hai vợ chồng. Phát hiện và thăm khám sớm tại các cơ sở chuyên khoa uy tín sẽ giúp tăng tỷ lệ thành công và mang lại hạnh phúc cho nhiều gia đình.
  `.trim(),
   },
   {
     id: "2",
-    title: "What is penile hypersensitivity? How to deal with penile hypersensitivity?",
+    title: "Dương vật nhạy cảm là gì? Cách khắc phục dương vật nhạy cảm?",
     date: "2024-04-15",
     category: "sexual",
-    categoryName: "Sexual Health",
-    author: "MSc. MD. Tran Thi B",
+    categoryName: "Sức Khỏe Tình Dục",
+    author: "ThS. BS. Trần Thị B",
     authorImg: "https://randomuser.me/api/portraits/women/44.jpg",
     img: "https://cdn.diag.vn/2025/05/3222bb5d-duong-vat-nhay-cam-1.jpg",
     excerpt:
-      "Penile hypersensitivity (also known as premature ejaculation) is a condition where men reach climax and ejaculate too quickly during sexual intercourse. This article will help you understand the causes and effective remedies.",
+      "Dương vật nhạy cảm (còn gọi là xuất tinh sớm) là tình trạng nam giới đạt cực khoái và xuất tinh quá nhanh trong quá trình quan hệ tình dục. Bài viết này sẽ giúp bạn hiểu về nguyên nhân và các biện pháp khắc phục hiệu quả.",
     readingTime: "6",
     content: `
-What is penile hypersensitivity? How to deal with penile hypersensitivity?
+Dương vật nhạy cảm là gì? Cách khắc phục dương vật nhạy cảm?
 
-Penile hypersensitivity is a fairly common condition in men, but is rarely shared due to feelings of embarrassment. So what is penile hypersensitivity, what causes it, and how to address it? Let's explore in this article.
+Dương vật nhạy cảm là tình trạng khá phổ biến ở nam giới, nhưng ít được chia sẻ do cảm giác ngượng ngùng. Vậy dương vật nhạy cảm là gì, nguyên nhân và cách khắc phục ra sao? Hãy cùng tìm hiểu trong bài viết này.
 
-What is penile hypersensitivity?
+Dương vật nhạy cảm là gì?
 
-Penile hypersensitivity is a condition where the glans or the entire penis is easily overstimulated when there is physical or sexual stimulation. The most common manifestation is when even slight contact or exposure to a moist environment or clothing causes discomfort, "ticklish" sensations, or arousal too quickly. In some men, this can lead to premature ejaculation, making it difficult to control the timing of climax.
+Dương vật nhạy cảm là tình trạng quy đầu hoặc toàn bộ dương vật dễ bị kích thích quá mức khi có tác động vật lý hoặc kích thích tình dục. Biểu hiện phổ biến nhất là khi chỉ cần tiếp xúc nhẹ hoặc tiếp xúc với môi trường ẩm ướt, quần áo đã gây khó chịu, cảm giác "nhột" hoặc hưng phấn quá nhanh. Ở một số nam giới, điều này dẫn đến xuất tinh sớm, khó kiểm soát thời điểm đạt cực khoái.
 
-Causes of penile hypersensitivity
+Nguyên nhân dương vật nhạy cảm
 
-There are many causes that make the penis become sensitive, including:
+Có nhiều nguyên nhân khiến dương vật trở nên nhạy cảm, bao gồm:
 
-Foreskin that is too long or tight: Makes the glans less exposed to the external environment, so it's easily stimulated when there is contact.
-Poor hygiene: Causes the genital area to become infected, increasing discomfort and irritation.
-Psychological stress and anxiety: Makes the body more sensitive to sexual stimulation.
-Sensory nerve disorders: Some people have strongly developed peripheral nervous systems, leading to more sensitive sensations in the penis than normal.
+Bao quy đầu quá dài hoặc hẹp: Khiến quy đầu ít được tiếp xúc với môi trường bên ngoài, nên dễ bị kích thích khi có sự tiếp xúc.
+Vệ sinh kém: Gây nhiễm trùng vùng sinh dục, tăng cảm giác khó chịu và kích ứng.
+Căng thẳng tâm lý và lo lắng: Khiến cơ thể nhạy cảm hơn với kích thích tình dục.
+Rối loạn dây thần kinh cảm giác: Một số người có hệ thần kinh ngoại biên phát triển mạnh, dẫn đến cảm giác ở dương vật nhạy cảm hơn bình thường.
 
-How to deal with penile hypersensitivity?
+Cách khắc phục dương vật nhạy cảm?
 
-Here are some solutions for men with penile hypersensitivity:
+Sau đây là một số giải pháp cho nam giới bị dương vật nhạy cảm:
 
-Proper genital hygiene: Clean the penis and foreskin daily with clean water, avoid using soap or solutions with strong detergents.
-Circumcision: If the foreskin is long/tight, visit a reputable medical facility for consultation and circumcision procedure, helping the glans gradually get used to external stimulation.
-Practice emotional control: Relaxation, exercise, yoga, or breathing control skills help improve psychology, reduce hypersensitivity.
-Use condoms: Condoms not only help prevent disease transmission but also reduce penis sensitivity during intercourse.
-Consult experts: If the sensitivity affects sexual activity or family happiness, see a urologist for proper diagnosis and treatment.
+Vệ sinh bộ phận sinh dục đúng cách: Làm sạch dương vật và bao quy đầu hàng ngày bằng nước sạch, tránh sử dụng xà phòng hoặc dung dịch có chất tẩy rửa mạnh.
+Cắt bao quy đầu: Nếu bao quy đầu dài/hẹp, hãy đến cơ sở y tế uy tín để được tư vấn và thực hiện thủ thuật cắt bao quy đầu, giúp quy đầu dần làm quen với kích thích bên ngoài.
+Luyện tập kiểm soát cảm xúc: Các kỹ thuật thư giãn, tập thể dục, yoga, hay kỹ năng kiểm soát hơi thở giúp cải thiện tâm lý, giảm tình trạng nhạy cảm.
+Sử dụng bao cao su: Bao cao su không chỉ giúp phòng ngừa lây truyền bệnh mà còn giảm độ nhạy cảm của dương vật khi quan hệ.
+Tham khảo ý kiến chuyên gia: Nếu tình trạng nhạy cảm ảnh hưởng đến hoạt động tình dục hoặc hạnh phúc gia đình, hãy thăm khám bác sĩ nam khoa để được chẩn đoán và điều trị phù hợp.
 
-Conclusion:
-Penile hypersensitivity is not a serious problem if detected and treated properly. Men should not be insecure or hesitant, but take initiative in finding solutions to improve the quality of their sex life and protect reproductive health.    `.trim(),
+Kết luận:
+Dương vật nhạy cảm không phải vấn đề nghiêm trọng nếu được phát hiện và điều trị đúng cách. Nam giới không nên tự ti hay ngần ngại, mà hãy chủ động tìm giải pháp để cải thiện chất lượng đời sống tình dục và bảo vệ sức khỏe sinh sản.    `.trim(),
   },
   {
     id: "3",
-    title: "How to read semen analysis results: What's normal and what's weak?",
+    title: "Cách đọc kết quả tinh dịch đồ: Chỉ số nào bình thường, chỉ số nào yếu?",
     date: "2024-03-28",
     category: "reproductive",
-    categoryName: "Reproductive Health",
-    author: "Assoc. Prof. PhD. Le Van C",
+    categoryName: "Sức Khỏe Sinh Sản",
+    author: "PGS. TS. Lê Văn C",
     authorImg: "https://randomuser.me/api/portraits/men/62.jpg",
     img: "https://cdn.diag.vn/2025/05/5d00b4dc-cach-doc-ket-qua-tinh-dich-do-5.jpg",
     excerpt:
-      "Semen analysis is an important test that helps evaluate the quality of sperm in men. Understanding the indicators in semen analysis results will help men know whether their reproductive health status is normal or not.",
+      "Xét nghiệm tinh dịch đồ là một xét nghiệm quan trọng giúp đánh giá chất lượng tinh trùng ở nam giới. Hiểu được các chỉ số trong kết quả tinh dịch đồ sẽ giúp nam giới biết tình trạng sức khỏe sinh sản của mình có bình thường hay không.",
     readingTime: "10",
     content: `
-Do you know how to read semen analysis results to assess male reproductive health? In 10 minutes, this article provides detailed guidance on important indicators such as volume, density, motility, sperm morphology... What's normal, what's weak? When should you seek specialized examination? Read the article to correctly identify abnormalities, understand the meaning of each indicator, and receive advice from experts to improve sperm quality and increase chances of natural conception.
+Bạn đã biết cách đọc kết quả tinh dịch đồ để đánh giá sức khỏe sinh sản nam giới chưa? Trong 10 phút, bài viết này hướng dẫn chi tiết về các chỉ số quan trọng như thể tích, mật độ, khả năng di động, hình thái tinh trùng... Chỉ số nào là bình thường, chỉ số nào là yếu? Khi nào cần thăm khám chuyên sâu? Đọc bài viết để nhận biết đúng bất thường, hiểu ý nghĩa từng chỉ số và nhận lời khuyên từ chuyên gia để cải thiện chất lượng tinh trùng và tăng cơ hội thụ thai tự nhiên.
 
-Specifically, normal semen volume ranges from 1.5-5ml, sperm density above 15 million/ml, motility rate above 40%, normal morphology above 4%. If these indicators are lower than reference values, they may reflect poor sperm quality, affecting fertility. In addition, factors such as pH, color, and viscosity should also be noted. Semen analysis results are only part of the assessment; doctors will also rely on clinical findings and other tests to determine causes and treatment directions. Maintaining a healthy lifestyle, avoiding stress, proper nutrition, and periodic re-examination will help improve sperm quality, increase the chances of natural conception, and enhance the effectiveness of modern assisted reproductive techniques.
+Cụ thể, thể tích tinh dịch bình thường dao động từ 1,5-5ml, mật độ tinh trùng trên 15 triệu/ml, tỷ lệ di động trên 40%, hình thái bình thường trên 4%. Nếu các chỉ số này thấp hơn giá trị tham chiếu, có thể phản ánh chất lượng tinh trùng kém, ảnh hưởng đến khả năng sinh sản. Ngoài ra, các yếu tố như độ pH, màu sắc, độ nhớt cũng cần được lưu ý. Kết quả tinh dịch đồ chỉ là một phần của đánh giá; bác sĩ còn dựa vào lâm sàng và các xét nghiệm khác để xác định nguyên nhân và hướng điều trị. Duy trì lối sống lành mạnh, tránh stress, dinh dưỡng hợp lý và tái khám định kỳ sẽ giúp cải thiện chất lượng tinh trùng, tăng cơ hội thụ thai tự nhiên và nâng cao hiệu quả của các kỹ thuật hỗ trợ sinh sản hiện đại.
     `.trim(),
   },
   {
     id: "4",
-    title: "Vaginitis: Causes, symptoms and effective treatment methods",
+    title: "Viêm âm đạo: Nguyên nhân, triệu chứng và phương pháp điều trị hiệu quả",
     date: "2024-03-10",
     category: "reproductive",
-    categoryName: "Reproductive Health",
-    author: "PhD. MD. Pham Thi D",
+    categoryName: "Sức Khỏe Sinh Sản",
+    author: "TS. BS. Phạm Thị D",
     authorImg: "https://randomuser.me/api/portraits/women/32.jpg",
     img: "https://tamanhhospital.vn/wp-content/uploads/2021/05/viem-nhiem-vung-kin.jpeg",
     excerpt:
-      "Vaginitis is a common condition in women of reproductive age. This article will help you understand the signs of recognition, causes and how to effectively treat vaginitis at home and when to see a doctor.",
+      "Viêm âm đạo là tình trạng phổ biến ở phụ nữ trong độ tuổi sinh sản. Bài viết này sẽ giúp bạn hiểu về dấu hiệu nhận biết, nguyên nhân và cách điều trị viêm âm đạo hiệu quả tại nhà và khi nào cần đến bác sĩ.",
     readingTime: "7",
     content: `
-Vaginitis is a common gynecological disease that affects women's health and life. In 7 minutes of reading, this article provides information about causes (bacteria, fungi, viruses...), typical symptoms (itching, abnormal discharge, pain during intercourse...) and effective treatment methods at home as well as indications to see a doctor when necessary. Additionally, there are prevention tips to protect your reproductive health.
+Viêm âm đạo là bệnh phụ khoa phổ biến ảnh hưởng đến sức khỏe và cuộc sống của phụ nữ. Trong 7 phút đọc, bài viết cung cấp thông tin về nguyên nhân (vi khuẩn, nấm, virus...), triệu chứng điển hình (ngứa, khí hư bất thường, đau khi quan hệ...) và phương pháp điều trị hiệu quả tại nhà cũng như chỉ định đi khám bác sĩ khi cần thiết. Ngoài ra còn có các lời khuyên phòng ngừa để bảo vệ sức khỏe sinh sản của bạn.
 
-The most common causes of vaginitis are bacterial infections, Candida fungi, or Trichomonas. Symptoms may include foul-smelling discharge, abnormal color, itching, burning pain during intercourse or urination. For effective treatment, you need to clean the genital area properly, avoid using soaps with strong detergents, avoid deep douching, and follow the doctor's treatment regimen. Some cases may require vaginal medication, oral medication, or a combination of both. Post-treatment follow-up is very important to prevent recurrence. Additionally, you should wear breathable underwear, keep the genital area dry, and avoid unsafe sexual intercourse. If you have unusual signs that persist or don't respond to treatment, visit a hospital for consultation and specialized intervention.
+Nguyên nhân phổ biến nhất gây viêm âm đạo là do nhiễm khuẩn vi khuẩn, nấm Candida, hoặc Trichomonas. Triệu chứng có thể bao gồm khí hư có mùi hôi, màu sắc bất thường, ngứa, đau rát khi quan hệ hoặc đi tiểu. Để điều trị hiệu quả, bạn cần vệ sinh vùng kín đúng cách, tránh sử dụng xà phòng có chất tẩy rửa mạnh, tránh thụt rửa sâu bên trong, và tuân thủ phác đồ điều trị của bác sĩ. Một số trường hợp có thể cần thuốc đặt âm đạo, thuốc uống, hoặc kết hợp cả hai. Tái khám sau điều trị rất quan trọng để phòng ngừa tái phát. Ngoài ra, bạn nên mặc đồ lót thoáng khí, giữ vùng kín khô ráo, tránh quan hệ tình dục không an toàn. Nếu có dấu hiệu bất thường kéo dài hoặc không đáp ứng với điều trị, hãy đến bệnh viện để được tư vấn và can thiệp chuyên sâu.
     `.trim(),
   },
   {
     id: "5",
-    title: "Understanding the menstrual cycle - What women need to know",
+    title: "Hiểu về chu kỳ kinh nguyệt - Điều phụ nữ cần biết",
     date: "2024-02-20",
     category: "education",
-    categoryName: "Sex Education",
-    author: "MSc. MD. Nguyen Thi E",
+    categoryName: "Giáo Dục Giới Tính",
+    author: "ThS. BS. Nguyễn Thị E",
     authorImg: "https://randomuser.me/api/portraits/women/68.jpg",
     img: "https://tamanhhospital.vn/wp-content/uploads/2023/05/chu-ky-kinh-nguyet.jpg",
     excerpt:
-      "The menstrual cycle is an important part of women's reproductive health. This article will help you understand the stages of the cycle, hormonal changes, and how to track your cycle to better understand your health.",
+      "Chu kỳ kinh nguyệt là một phần quan trọng trong sức khỏe sinh sản của phụ nữ. Bài viết này sẽ giúp bạn hiểu về các giai đoạn của chu kỳ, những thay đổi hormone và cách theo dõi chu kỳ để hiểu rõ hơn về sức khỏe của mình.",
     readingTime: "9",
     content: `
-The menstrual cycle is a natural physiological process that reflects women's reproductive health. In 9 minutes, this article clearly explains each stage of the cycle, normal signs, hormonal changes, and common issues. You will learn how to track, identify abnormalities, and get advice to better care for your health every day.
+Chu kỳ kinh nguyệt là quá trình sinh lý tự nhiên phản ánh sức khỏe sinh sản của phụ nữ. Trong 9 phút đọc, bài viết giải thích rõ từng giai đoạn của chu kỳ, các dấu hiệu bình thường, sự thay đổi hormone và những vấn đề thường gặp. Bạn sẽ biết cách theo dõi, nhận biết bất thường và nhận lời khuyên để chăm sóc sức khỏe tốt hơn mỗi ngày.
 
-Each menstrual cycle typically lasts 28-35 days, including stages: menstruation, follicular phase, ovulation, and luteal phase. Changes in estrogen and progesterone hormones control this entire process, affecting mood, skin, reproductive health, and fertility. When there are abnormal signs such as delayed periods, menorrhagia, severe abdominal pain, or changes in menstrual blood volume, you should see a doctor for early diagnosis of issues like hormonal disorders, uterine fibroids, or endometriosis. Tracking your cycle with apps or personal notes helps you be proactive in health care and appropriate reproductive planning. Additionally, maintaining a balanced diet, exercising, and managing stress also contribute to stabilizing the menstrual cycle and improving overall health.
+Mỗi chu kỳ kinh nguyệt thường kéo dài 28-35 ngày, bao gồm các giai đoạn: kỳ kinh nguyệt, giai đoạn nang noãn, rụng trứng và giai đoạn hoàng thể. Sự thay đổi của hormone estrogen và progesterone điều khiển toàn bộ quá trình này, ảnh hưởng đến tâm trạng, làn da, sức khỏe sinh sản và khả năng sinh sản. Khi có dấu hiệu bất thường như trễ kinh, rong kinh, đau bụng dữ dội, hoặc thay đổi về lượng máu kinh nguyệt, bạn nên đi khám bác sĩ để được chẩn đoán sớm các vấn đề như rối loạn hormone, u xơ tử cung, hay lạc nội mạc tử cung. Theo dõi chu kỳ bằng các ứng dụng hoặc ghi chú cá nhân giúp bạn chủ động trong việc chăm sóc sức khỏe và lên kế hoạch sinh sản phù hợp. Ngoài ra, duy trì chế độ ăn uống cân bằng, tập thể dục, quản lý stress cũng góp phần ổn định chu kỳ kinh nguyệt và cải thiện sức khỏe tổng thể.
     `.trim(),
   },
   {
     id: "6",
     title:
-      "Modern contraceptive methods: Pros and cons and how to choose",
+      "Các phương pháp tránh thai hiện đại: Ưu nhược điểm và cách lựa chọn",
     date: "2024-01-15",
     category: "education",
-    categoryName: "Sex Education",
-    author: "PhD. MD. Hoang Van F",
+    categoryName: "Giáo Dục Giới Tính",
+    author: "TS. BS. Hoàng Văn F",
     authorImg: "https://randomuser.me/api/portraits/men/78.jpg",
     img: "https://data-service.pharmacity.io/pmc-upload-media/production/pmc-ecm-asm/blog/luu-y-khi-chon-bien-phap-tranh-thai.webp",
     excerpt:
-      "There are currently many contraceptive methods with different effectiveness. This article will provide detailed information about common contraceptive methods, helping you make choices suitable for your health condition and personal needs.",
+      "Hiện nay có rất nhiều phương pháp tránh thai với hiệu quả khác nhau. Bài viết này sẽ cung cấp thông tin chi tiết về các phương pháp tránh thai phổ biến, giúp bạn đưa ra lựa chọn phù hợp với tình trạng sức khỏe và nhu cầu cá nhân.",
     readingTime: "8",
     content: `
-Want to choose the right contraceptive method? This article compiles modern contraceptive methods such as oral contraceptives, IUDs, condoms, implants, tubal ligation..., analyzing the pros and cons of each method in 8 minutes of reading. You'll gain knowledge to make decisions based on personal needs, health conditions, and expert advice.
+Muốn chọn phương pháp tránh thai phù hợp? Bài viết tổng hợp các phương pháp tránh thai hiện đại như thuốc uống, vòng tránh thai, bao cao su, que cấy, thắt ống dẫn trứng..., phân tích ưu nhược điểm của từng phương pháp trong 8 phút đọc. Bạn sẽ có kiến thức để đưa ra quyết định dựa trên nhu cầu cá nhân, tình trạng sức khỏe và lời khuyên của chuyên gia.
 
-Contraceptive pills help effectively control reproduction but may cause side effects like nausea, weight gain, or menstrual disorders. Intrauterine devices (IUDs) are suitable for women who have had children, have long-term effects but may cause abdominal pain or infections. Contraceptive implants are simple, highly effective, with effects lasting 3-5 years but at a higher cost. Condoms are a common, easy-to-use method that also prevents sexually transmitted diseases but may reduce sensation. Tubal ligation or vasectomy are permanent methods, suitable for people who no longer want children. To choose an appropriate method, you should consult a doctor, consider your health condition, personal needs, and future reproductive plans.
+Thuốc tránh thai giúp kiểm soát sinh sản hiệu quả nhưng có thể gây tác dụng phụ như buồn nôn, tăng cân, hoặc rối loạn kinh nguyệt. Vòng tránh thai (IUD) phù hợp với phụ nữ đã sinh con, có tác dụng lâu dài nhưng có thể gây đau bụng hoặc nhiễm trùng. Que cấy tránh thai đơn giản, hiệu quả cao, có tác dụng kéo dài 3-5 năm nhưng chi phí cao hơn. Bao cao su là phương pháp phổ biến, dễ sử dụng, còn phòng ngừa được bệnh lây qua đường tình dục nhưng có thể làm giảm cảm giác. Thắt ống dẫn trứng hoặc thắt ống dẫn tinh là phương pháp vĩnh viễn, phù hợp với người không còn mong muốn có con. Để lựa chọn phương pháp phù hợp, bạn nên tham khảo ý kiến bác sĩ, cân nhắc tình trạng sức khỏe, nhu cầu cá nhân và kế hoạch sinh sản trong tương lai.
     `.trim(),
   },
   {
     id: "7",
-    title: "Stress and reproductive health: A little-known connection",
+    title: "Stress và sức khỏe sinh sản: Mối liên hệ ít được biết đến",
     date: "2023-12-12",
     category: "mental",
-    categoryName: "Mental Health",
-    author: "Assoc. Prof. PhD. Tran Van G",
+    categoryName: "Sức Khỏe Tâm Thần",
+    author: "PGS. TS. Trần Văn G",
     authorImg: "https://randomuser.me/api/portraits/men/42.jpg",
     img: "https://suckhoedoisong.qltns.mediacdn.vn/324455921873985536/2023/2/3/stress-16754076175341168140385.jpg",
     excerpt:
-      "Prolonged stress can seriously affect the fertility of both men and women. This article analyzes the connection between stress and reproductive health, while providing effective stress reduction measures.",
+      "Stress kéo dài có thể ảnh hưởng nghiêm trọng đến khả năng sinh sản của cả nam và nữ. Bài viết phân tích mối liên hệ giữa stress và sức khỏe sinh sản, đồng thời đưa ra các biện pháp giảm stress hiệu quả.",
     readingTime: "7",
     content: `
-Stress is a silent factor affecting reproductive health but is often overlooked. With just 7 minutes of reading, this article analyzes the connection between stress and male and female fertility, warning signs that stress is harming reproductive health, and effective stress reduction methods to help you protect and improve overall health as well as quality of life.
+Stress là yếu tố thầm lặng ảnh hưởng đến sức khỏe sinh sản nhưng thường bị bỏ qua. Chỉ với 7 phút đọc, bài viết phân tích mối liên hệ giữa stress và khả năng sinh sản của nam và nữ, những dấu hiệu cảnh báo stress đang gây hại cho sức khỏe sinh sản, và các phương pháp giảm stress hiệu quả giúp bạn bảo vệ và nâng cao sức khỏe tổng thể cũng như chất lượng cuộc sống.
 
-Prolonged stress disrupts hormones, reduces sexual desire, affects women's menstrual cycles, and reduces sperm quality in men. Manifestations may include insomnia, anxiety, irritability, decreased work efficiency, and physiological disorders. To reduce stress, you should build a healthy lifestyle: regular exercise, maintain a balanced diet, keep regular sleep habits, participate in relaxing activities such as yoga, meditation, or reading. If you feel prolonged stress affecting your health, seek support from a psychologist or doctor for timely advice and treatment. Awareness of the impact of stress on reproductive health will help you actively prevent and improve quality of life.
+Stress kéo dài làm rối loạn hormone, giảm ham muốn tình dục, ảnh hưởng đến chu kỳ kinh nguyệt ở nữ, và giảm chất lượng tinh trùng ở nam giới. Biểu hiện có thể là mất ngủ, lo âu, cáu gắt, giảm hiệu quả công việc, và rối loạn sinh lý. Để giảm stress, bạn nên xây dựng lối sống lành mạnh: tập thể dục thường xuyên, duy trì chế độ ăn uống cân bằng, giữ thói quen ngủ đều đặn, tham gia các hoạt động thư giãn như yoga, thiền, hoặc đọc sách. Nếu bạn cảm thấy stress kéo dài ảnh hưởng đến sức khỏe, hãy tìm kiếm sự hỗ trợ từ chuyên gia tâm lý hoặc bác sĩ để được tư vấn và điều trị kịp thời. Nhận thức được tác động của stress đến sức khỏe sinh sản sẽ giúp bạn chủ động phòng ngừa và cải thiện chất lượng cuộc sống.
     `.trim(),
   },
   {
     id: "8",
     title:
-      "Signs of sexually transmitted diseases you shouldn't ignore",
+      "Dấu hiệu bệnh lây truyền qua đường tình dục bạn không nên bỏ qua",
     date: "2023-11-05",
     category: "sexual",
-    categoryName: "Sexual Health",
-    author: "PhD. MD. Le Thi H",
+    categoryName: "Sức Khỏe Tình Dục",
+    author: "TS. BS. Lê Thị H",
     authorImg: "https://randomuser.me/api/portraits/women/22.jpg",
     img: "https://medlatec.vn/media/29903/file/benh-lau.jpg",
     excerpt:
-      "Sexually transmitted diseases may not have clear symptoms in the early stages. This article helps you recognize early warning signs and provides guidance on effective prevention.",
+      "Các bệnh lây truyền qua đường tình dục có thể không có triệu chứng rõ ràng trong giai đoạn đầu. Bài viết này giúp bạn nhận biết các dấu hiệu cảnh báo sớm và đưa ra hướng dẫn về phòng ngừa hiệu quả.",
     readingTime: "9",
     content: `
-Sexually transmitted diseases (STDs) often progress silently with symptoms that are difficult to recognize. In 9 minutes of reading, this article points out signs you shouldn't ignore, guides early recognition of diseases, the harms of delayed treatment, and effective prevention measures to protect your health and the community.
+Các bệnh lây truyền qua đường tình dục (STDs) thường tiến triển thầm lặng với các triệu chứng khó nhận biết. Trong 9 phút đọc, bài viết chỉ ra những dấu hiệu bạn không nên bỏ qua, hướng dẫn nhận biết sớm bệnh, tác hại của việc điều trị muộn, và các biện pháp phòng ngừa hiệu quả để bảo vệ sức khỏe bản thân và cộng đồng.
 
-Early signs of STDs can include pimples, sores, itching or abnormal discharge in the genital area, painful urination, pain during intercourse, swollen groin lymph nodes, or mild fever. However, many cases have no symptoms or very mild symptoms that are easily overlooked, leading to serious complications such as infertility, cervical cancer, pelvic inflammation, or transmission to partners. For prevention, you should practice safe sex, get regular health checks, use condoms, and avoid sharing personal items. When you detect unusual symptoms, visit a medical facility for early examination and treatment, helping to protect yourself and those around you from the risk of contracting these dangerous diseases.
+Các dấu hiệu sớm của STDs có thể bao gồm mụn, vết loét, ngứa hoặc chất tiết bất thường ở vùng sinh dục, đau rát khi đi tiểu, đau khi quan hệ tình dục, sưng hạch bẹn, hoặc sốt nhẹ. Tuy nhiên, nhiều trường hợp không có triệu chứng hoặc triệu chứng rất nhẹ dễ bị bỏ qua, dẫn đến biến chứng nghiêm trọng như vô sinh, ung thư cổ tử cung, viêm vùng chậu, hoặc lây truyền cho bạn tình. Để phòng ngừa, bạn nên thực hành tình dục an toàn, kiểm tra sức khỏe định kỳ, sử dụng bao cao su, và tránh dùng chung vật dụng cá nhân. Khi phát hiện các triệu chứng bất thường, hãy đến cơ sở y tế để được thăm khám và điều trị sớm, giúp bảo vệ bản thân và những người xung quanh khỏi nguy cơ mắc các bệnh nguy hiểm này.
     `.trim(),
   },
 ];
 
-export default blogPosts;
+export default blogData;

@@ -5,14 +5,14 @@ import { motion } from "framer-motion";
 import { Search } from "lucide-react";
 
 // Blog data should be moved to a separate file
-import { blogPosts } from "../data/blogData";
+import { blogData } from "../data/blogData";
 
 const categories = [
-  { id: "all", name: "All articles" },
-  { id: "reproductive", name: "Reproductive health" },
-  { id: "sexual", name: "Sexual health" },
-  { id: "mental", name: "Mental health" },
-  { id: "education", name: "Sex education" },
+  { id: "all", name: "Tất cả bài viết" },
+  { id: "reproductive", name: "Sức khỏe sinh sản" },
+  { id: "sexual", name: "Sức khỏe tình dục" },
+  { id: "mental", name: "Sức khỏe tâm thần" },
+  { id: "education", name: "Giáo dục giới tính" },
 ];
 
 function Blog() {
@@ -20,7 +20,7 @@ function Blog() {
   const [activeCategory, setActiveCategory] = useState("all");
 
   // Filter blog posts by category and search term
-  const filteredBlogs = blogPosts
+  const filteredBlogs = blogData
     .sort((a, b) => new Date(b.date) - new Date(a.date)) // Sort by newest date
     .map((blog) => ({
       ...blog,
@@ -47,7 +47,7 @@ function Blog() {
               transition={{ duration: 0.5 }}
               className="text-4xl font-extrabold tracking-tight sm:text-5xl"
             >
-              Gender Health News
+              Tin Tức Sức Khỏe Giới Tính
             </motion.h1>
             <motion.p
               initial={{ opacity: 0, y: 20 }}
@@ -55,8 +55,8 @@ function Blog() {
               transition={{ duration: 0.5, delay: 0.2 }}
               className="mt-4 text-lg"
             >
-              Explore knowledge, news, and guidance on reproductive health, 
-              sexual health, and gender issues from experts
+              Khám phá kiến thức, tin tức, và hướng dẫn về sức khỏe sinh sản, 
+              sức khỏe tình dục, và các vấn đề giới tính từ các chuyên gia
             </motion.p>
 
             {/* Search box */}
@@ -64,7 +64,7 @@ function Blog() {
               <div className="relative">
                 <input
                   type="text"
-                  placeholder="Search articles..."
+                  placeholder="Tìm kiếm bài viết..."
                   value={searchTerm}
                   onChange={(e) => setSearchTerm(e.target.value)}
                   className="w-full pl-5 pr-12 py-3.5 rounded-full text-gray-800 
@@ -120,7 +120,7 @@ function Blog() {
                   </div>
                   <div className="p-8 md:w-1/2 flex flex-col justify-center">
                     <div className="uppercase tracking-wide text-sm text-indigo-600 font-semibold">
-                      Featured Article
+                      Bài Viết Nổi Bật
                     </div>
                     <h2 className="mt-2 text-2xl font-bold text-gray-900 hover:text-indigo-600 transition-colors">
                       {filteredBlogs[0].title}
@@ -136,16 +136,16 @@ function Blog() {
                             filteredBlogs[0].authorImg ||
                             "https://images.unsplash.com/photo-1494790108377-be9c29b29330?ixlib=rb-1.2.1&ixid=eyJhcHBfaWQiOjEyMDd9&auto=format&fit=facearea&facepad=2&w=256&h=256&q=80"
                           }
-                          alt={filteredBlogs[0].author || "Author"}
+                          alt={filteredBlogs[0].author || "Tác giả"}
                         />
                       </div>
                       <div className="ml-3">
                         <p className="text-sm font-medium text-gray-900">
-                          {filteredBlogs[0].author || "Gender Healthcare Team"}
+                          {filteredBlogs[0].author || "Đội Chăm Sóc Sức Khỏe Giới Tính"}
                         </p>
                         <p className="text-sm text-gray-500">
                           {new Date(filteredBlogs[0].date).toLocaleDateString(
-                            "en-US",
+                            "vi-VN",
                             {
                               year: "numeric",
                               month: "long",
@@ -165,7 +165,7 @@ function Blog() {
         {/* Filter status */}
         {searchTerm && (
           <p className="text-gray-600 mb-4">
-            Showing {filteredBlogs.length} results for "{searchTerm}"
+            Hiển thị {filteredBlogs.length} kết quả cho "{searchTerm}"
           </p>
         )}
 
@@ -173,10 +173,10 @@ function Blog() {
         {filteredBlogs.length === 0 ? (
           <div className="text-center py-12">
             <h3 className="text-xl font-medium text-gray-900">
-              No articles found
+              Không tìm thấy bài viết nào
             </h3>
             <p className="mt-2 text-gray-500">
-              Please try another keyword or select a different category
+              Vui lòng thử từ khóa khác hoặc chọn danh mục khác
             </p>
           </div>
         ) : (
@@ -200,10 +200,10 @@ function Blog() {
                     <div className="p-6">
                       <div className="flex items-center space-x-2 mb-2">
                         <span className="inline-block px-2 py-1 text-xs font-semibold bg-indigo-100 text-indigo-800 rounded-full">
-                          {blog.categoryName || "Health"}
+                          {blog.categoryName || "Sức khỏe"}
                         </span>
                         <span className="text-sm text-gray-500">
-                          {new Date(blog.date).toLocaleDateString("en-US", {
+                          {new Date(blog.date).toLocaleDateString("vi-VN", {
                             year: "numeric",
                             month: "long",
                             day: "numeric",
@@ -223,10 +223,10 @@ function Blog() {
                             blog.authorImg ||
                             "https://images.unsplash.com/photo-1494790108377-be9c29b29330?ixlib=rb-1.2.1&ixid=eyJhcHBfaWQiOjEyMDd9&auto=format&fit=facearea&facepad=2&w=256&h=256&q=80"
                           }
-                          alt={blog.author || "Author"}
+                          alt={blog.author || "Tác giả"}
                         />
                         <span className="text-sm font-medium text-gray-900">
-                          {blog.author || "Gender Healthcare Team"}
+                          {blog.author || "Đội Chăm Sóc Sức Khỏe Giới Tính"}
                         </span>
                       </div>
                     </div>
@@ -241,26 +241,26 @@ function Blog() {
         <div className="mt-16 bg-white rounded-lg shadow-lg overflow-hidden">
           <div className="md:flex">
             <div className="md:w-1/2 bg-indigo-700 p-8 text-white flex flex-col justify-center">
-              <h3 className="text-2xl font-bold mb-4">Subscribe to our newsletter</h3>
+              <h3 className="text-2xl font-bold mb-4">Đăng ký nhận bản tin</h3>
               <p className="mb-6">
-                Get the latest information on gender health via email.
-                We won't spam or share your information.
+                Nhận thông tin mới nhất về sức khỏe giới tính qua email.
+                Chúng tôi sẽ không gửi thư rác hoặc chia sẻ thông tin của bạn.
               </p>
               <div className="flex flex-col sm:flex-row">
                 <input
                   type="email"
-                  placeholder="Your email"
+                  placeholder="Email của bạn"
                   className="px-4 py-2 w-full sm:w-auto rounded-l text-white focus:outline-none border border-gray-300 focus:ring-2 focus:ring-indigo-500 focus:border-transparent transition-colors"
                 />
                 <button className="mt-2 sm:mt-0 bg-white text-indigo-700 font-medium px-4 py-2 rounded-r hover:bg-gray-100 transition-colors">
-                  Subscribe
+                  Đăng ký
                 </button>
               </div>
             </div>
             <div className="md:w-1/2">
               <img
                 src="https://images.unsplash.com/photo-1573164713988-8665fc963095?ixlib=rb-1.2.1&auto=format&fit=crop&w=600&q=80"
-                alt="Newsletter"
+                alt="Bản tin"
                 className="w-full h-64 md:h-full object-cover"
               />
             </div>

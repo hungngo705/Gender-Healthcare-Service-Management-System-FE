@@ -17,7 +17,7 @@ function Login() {
     e.preventDefault();
 
     if (!email || !password) {
-      setError("Please enter both email and password");
+      setError("Vui lòng nhập cả email và mật khẩu");
       return;
     }
 
@@ -26,10 +26,10 @@ function Login() {
 
     try {
       const user = await authService.login(email, password);
-      login(user); // Use AuthContext to save user and update authentication state
-      navigate("/"); // Navigate to homepage after successful login
+      login(user); // Sử dụng AuthContext để lưu thông tin người dùng và cập nhật trạng thái xác thực
+      navigate("/"); // Chuyển đến trang chủ sau khi đăng nhập thành công
     } catch (err) {
-      setError(err.message || "Login failed. Please check your credentials.");
+      setError(err.message || "Đăng nhập thất bại. Vui lòng kiểm tra thông tin đăng nhập của bạn.");
     } finally {
       setIsLoggingIn(false);
     }
@@ -43,7 +43,7 @@ function Login() {
         animate={{ opacity: 1, scale: 1 }}
         transition={{ duration: 0.5 }}
       >
-        {/* Left side - Gradient background */}
+        {/* Bên trái - Nền gradient */}
         <motion.div
           className="relative flex flex-col flex-1 bg-gradient-to-br from-blue-600 to-purple-600 p-10 text-white"
           initial={{ x: -50, opacity: 0 }}
@@ -69,14 +69,14 @@ function Login() {
             </motion.div>
           </div>
 
-          {/* Welcome text */}
+          {/* Văn bản chào mừng */}
           <motion.div
             initial={{ y: 20, opacity: 0 }}
             animate={{ y: 0, opacity: 1 }}
             transition={{ delay: 0.3 }}
           >
-            <h1 className="text-3xl font-bold mb-4">Welcome Back</h1>
-            <p className="opacity-90">Sign in to your healthcare account</p>
+            <h1 className="text-3xl font-bold mb-4">Chào Mừng Trở Lại</h1>
+            <p className="opacity-90">Đăng nhập vào tài khoản chăm sóc sức khỏe của bạn</p>
           </motion.div>
 
           <motion.div
@@ -85,7 +85,7 @@ function Login() {
             animate={{ y: 0, opacity: 1 }}
             transition={{ delay: 0.4 }}
           >
-            <p className="text-lg font-bold mb-2">Key features</p>
+            <p className="text-lg font-bold mb-2">Tính năng chính</p>
             <ul className="space-y-2">
               <li className="flex items-center">
                 <svg
@@ -99,7 +99,7 @@ function Login() {
                     clipRule="evenodd"
                   ></path>
                 </svg>
-                Specialized gender healthcare
+                Chăm sóc sức khỏe giới tính chuyên biệt
               </li>
               <li className="flex items-center">
                 <svg
@@ -113,12 +113,12 @@ function Login() {
                     clipRule="evenodd"
                   ></path>
                 </svg>
-                Private and secure
+                Riêng tư và bảo mật
               </li>
             </ul>
           </motion.div>
 
-          {/* Decorative circles */}
+          {/* Hình trang trí */}
           <motion.div
             className="absolute w-24 h-24 rounded-full bg-cyan-400/50 top-1/3 left-2/3"
             animate={{
@@ -145,7 +145,7 @@ function Login() {
           ></motion.div>
         </motion.div>
 
-        {/* Right side - Login form */}
+        {/* Bên phải - Biểu mẫu đăng nhập */}
         <motion.div
           className="flex-1 p-10 flex flex-col justify-center"
           initial={{ x: 50, opacity: 0 }}
@@ -164,7 +164,7 @@ function Login() {
             animate={{ opacity: 1 }}
             transition={{ delay: 0.2 }}
           >
-            Sign In
+            Đăng Nhập
           </motion.h2>
           {error && (
             <motion.div
@@ -183,7 +183,7 @@ function Login() {
             >
               <input
                 type="email"
-                placeholder="Email Address"
+                placeholder="Địa Chỉ Email"
                 value={email}
                 onChange={(e) => setEmail(e.target.value)}
                 required
@@ -197,7 +197,7 @@ function Login() {
             >
               <input
                 type="password"
-                placeholder="Password"
+                placeholder="Mật Khẩu"
                 value={password}
                 onChange={(e) => setPassword(e.target.value)}
                 required
@@ -211,7 +211,7 @@ function Login() {
               transition={{ delay: 0.5 }}
             >
               <a href="#" className="text-sm text-blue-600 hover:underline">
-                Forgot Password?
+                Quên Mật Khẩu?
               </a>
             </motion.div>{" "}
             <motion.button
@@ -246,11 +246,11 @@ function Login() {
                       d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"
                     ></path>
                   </svg>
-                  SIGNING IN...
+                  ĐANG ĐĂNG NHẬP...
                 </>
               ) : (
                 <>
-                  CONTINUE
+                  TIẾP TỤC
                   <svg
                     xmlns="http://www.w3.org/2000/svg"
                     className="h-5 w-5 ml-2"
@@ -273,9 +273,9 @@ function Login() {
             animate={{ opacity: 1 }}
             transition={{ delay: 0.7 }}
           >
-            <span className="text-gray-600">Don't have an account?</span>{" "}
+            <span className="text-gray-600">Chưa có tài khoản?</span>{" "}
             <Link to="/signup" className="text-blue-600 hover:underline">
-              Create Account
+              Tạo Tài Khoản
             </Link>
           </motion.div>
           <motion.div
@@ -285,7 +285,7 @@ function Login() {
             transition={{ delay: 0.8 }}
           >
             <Link to="/" className="text-blue-600 hover:underline">
-              Continue without logging in
+              Tiếp tục mà không cần đăng nhập
             </Link>
           </motion.div>
         </motion.div>
