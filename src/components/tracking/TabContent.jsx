@@ -1,8 +1,6 @@
 import React from "react";
 import CalendarView from "./CalendarView";
 import OvulationPredictor from "./OvulationPrediction";
-import CycleHistory from "./CycleHistory";
-import SymptomsTracker from "./SymptomsTracker";
 import Settings from "./Settings";
 
 const TabContent = ({ activeTab }) => {
@@ -12,10 +10,6 @@ const TabContent = ({ activeTab }) => {
         return <CalendarView />;
       case "prediction":
         return <OvulationPredictor />;
-      case "history":
-        return <CycleHistory />;
-      case "symptoms":
-        return <SymptomsTracker />;
       case "settings":
         return <Settings />;
       default:

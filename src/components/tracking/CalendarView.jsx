@@ -66,7 +66,7 @@ const CalendarView = () => {
 
   return (
     <div className="space-y-8">
-      <h2 className="text-2xl font-bold text-gray-800">Cycle Calendar</h2>
+      <h2 className="text-2xl font-bold text-gray-800">Lịch Theo Dõi Chu Kỳ</h2>
 
       {/* Calendar Widget */}
       <div className="bg-white border border-gray-200 rounded-lg overflow-hidden">
@@ -99,7 +99,7 @@ const CalendarView = () => {
               onClick={() => setCurrentMonth(new Date())}
               className="px-3 py-1 text-sm border border-gray-300 rounded hover:bg-gray-100"
             >
-              Today
+              Hôm Nay
             </button>
             <button
               onClick={nextMonth}
@@ -124,7 +124,7 @@ const CalendarView = () => {
         <div className="p-4">
           {/* Day headers */}
           <div className="grid grid-cols-7 gap-2 mb-2">
-            {["Sun", "Mon", "Tue", "Wed", "Thu", "Fri", "Sat"].map((day) => (
+            {["CN", "T2", "T3", "T4", "T5", "T6", "T7"].map((day) => (
               <div
                 key={day}
                 className="text-center text-gray-500 text-sm font-medium"
@@ -197,20 +197,20 @@ const CalendarView = () => {
       {/* Legend */}
       <div className="bg-white border border-gray-200 rounded-lg p-4">
         <h3 className="text-sm font-semibold text-gray-700 mb-3">
-          Calendar Legend
+          Chú Thích Lịch
         </h3>
         <div className="flex flex-wrap gap-4">
           <div className="flex items-center">
             <span className="w-4 h-4 rounded-full bg-red-100 mr-2"></span>
-            <span className="text-sm text-gray-600">Period</span>
+            <span className="text-sm text-gray-600">Kỳ Kinh Nguyệt</span>
           </div>
           <div className="flex items-center">
             <span className="w-4 h-4 rounded-full bg-indigo-600 mr-2"></span>
-            <span className="text-sm text-gray-600">Ovulation Day</span>
+            <span className="text-sm text-gray-600">Ngày Rụng Trứng</span>
           </div>
           <div className="flex items-center">
             <span className="w-4 h-4 rounded-full bg-indigo-100 mr-2"></span>
-            <span className="text-sm text-gray-600">Fertile Window</span>
+            <span className="text-sm text-gray-600">Thời Kỳ Sinh Sản</span>
           </div>
         </div>
       </div>

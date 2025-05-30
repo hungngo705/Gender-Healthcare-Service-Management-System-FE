@@ -2,11 +2,9 @@ import React from "react";
 
 const TabNavigator = ({ activeTab, setActiveTab }) => {
   const tabs = [
-    { id: "calendar", label: "Calendar View" },
-    { id: "prediction", label: "Ovulation Prediction" },
-    { id: "history", label: "Cycle History" },
-    { id: "symptoms", label: "Symptoms Tracker" },
-    { id: "settings", label: "Settings" },
+    { id: "calendar", label: "Xem Lịch Chu Kỳ" },
+    { id: "prediction", label: "Dự đoán thời gian thụ thai" },
+    { id: "settings", label: "Cài đặt thông báo" },
   ];
 
   return (

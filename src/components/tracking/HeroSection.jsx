@@ -6,11 +6,11 @@ function HeroSection() {
       <div className="max-w-5xl mx-auto">
         <div className="text-center mb-8">
           <h1 className="text-4xl font-bold mb-4 sm:text-5xl">
-            Cycle Tracking & Ovulation Prediction
+            Theo Dõi Chu Kỳ & Dự Đoán Rụng Trứng
           </h1>
           <p className="text-xl max-w-3xl mx-auto">
-            Take control of your reproductive health with our comprehensive
-            tracking tools designed to help you understand your unique cycle.
+            Kiểm soát sức khỏe sinh sản của bạn với các công cụ theo dõi toàn diện 
+            được thiết kế để giúp bạn hiểu chu kỳ độc đáo của mình.
           </p>
         </div>
 
@@ -19,7 +19,7 @@ function HeroSection() {
             href="#calendar"
             className="px-6 py-3 bg-white text-indigo-900 rounded-full font-medium hover:bg-opacity-90 transition-all flex items-center"
           >
-            View Calendar
+            Xem Lịch
             <svg
               xmlns="http://www.w3.org/2000/svg"
               className="h-5 w-5 ml-1"
@@ -37,7 +37,7 @@ function HeroSection() {
             href="#prediction"
             className="px-6 py-3 bg-transparent border border-white text-white rounded-full font-medium hover:bg-white hover:bg-opacity-10 transition-all flex items-center"
           >
-            Ovulation Prediction
+            Dự Đoán Rụng Trứng
             <svg
               xmlns="http://www.w3.org/2000/svg"
               className="h-5 w-5 ml-1"

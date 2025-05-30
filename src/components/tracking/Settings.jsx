@@ -43,22 +43,22 @@ const Settings = () => {
   const handleSaveSettings = (e) => {
     e.preventDefault();
     // Would save to backend in real app
-    alert("Settings saved successfully!");
+    alert("Lưu cài đặt thành công!");
   };
 
   return (
     <div className="space-y-8">
-      <h2 className="text-2xl font-bold text-gray-800">Tracker Settings</h2>
+      <h2 className="text-2xl font-bold text-gray-800">Cài Đặt Theo Dõi</h2>
 
       <form onSubmit={handleSaveSettings}>
         {/* Cycle Settings */}
         <div className="bg-white border border-gray-200 rounded-lg p-6 mb-6">
-          <h3 className="text-lg font-semibold mb-4">Cycle Settings</h3>
+          <h3 className="text-lg font-semibold mb-4">Cài Đặt Chu Kỳ</h3>
 
           <div className="grid grid-cols-1 sm:grid-cols-2 gap-6">
             <div>
               <label className="block text-sm font-medium text-gray-700 mb-1">
-                Average Cycle Length (days)
+                Độ Dài Chu Kỳ Trung Bình (ngày)
               </label>
               <input
                 type="number"
@@ -73,7 +73,7 @@ const Settings = () => {
 
             <div>
               <label className="block text-sm font-medium text-gray-700 mb-1">
-                Average Period Length (days)
+                Độ Dài Kỳ Kinh Trung Bình (ngày)
               </label>
               <input
                 type="number"
@@ -90,7 +90,7 @@ const Settings = () => {
 
         {/* Notification Settings */}
         <div className="bg-white border border-gray-200 rounded-lg p-6 mb-6">
-          <h3 className="text-lg font-semibold mb-4">Notification Settings</h3>
+          <h3 className="text-lg font-semibold mb-4">Cài Đặt Thông Báo</h3>
 
           <div className="flex items-center mb-4">
             <input
@@ -105,14 +105,14 @@ const Settings = () => {
               htmlFor="notifications"
               className="ml-2 block text-sm text-gray-700"
             >
-              Enable notifications
+              Bật thông báo
             </label>
           </div>
 
           {settings.notifications && (
             <div>
               <label className="block text-sm font-medium text-gray-700 mb-1">
-                Reminder Time
+                Thời Gian Nhắc Nhở
               </label>
               <input
                 type="time"
@@ -127,7 +127,7 @@ const Settings = () => {
 
         {/* Tracking Preferences */}
         <div className="bg-white border border-gray-200 rounded-lg p-6 mb-6">
-          <h3 className="text-lg font-semibold mb-4">Tracking Preferences</h3>
+          <h3 className="text-lg font-semibold mb-4">Tùy Chọn Theo Dõi</h3>
 
           <div className="grid grid-cols-1 sm:grid-cols-2 gap-x-6 gap-y-3">
             <div className="flex items-center">
@@ -143,7 +143,7 @@ const Settings = () => {
                 htmlFor="track-symptoms"
                 className="ml-2 block text-sm text-gray-700"
               >
-                Track symptoms
+                Theo dõi triệu chứng
               </label>
             </div>
 
@@ -160,7 +160,7 @@ const Settings = () => {
                 htmlFor="track-mood"
                 className="ml-2 block text-sm text-gray-700"
               >
-                Track mood
+                Theo dõi tâm trạng
               </label>
             </div>
 
@@ -177,7 +177,7 @@ const Settings = () => {
                 htmlFor="track-temperature"
                 className="ml-2 block text-sm text-gray-700"
               >
-                Track basal temperature
+                Theo dõi nhiệt độ cơ bản
               </label>
             </div>
 
@@ -194,7 +194,7 @@ const Settings = () => {
                 htmlFor="track-weight"
                 className="ml-2 block text-sm text-gray-700"
               >
-                Track weight
+                Theo dõi cân nặng
               </label>
             </div>
 
@@ -211,7 +211,7 @@ const Settings = () => {
                 htmlFor="track-notes"
                 className="ml-2 block text-sm text-gray-700"
               >
-                Track notes
+                Theo dõi ghi chú
               </label>
             </div>
           </div>
@@ -219,7 +219,7 @@ const Settings = () => {
 
         {/* Privacy Settings */}
         <div className="bg-white border border-gray-200 rounded-lg p-6 mb-6">
-          <h3 className="text-lg font-semibold mb-4">Privacy Settings</h3>
+          <h3 className="text-lg font-semibold mb-4">Cài Đặt Quyền Riêng Tư</h3>
 
           <div className="flex items-center">
             <input
@@ -234,13 +234,12 @@ const Settings = () => {
               htmlFor="data-sharing"
               className="ml-2 block text-sm text-gray-700"
             >
-              Allow anonymous data sharing for research purposes
+              Cho phép chia sẻ dữ liệu ẩn danh cho mục đích nghiên cứu
             </label>
           </div>
 
           <p className="mt-2 text-sm text-gray-500">
-            Your personal information will remain private. Only anonymized
-            statistical data would be shared.
+            Thông tin cá nhân của bạn sẽ được giữ kín. Chỉ dữ liệu thống kê ẩn danh mới được chia sẻ.
           </p>
         </div>
 
@@ -250,7 +249,7 @@ const Settings = () => {
             type="submit"
             className="px-6 py-3 bg-indigo-600 text-white rounded-md font-medium hover:bg-indigo-700 transition-colors"
           >
-            Save Settings
+            Lưu Cài Đặt
           </button>
         </div>
       </form>
