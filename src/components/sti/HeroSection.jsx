@@ -19,7 +19,7 @@ function HeroSection() {
             href="#appointment"
             className="px-6 py-3 bg-white text-indigo-900 rounded-full font-medium hover:bg-opacity-90 transition-all flex items-center"
           >
-            Book an Appointment
+            Đặt Lịch Hẹn Ngay
             <svg
               xmlns="http://www.w3.org/2000/svg"
               className="h-5 w-5 ml-1"
@@ -37,7 +37,7 @@ function HeroSection() {
             href="#faq"
             className="px-6 py-3 bg-transparent border border-white text-white rounded-full font-medium hover:bg-white hover:bg-opacity-10 transition-all flex items-center"
           >
-            Learn More
+            Tìm Hiểu Thêm
             <svg
               xmlns="http://www.w3.org/2000/svg"
               className="h-5 w-5 ml-1"
