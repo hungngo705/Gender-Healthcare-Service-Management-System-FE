@@ -5,7 +5,7 @@ import { motion } from "framer-motion";
 import { Search } from "lucide-react";
 
 // Blog data should be moved to a separate file
-import { blogPosts } from "../data/blogData";
+import { blogData } from "../data/blogData";
 
 const categories = [
   { id: "all", name: "Tất cả bài viết" },
@@ -20,7 +20,7 @@ function Blog() {
   const [activeCategory, setActiveCategory] = useState("all");
 
   // Filter blog posts by category and search term
-  const filteredBlogs = blogPosts
+  const filteredBlogs = blogData
     .sort((a, b) => new Date(b.date) - new Date(a.date)) // Sort by newest date
     .map((blog) => ({
       ...blog,

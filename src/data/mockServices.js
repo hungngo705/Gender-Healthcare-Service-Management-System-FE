@@ -1,99 +1,99 @@
 const mockServices = [
   {
     id: 1,
-    name: "Reproductive Cycle Tracking",
+    name: "Theo Dõi Chu Kỳ Sinh Sản",
     category: "reproductive",
     description:
-      "Monitor your menstrual cycle, receive predictions for ovulation periods, fertility windows, and set reminders for birth control.",
+      "Theo dõi chu kỳ kinh nguyệt, nhận dự đoán về thời kỳ rụng trứng, cửa sổ sinh sản và thiết lập nhắc nhở về biện pháp tránh thai.",
     imageUrl:
       "https://images.unsplash.com/photo-1631815588090-d1bcbe9b4b91?auto=format&fit=crop&q=80",
     features: [
-      "Personalized cycle predictions",
-      "Ovulation and fertility window tracking",
-      "Birth control reminders",
-      "Historical cycle data analysis",
+      "Dự đoán chu kỳ cá nhân hóa",
+      "Theo dõi rụng trứng và cửa sổ sinh sản",
+      "Nhắc nhở biện pháp tránh thai",
+      "Phân tích dữ liệu chu kỳ trong quá khứ",
     ],
-    price: "Free",
+    price: "Miễn phí",
   },
   {
     id: 2,
-    name: "Comprehensive STI Testing",
+    name: "Xét Nghiệm STI Toàn Diện",
     category: "sti",
     description:
-      "Confidential testing for sexually transmitted infections with secure online results delivery and follow-up care if needed.",
+      "Xét nghiệm bảo mật các bệnh lây truyền qua đường tình dục với kết quả trực tuyến an toàn và chăm sóc theo dõi nếu cần.",
     imageUrl:
       "https://images.unsplash.com/photo-1576091160399-112ba8d25d1d?auto=format&fit=crop&q=80",
     features: [
-      "Comprehensive testing panel",
-      "Private results through secure portal",
-      "Follow-up treatment options",
-      "Regular testing reminders",
+      "Bảng xét nghiệm toàn diện",
+      "Kết quả riêng tư qua cổng thông tin bảo mật",
+      "Các lựa chọn điều trị tiếp theo",
+      "Nhắc nhở xét nghiệm định kỳ",
     ],
-    price: "From $49",
+    price: "Từ 49$",
   },
   {
     id: 3,
-    name: "Online Health Consultations",
+    name: "Tư Vấn Sức Khỏe Trực Tuyến",
     category: "consultation",
     description:
-      "Schedule private video consultations with our healthcare professionals for reproductive health guidance and concerns.",
+      "Lên lịch tư vấn video riêng tư với các chuyên gia y tế của chúng tôi để được hướng dẫn và giải đáp về sức khỏe sinh sản.",
     imageUrl:
       "https://images.unsplash.com/photo-1576091160550-2173dba999ef?auto=format&fit=crop&q=80",
     features: [
-      "Private video consultations",
-      "Flexible scheduling options",
-      "Access to specialized professionals",
-      "Secure communication platform",
+      "Tư vấn video riêng tư",
+      "Tùy chọn lịch linh hoạt",
+      "Tiếp cận với các chuyên gia chuyên môn",
+      "Nền tảng giao tiếp bảo mật",
     ],
-    price: "From $35",
+    price: "Từ 35$",
   },
   {
     id: 4,
-    name: "Sexual Health Q&A",
+    name: "Hỏi Đáp Về Sức Khỏe Tình Dục",
     category: "consultation",
     description:
-      "Submit your questions to our healthcare professionals and receive expert answers about your reproductive and sexual health concerns.",
+      "Gửi câu hỏi cho các chuyên gia y tế của chúng tôi và nhận câu trả lời chuyên môn về các vấn đề sức khỏe sinh sản và tình dục của bạn.",
     imageUrl:
       "https://images.unsplash.com/photo-1522152302542-71a8e5172aa1?auto=format&fit=crop&q=80",
     features: [
-      "Anonymous question submission",
-      "Expert answers from professionals",
-      "Quick response times",
-      "Searchable Q&A database",
+      "Gửi câu hỏi ẩn danh",
+      "Câu trả lời chuyên môn từ chuyên gia",
+      "Thời gian phản hồi nhanh",
+      "Cơ sở dữ liệu hỏi đáp có thể tìm kiếm",
     ],
-    price: "Free",
+    price: "Miễn phí",
   },
   {
     id: 5,
-    name: "Reproductive Health Education",
+    name: "Giáo Dục Sức Khỏe Sinh Sản",
     category: "education",
     description:
-      "Access comprehensive educational resources on reproductive health, contraception options, and family planning.",
+      "Tiếp cận các tài nguyên giáo dục toàn diện về sức khỏe sinh sản, các lựa chọn tránh thai và kế hoạch hóa gia đình.",
     imageUrl:
       "https://images.unsplash.com/photo-1606326608606-aa0b62935f2b?auto=format&fit=crop&q=80",
     features: [
-      "Evidence-based information",
-      "Multimedia learning resources",
-      "Downloadable guides",
-      "Regular content updates",
+      "Thông tin dựa trên bằng chứng",
+      "Tài nguyên học tập đa phương tiện",
+      "Hướng dẫn có thể tải xuống",
+      "Cập nhật nội dung thường xuyên",
     ],
-    price: "Free",
+    price: "Miễn phí",
   },
   {
     id: 6,
-    name: "STI Prevention & Education",
+    name: "Phòng Ngừa & Giáo Dục STI",
     category: "sti",
     description:
-      "Learn about STI prevention strategies, testing recommendations, and treatment options through our educational resources.",
+      "Tìm hiểu về các chiến lược phòng ngừa STI, khuyến nghị xét nghiệm và các lựa chọn điều trị thông qua các tài liệu giáo dục của chúng tôi.",
     imageUrl:
       "https://images.unsplash.com/photo-1582719471384-894fbb16e074?auto=format&fit=crop&q=80",
     features: [
-      "Prevention strategies",
-      "Risk assessment tools",
-      "Testing information",
-      "Treatment guides",
+      "Chiến lược phòng ngừa",
+      "Công cụ đánh giá rủi ro",
+      "Thông tin về xét nghiệm",
+      "Hướng dẫn điều trị",
     ],
-    price: "Free",
+    price: "Miễn phí",
   },
 ];
 

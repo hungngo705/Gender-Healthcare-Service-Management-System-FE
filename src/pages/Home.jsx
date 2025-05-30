@@ -9,7 +9,7 @@ import {
   services,
   consultants,
   testimonials,
-  blogPosts,
+  blogData,
   bannerSlides,
 } from "../data";
 
@@ -388,7 +388,7 @@ function Home() {
                 Thuật toán thông minh của chúng tôi thích ứng với chu kỳ độc đáo của bạn.
               </p>
               <Link
-                to="/cycle-tracker"
+                to="/services/tracking"
                 className="inline-flex items-center text-purple-700 font-medium hover:text-purple-900"
               >
                 Thử công cụ theo dõi
@@ -570,7 +570,9 @@ function Home() {
           </div>
 
           <div className="grid grid-cols-1 md:grid-cols-3 gap-8">
-            {blogPosts.map((post) => (
+            {blogData.sort((a, b) => new Date(b.date) - new Date(a.date)) //sort for newsest
+            .slice(0,3)
+            .map((post) => (
               <motion.div
                 key={post.id}
                 className="bg-white rounded-xl shadow-md overflow-hidden"
@@ -578,7 +580,7 @@ function Home() {
               >
                 <div className="h-48 overflow-hidden">
                   <img
-                    src={post.image}
+                    src={post.img}
                     alt={post.title}
                     className="w-full h-full object-cover transform hover:scale-105 transition duration-500"
                   />
@@ -593,14 +595,11 @@ function Home() {
                   </h3>
                   <p className="text-gray-600 mb-4">{post.excerpt}</p>
                   <div className="mb-4 flex flex-wrap gap-2">
-                    {post.categories.map((category, index) => (
-                      <span
-                        key={index}
-                        className="inline-block bg-indigo-100 text-indigo-800 text-xs px-2 py-1 rounded-md"
-                      >
-                        {category}
-                      </span>
-                    ))}
+                    <span
+                      className="inline-block bg-indigo-100 text-indigo-800 text-xs px-2 py-1 rounded-md"
+                    >
+                      {post.categoryName}
+                    </span>
                   </div>
                   <Link
                     to={`/blog/${post.id}`}
@@ -668,7 +667,7 @@ function Home() {
               </svg>
             </Link>
             <Link
-              to="/cycle-tracker"
+              to="/services/tracking"
               className="inline-flex items-center bg-white border-2 border-indigo-600 text-indigo-600 font-medium px-6 py-3 rounded-lg hover:bg-indigo-50 transition duration-300"
             >
               Thử Công Cụ Theo Dõi

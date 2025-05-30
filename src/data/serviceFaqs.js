@@ -1,23 +1,23 @@
 const serviceFaqs = [
   {
-    question: "How private is the Cycle Tracking service?",
+    question: "Dịch vụ Theo Dõi Chu Kỳ có riêng tư không?",
     answer:
-      "Your cycle tracking data is completely private and encrypted. We never share your personal health information with any third parties, and you control who has access to your data. You can delete your data at any time.",
+      "Dữ liệu theo dõi chu kỳ của bạn hoàn toàn riêng tư và được mã hóa. Chúng tôi không bao giờ chia sẻ thông tin sức khỏe cá nhân của bạn với bất kỳ bên thứ ba nào, và bạn kiểm soát được ai có quyền truy cập vào dữ liệu của mình. Bạn có thể xóa dữ liệu của mình bất cứ lúc nào.",
   },
   {
-    question: "How does online consultation work?",
+    question: "Tư vấn trực tuyến hoạt động như thế nào?",
     answer:
-      "Our online consultations are conducted through a secure video platform. After booking, you'll receive a link to join the consultation at your scheduled time. You can discuss your health concerns privately with our qualified healthcare professionals from the comfort of your home.",
+      "Các buổi tư vấn trực tuyến của chúng tôi được thực hiện thông qua nền tảng video bảo mật. Sau khi đặt lịch, bạn sẽ nhận được một liên kết để tham gia buổi tư vấn vào thời gian đã hẹn. Bạn có thể thảo luận riêng tư về các vấn đề sức khỏe của mình với các chuyên gia y tế có trình độ của chúng tôi ngay tại nhà.",
   },
   {
-    question: "Are STI testing results confidential?",
+    question: "Kết quả xét nghiệm STI có bảo mật không?",
     answer:
-      "Absolutely. All STI testing results are delivered through our secure patient portal that only you can access. We never share your results with anyone without your explicit permission, and all our staff adhere to strict confidentiality protocols.",
+      "Hoàn toàn bảo mật. Tất cả kết quả xét nghiệm STI được gửi thông qua cổng thông tin bệnh nhân an toàn mà chỉ bạn mới có thể truy cập. Chúng tôi không bao giờ chia sẻ kết quả của bạn với bất kỳ ai nếu không có sự cho phép rõ ràng từ bạn, và tất cả nhân viên của chúng tôi tuân thủ các quy định bảo mật nghiêm ngặt.",
   },
   {
-    question: "Can I submit anonymous questions about sexual health?",
+    question: "Tôi có thể gửi câu hỏi ẩn danh về sức khỏe tình dục không?",
     answer:
-      "Yes, our Q&A service allows you to submit questions anonymously. Our healthcare professionals will answer your questions without knowing your identity, ensuring you can get accurate information about sensitive topics without privacy concerns.",
+      "Có, dịch vụ Hỏi & Đáp của chúng tôi cho phép bạn gửi câu hỏi ẩn danh. Các chuyên gia y tế của chúng tôi sẽ trả lời câu hỏi của bạn mà không biết danh tính của bạn, đảm bảo rằng bạn có thể nhận thông tin chính xác về các chủ đề nhạy cảm mà không cần lo lắng về vấn đề riêng tư.",
   },
 ];
 

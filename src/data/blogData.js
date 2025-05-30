@@ -1,4 +1,4 @@
-export const blogPosts = [
+export const blogData = [
   {
     id: "1",
     title: "Cách điều trị vô sinh nam? 6 phương pháp điều trị vô sinh nam hiệu quả",
@@ -199,4 +199,4 @@ Các dấu hiệu sớm của STDs có thể bao gồm mụn, vết loét, ngứ
   },
 ];
 
-export default blogPosts;
+export default blogData;

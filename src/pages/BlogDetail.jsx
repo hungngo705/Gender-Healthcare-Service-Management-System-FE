@@ -14,7 +14,7 @@ import {
   Mail,
   Link as LinkIcon,
 } from "lucide-react";
-import { blogPosts } from "../data/blogData";
+import { blogData } from "../data/blogData";
 
 function BlogDetail() {
   const { id } = useParams();
@@ -28,13 +28,13 @@ function BlogDetail() {
     window.scrollTo(0, 0);
 
     // Find the blog with the matching ids
-    const foundBlog = blogPosts.find((post) => post.id === id);
+    const foundBlog = blogData.find((post) => post.id === id);
 
     if (foundBlog) {
       setBlog(foundBlog);
 
       // Find related posts (same category)
-      const related = blogPosts
+      const related = blogData
         .filter(
           (post) => post.id !== id && post.category === foundBlog.category
         )
