@@ -11,7 +11,7 @@ const ReminderSettings = () => {
   
   const handleSubmit = (e) => {
     e.preventDefault();
-    alert('Reminder settings saved successfully!');
+    alert('Đã lưu cài đặt nhắc nhở thành công!');
   };
 
   const addCustomReminder = () => {
@@ -29,7 +29,7 @@ const ReminderSettings = () => {
     <div className="bg-white rounded-lg">
       <form onSubmit={handleSubmit} className="space-y-6">
         <div className="space-y-4">
-          <h3 className="text-lg font-medium text-gray-900">Standard Reminders</h3>
+          <h3 className="text-lg font-medium text-gray-900">Nhắc Nhở Chuẩn</h3>
           
           <div className="flex items-center">
             <input
@@ -44,8 +44,8 @@ const ReminderSettings = () => {
                 <Bell className="h-4 w-4 text-pink-600" />
               </div>
               <div>
-                <div className="text-sm font-medium text-gray-900">Birth Control Reminder</div>
-                <div className="text-xs text-gray-500">Daily reminder to take your birth control</div>
+                <div className="text-sm font-medium text-gray-900">Nhắc Uống Thuốc Ngừa Thai</div>
+                <div className="text-xs text-gray-500">Nhắc nhở hàng ngày để uống thuốc ngừa thai</div>
               </div>
             </label>
           </div>
@@ -63,8 +63,8 @@ const ReminderSettings = () => {
                 <Calendar className="h-4 w-4 text-red-600" />
               </div>
               <div>
-                <div className="text-sm font-medium text-gray-900">Period Reminder</div>
-                <div className="text-xs text-gray-500">Notification before your next period starts</div>
+                <div className="text-sm font-medium text-gray-900">Nhắc Kỳ Kinh Nguyệt</div>
+                <div className="text-xs text-gray-500">Thông báo trước khi kỳ kinh nguyệt tiếp theo bắt đầu</div>
               </div>
             </label>
           </div>
@@ -82,19 +82,19 @@ const ReminderSettings = () => {
                 <Calendar className="h-4 w-4 text-blue-600" />
               </div>
               <div>
-                <div className="text-sm font-medium text-gray-900">Health Check Reminder</div>
-                <div className="text-xs text-gray-500">Regular reminders for health check-ups</div>
+                <div className="text-sm font-medium text-gray-900">Nhắc Kiểm Tra Sức Khỏe</div>
+                <div className="text-xs text-gray-500">Nhắc nhở định kỳ cho các buổi kiểm tra sức khỏe</div>
               </div>
             </label>
           </div>
         </div>
         
         <div className="space-y-4">
-          <h3 className="text-lg font-medium text-gray-900">Notification Settings</h3>
+          <h3 className="text-lg font-medium text-gray-900">Cài Đặt Thông Báo</h3>
           <div className="flex items-center">
             <Clock className="h-5 w-5 text-gray-500 mr-2" />
             <label htmlFor="notificationTime" className="block text-sm font-medium text-gray-700">
-              Preferred notification time:
+              Thời gian thông báo ưa thích:
             </label>
             <input
               id="notificationTime"
@@ -108,21 +108,21 @@ const ReminderSettings = () => {
         
         <div className="space-y-4">
           <div className="flex items-center justify-between">
-            <h3 className="text-lg font-medium text-gray-900">Custom Reminders</h3>
+            <h3 className="text-lg font-medium text-gray-900">Nhắc Nhở Tùy Chỉnh</h3>
             <button 
               type="button" 
               onClick={() => document.getElementById('addReminderForm').classList.toggle('hidden')}
               className="inline-flex items-center px-2.5 py-1.5 border border-transparent text-xs font-medium rounded text-indigo-700 bg-indigo-100 hover:bg-indigo-200 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-indigo-500"
             >
               <PlusCircle className="h-4 w-4 mr-1" />
-              Add New
+              Thêm Mới
             </button>
           </div>
           
           <div id="addReminderForm" className="hidden bg-gray-50 p-4 rounded-md space-y-3">
             <div>
               <label htmlFor="reminderTitle" className="block text-sm font-medium text-gray-700">
-                Reminder Title
+                Tiêu Đề Nhắc Nhở
               </label>
               <input
                 type="text"
@@ -130,14 +130,14 @@ const ReminderSettings = () => {
                 value={newReminder.title}
                 onChange={(e) => setNewReminder({...newReminder, title: e.target.value})}
                 className="mt-1 block w-full border-gray-300 rounded-md shadow-sm focus:ring-indigo-500 focus:border-indigo-500 sm:text-sm"
-                placeholder="E.g., Doctor's Appointment"
+                placeholder="Ví dụ: Cuộc hẹn bác sĩ"
               />
             </div>
             
             <div className="flex space-x-4">
               <div className="flex-1">
                 <label htmlFor="reminderDate" className="block text-sm font-medium text-gray-700">
-                  Date
+                  Ngày
                 </label>
                 <input
                   type="date"
@@ -150,7 +150,7 @@ const ReminderSettings = () => {
               
               <div>
                 <label htmlFor="reminderTime" className="block text-sm font-medium text-gray-700">
-                  Time
+                  Thời Gian
                 </label>
                 <input
                   type="time"
@@ -168,7 +168,7 @@ const ReminderSettings = () => {
                 onClick={addCustomReminder}
                 className="w-full inline-flex justify-center items-center px-4 py-2 border border-transparent text-sm font-medium rounded-md shadow-sm text-white bg-indigo-600 hover:bg-indigo-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-indigo-500"
               >
-                Add Reminder
+                Thêm Nhắc Nhở
               </button>
             </div>
           </div>
@@ -180,7 +180,7 @@ const ReminderSettings = () => {
                   <div>
                     <div className="font-medium">{reminder.title}</div>
                     <div className="text-sm text-gray-500">
-                      {new Date(reminder.date).toLocaleDateString()} at {reminder.time}
+                      {new Date(reminder.date).toLocaleDateString('vi-VN')} lúc {reminder.time}
                     </div>
                   </div>
                   <button
@@ -188,13 +188,13 @@ const ReminderSettings = () => {
                     onClick={() => removeCustomReminder(reminder.id)}
                     className="text-red-500 hover:text-red-700"
                   >
-                    Remove
+                    Xóa
                   </button>
                 </div>
               ))}
             </div>
           ) : (
-            <p className="text-sm text-gray-500 italic">No custom reminders set</p>
+            <p className="text-sm text-gray-500 italic">Chưa có nhắc nhở tùy chỉnh nào</p>
           )}
         </div>
         
@@ -203,7 +203,7 @@ const ReminderSettings = () => {
             type="submit"
             className="inline-flex items-center px-4 py-2 border border-transparent text-sm font-medium rounded-md shadow-sm text-white bg-indigo-600 hover:bg-indigo-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-indigo-500"
           >
-            Save Settings
+            Lưu Cài Đặt
           </button>
         </div>
       </form>

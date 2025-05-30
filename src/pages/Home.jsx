@@ -64,7 +64,7 @@ function Home() {
         <button
           onClick={prevSlide}
           className="absolute left-4 top-1/2 z-10 bg-white/30 p-2 rounded-full hover:bg-white/50 transition-all"
-          aria-label="Previous slide"
+          aria-label="Slide trước"
         >
           <ChevronLeft size={24} />
         </button>
@@ -72,7 +72,7 @@ function Home() {
         <button
           onClick={nextSlide}
           className="absolute right-4 top-1/2 z-10 bg-white/30 p-2 rounded-full hover:bg-white/50 transition-all"
-          aria-label="Next slide"
+          aria-label="Slide tiếp theo"
         >
           <ChevronRight size={24} />
         </button>
@@ -89,7 +89,7 @@ function Home() {
               className={`w-3 h-3 rounded-full ${
                 index === currentSlide ? "bg-white scale-125" : "bg-white/50"
               } transition-all duration-300`}
-              aria-label={`Go to slide ${index + 1}`}
+              aria-label={`Chuyển đến slide ${index + 1}`}
             />
           ))}
         </div>
@@ -188,14 +188,14 @@ function Home() {
               transition={{ duration: 0.5 }}
             >
               <span className="bg-indigo-100 text-indigo-800 text-sm font-medium px-4 py-1.5 rounded-full inline-block mb-3">
-                Healthcare Services
+                Dịch Vụ Y Tế
               </span>
               <h2 className="text-4xl font-bold text-gray-900 mb-4">
-                Our Specialized Services
+                Dịch Vụ Chuyên Biệt Của Chúng Tôi
               </h2>
               <p className="text-xl text-gray-600 max-w-3xl mx-auto">
-                Comprehensive healthcare tailored to your reproductive health
-                and sexual wellbeing needs
+                Chăm sóc sức khỏe toàn diện được điều chỉnh phù hợp với nhu cầu 
+                sức khỏe sinh sản và tình dục của bạn
               </p>
             </motion.div>
           </div>
@@ -226,7 +226,7 @@ function Home() {
                     to={service.link}
                     className="group inline-flex items-center text-indigo-600 font-medium hover:text-indigo-800 transition-colors"
                   >
-                    Learn More
+                    Tìm Hiểu Thêm
                     <svg
                       xmlns="http://www.w3.org/2000/svg"
                       className="h-5 w-5 ml-1 transform group-hover:translate-x-1 transition-transform"
@@ -243,7 +243,7 @@ function Home() {
                     </svg>
                   </Link>
                   <div className="bg-indigo-100 text-indigo-800 text-xs font-medium px-2.5 py-1 rounded-full">
-                    {service.category || "Health"}
+                    {service.category || "Sức Khỏe"}
                   </div>
                 </div>
               </motion.div>
@@ -261,7 +261,7 @@ function Home() {
               to="/services"
               className="inline-flex items-center px-8 py-4 bg-gradient-to-r from-indigo-600 to-purple-600 text-white font-medium rounded-xl hover:from-indigo-700 hover:to-purple-700 transition-all duration-300 shadow-md hover:shadow-xl"
             >
-              View All Services
+              Xem Tất Cả Dịch Vụ
               <svg
                 xmlns="http://www.w3.org/2000/svg"
                 className="h-5 w-5 ml-2"
@@ -284,11 +284,11 @@ function Home() {
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
           <div className="text-center mb-12">
             <h2 className="text-3xl font-bold text-gray-900 mb-4">
-              Meet Our Consultants
+              Gặp Gỡ Đội Ngũ Tư Vấn
             </h2>
             <p className="text-xl text-gray-600 max-w-3xl mx-auto">
-              Experienced healthcare professionals dedicated to providing
-              quality care
+              Các chuyên gia y tế giàu kinh nghiệm cam kết cung cấp dịch vụ 
+              chăm sóc chất lượng
             </p>
           </div>
 
@@ -318,7 +318,7 @@ function Home() {
                       {"☆".repeat(5 - Math.floor(consultant.rating))}
                     </div>
                     <span className="text-gray-500 text-sm">
-                      ({consultant.reviewCount} reviews)
+                      ({consultant.reviewCount} đánh giá)
                     </span>
                   </div>
                   <p className="text-gray-600 text-sm mb-4">{consultant.bio}</p>
@@ -326,7 +326,7 @@ function Home() {
                     to={`/consultants/${consultant.id}`}
                     className="inline-block w-full text-center py-2 border border-indigo-600 text-indigo-600 rounded-md hover:bg-indigo-600 hover:text-white transition duration-300"
                   >
-                    View Profile
+                    Xem Hồ Sơ
                   </Link>
                 </div>
               </motion.div>
@@ -338,7 +338,7 @@ function Home() {
               to="/consultants"
               className="inline-flex items-center px-6 py-3 bg-indigo-600 text-white font-medium rounded-lg hover:bg-indigo-700 transition duration-300"
             >
-              View All Consultants
+              Xem Tất Cả Tư Vấn Viên
             </Link>
           </div>
         </div>
@@ -349,11 +349,10 @@ function Home() {
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
           <div className="text-center mb-12">
             <h2 className="text-3xl font-bold text-gray-900 mb-4">
-              Key Features
+              Tính Năng Nổi Bật
             </h2>
             <p className="text-xl text-gray-600 max-w-3xl mx-auto">
-              Innovative tools to support your reproductive and sexual health
-              journey
+              Các công cụ sáng tạo hỗ trợ hành trình sức khỏe sinh sản và tình dục của bạn
             </p>
           </div>
 
@@ -381,18 +380,18 @@ function Home() {
               </div>
 
               <h3 className="text-2xl font-semibold text-gray-900 mb-3">
-                Cycle Tracking
+                Theo Dõi Chu Kỳ
               </h3>
               <p className="text-gray-600 mb-6">
-                Monitor your menstrual cycle, receive predictions for ovulation
-                periods, fertility windows, and set reminders for birth control.
-                Our smart algorithms adapt to your unique patterns.
+                Theo dõi chu kỳ kinh nguyệt, nhận dự đoán về thời kỳ rụng trứng,
+                cửa sổ sinh sản và thiết lập nhắc nhở về biện pháp tránh thai.
+                Thuật toán thông minh của chúng tôi thích ứng với chu kỳ độc đáo của bạn.
               </p>
               <Link
                 to="/cycle-tracker"
                 className="inline-flex items-center text-purple-700 font-medium hover:text-purple-900"
               >
-                Try the tracker
+                Thử công cụ theo dõi
                 <svg
                   xmlns="http://www.w3.org/2000/svg"
                   className="h-5 w-5 ml-1"
@@ -433,18 +432,18 @@ function Home() {
               </div>
 
               <h3 className="text-2xl font-semibold text-gray-900 mb-3">
-                Online Consultations
+                Tư Vấn Trực Tuyến
               </h3>
               <p className="text-gray-600 mb-6">
-                Schedule private video consultations with our healthcare experts
-                for personalized advice on reproductive health, sexual
-                education, and any concerns you may have.
+                Lên lịch tư vấn video riêng tư với các chuyên gia y tế của chúng tôi
+                để được tư vấn cá nhân hóa về sức khỏe sinh sản, giáo dục giới tính,
+                và bất kỳ mối quan tâm nào bạn có thể có.
               </p>
               <Link
                 to="/consultations"
                 className="inline-flex items-center text-blue-700 font-medium hover:text-blue-900"
               >
-                Book a consultation
+                Đặt lịch tư vấn
                 <svg
                   xmlns="http://www.w3.org/2000/svg"
                   className="h-5 w-5 ml-1"
@@ -485,18 +484,18 @@ function Home() {
               </div>
 
               <h3 className="text-2xl font-semibold text-gray-900 mb-3">
-                STI Testing Services
+                Dịch Vụ Xét Nghiệm STI
               </h3>
               <p className="text-gray-600 mb-6">
-                Order confidential STI tests, book appointments at nearby
-                clinics, and receive your results securely through our platform,
-                with follow-up care options if needed.
+                Đặt các xét nghiệm STI bảo mật, đặt lịch hẹn tại các phòng khám gần đó,
+                và nhận kết quả của bạn một cách an toàn thông qua nền tảng của chúng tôi,
+                với các tùy chọn chăm sóc tiếp theo nếu cần.
               </p>
               <Link
                 to="/services/sti-testing"
                 className="inline-flex items-center text-pink-700 font-medium hover:text-pink-900"
               >
-                Learn about testing
+                Tìm hiểu về xét nghiệm
                 <svg
                   xmlns="http://www.w3.org/2000/svg"
                   className="h-5 w-5 ml-1"
@@ -521,9 +520,9 @@ function Home() {
       <section className="py-16 bg-gradient-to-br from-indigo-900 to-blue-700 text-white">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
           <div className="text-center mb-12">
-            <h2 className="text-3xl font-bold mb-4">What Our Clients Say</h2>
+            <h2 className="text-3xl font-bold mb-4">Khách Hàng Nói Gì Về Chúng Tôi</h2>
             <p className="text-xl opacity-90 max-w-3xl mx-auto">
-              Read about the experiences of those who have used our services
+              Đọc về trải nghiệm của những người đã sử dụng dịch vụ của chúng tôi
             </p>
           </div>
 
@@ -562,11 +561,11 @@ function Home() {
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
           <div className="text-center mb-12">
             <h2 className="text-3xl font-bold text-gray-900 mb-4">
-              Latest from Our Blog
+              Bài Viết Mới Nhất
             </h2>
             <p className="text-xl text-gray-600 max-w-3xl mx-auto">
-              Educational articles on reproductive health and sexual wellbeing
-              topics that matter to you
+              Các bài viết giáo dục về sức khỏe sinh sản và tình dục
+              với các chủ đề quan trọng đối với bạn
             </p>
           </div>
 
@@ -587,7 +586,7 @@ function Home() {
                 <div className="p-6">
                   <div className="flex justify-between items-center mb-3 text-sm text-gray-500">
                     <span>{post.date}</span>
-                    <span>By {post.author}</span>
+                    <span>Bởi {post.author}</span>
                   </div>
                   <h3 className="text-xl font-bold text-gray-900 mb-3">
                     {post.title}
@@ -607,7 +606,7 @@ function Home() {
                     to={`/blog/${post.id}`}
                     className="inline-flex items-center text-indigo-600 font-medium hover:text-indigo-800"
                   >
-                    Read More
+                    Đọc Thêm
                     <svg
                       xmlns="http://www.w3.org/2000/svg"
                       className="h-4 w-4 ml-1"
@@ -633,7 +632,7 @@ function Home() {
               to="/blog"
               className="inline-flex items-center px-6 py-3 bg-indigo-600 text-white font-medium rounded-lg hover:bg-indigo-700 transition duration-300"
             >
-              Visit Our Blog
+              Ghé Thăm Blog
             </Link>
           </div>
         </div>
@@ -643,19 +642,18 @@ function Home() {
       <section className="py-20 px-4 bg-white">
         <div className="max-w-5xl mx-auto text-center">
           <h2 className="text-4xl font-bold text-gray-900 mb-6">
-            Take Control of Your Reproductive Health Today
+            Kiểm Soát Sức Khỏe Sinh Sản Của Bạn Ngay Hôm Nay
           </h2>
           <p className="text-xl text-gray-600 mb-10 max-w-3xl mx-auto">
-            Start tracking your cycle, book a consultation with our healthcare
-            professionals, or schedule an STI test for comprehensive
-            reproductive healthcare.
+            Bắt đầu theo dõi chu kỳ của bạn, đặt lịch tư vấn với các chuyên gia y tế,
+            hoặc lên lịch xét nghiệm STI để chăm sóc sức khỏe sinh sản toàn diện.
           </p>
           <div className="flex flex-col sm:flex-row justify-center space-y-4 sm:space-y-0 sm:space-x-4">
             <Link
               to="/appointment"
               className="inline-flex items-center bg-indigo-600 hover:bg-indigo-700 text-white font-medium px-6 py-3 rounded-lg shadow-md transition duration-300"
             >
-              Book Appointment
+              Đặt Lịch Hẹn
               <svg
                 xmlns="http://www.w3.org/2000/svg"
                 className="h-5 w-5 ml-2"
@@ -673,7 +671,7 @@ function Home() {
               to="/cycle-tracker"
               className="inline-flex items-center bg-white border-2 border-indigo-600 text-indigo-600 font-medium px-6 py-3 rounded-lg hover:bg-indigo-50 transition duration-300"
             >
-              Try Cycle Tracker
+              Thử Công Cụ Theo Dõi
               <svg
                 xmlns="http://www.w3.org/2000/svg"
                 className="h-5 w-5 ml-2"

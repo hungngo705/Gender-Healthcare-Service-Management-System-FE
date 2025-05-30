@@ -11,7 +11,7 @@ const OvulationPredictor = () => {
     const periodDate = new Date(lastPeriodDate);
     const ovulationDate = new Date(periodDate);
     ovulationDate.setDate(periodDate.getDate() + cycleLength - 14); 
-    return ovulationDate.toLocaleDateString('en-US', { 
+    return ovulationDate.toLocaleDateString('vi-VN', { 
       weekday: 'long', 
       year: 'numeric', 
       month: 'long', 
@@ -22,14 +22,14 @@ const OvulationPredictor = () => {
   const calculateFertileWindow = () => {
     const periodDate = new Date(lastPeriodDate);
     const startDate = new Date(periodDate);
-    startDate.setDate(periodDate.getDate() + cycleLength - 19); // 5 days before ovulation
+    startDate.setDate(periodDate.getDate() + cycleLength - 19); // 5 ngày trước rụng trứng
     
     const endDate = new Date(periodDate);
-    endDate.setDate(periodDate.getDate() + cycleLength - 10); // 1 day after ovulation
+    endDate.setDate(periodDate.getDate() + cycleLength - 10); // 1 ngày sau rụng trứng
     
     return {
-      start: startDate.toLocaleDateString('en-US', { month: 'long', day: 'numeric' }),
-      end: endDate.toLocaleDateString('en-US', { month: 'long', day: 'numeric' })
+      start: startDate.toLocaleDateString('vi-VN', { month: 'long', day: 'numeric' }),
+      end: endDate.toLocaleDateString('vi-VN', { month: 'long', day: 'numeric' })
     };
   };
 
@@ -48,7 +48,7 @@ const OvulationPredictor = () => {
       <div className="mb-6 space-y-4">
         <div>
           <label className="block text-sm font-medium text-gray-700 mb-1">
-            When did your last period start?
+            Kỳ kinh nguyệt gần đây nhất của bạn bắt đầu khi nào?
           </label>
           <input
             type="date"
@@ -60,7 +60,7 @@ const OvulationPredictor = () => {
         
         <div>
           <label className="block text-sm font-medium text-gray-700 mb-1">
-            Average cycle length (days)
+            Độ dài chu kỳ trung bình (ngày)
           </label>
           <div className="flex items-center">
             <input
@@ -84,22 +84,22 @@ const OvulationPredictor = () => {
       </div>
       
       <div className="bg-indigo-50 p-4 rounded-lg mb-6">
-        <h3 className="font-semibold text-indigo-900 mb-2">Your Predictions:</h3>
+        <h3 className="font-semibold text-indigo-900 mb-2">Kết Quả Dự Đoán:</h3>
         <div className="space-y-2">
           <p className="text-indigo-800">
-            <span className="font-medium">Ovulation Day:</span> {calculateOvulationDate()}
+            <span className="font-medium">Ngày Rụng Trứng:</span> {calculateOvulationDate()}
           </p>
           <p className="text-indigo-800">
-            <span className="font-medium">Fertile Window:</span> {fertileWindow.start} - {fertileWindow.end}
+            <span className="font-medium">Thời Kỳ Dễ Thụ Thai:</span> {fertileWindow.start} - {fertileWindow.end}
           </p>
         </div>
       </div>
       
       <div className="bg-blue-50 p-4 rounded-lg">
-        <h3 className="font-semibold text-blue-900 mb-2">Understanding Your Fertility:</h3>
+        <h3 className="font-semibold text-blue-900 mb-2">Hiểu Về Khả Năng Sinh Sản Của Bạn:</h3>
         <p className="text-blue-800 text-sm">
-          Your most fertile days are during your fertile window, with peak fertility occurring on your ovulation day. 
-          Having intercourse during these days increases your chances of conception.
+          Những ngày dễ thụ thai nhất là trong thời kỳ dễ thụ thai, với khả năng thụ thai cao nhất vào ngày rụng trứng.
+          Quan hệ tình dục trong những ngày này sẽ tăng cơ hội thụ thai của bạn.
         </p>
       </div>
     </div>

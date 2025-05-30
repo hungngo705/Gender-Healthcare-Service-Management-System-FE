@@ -23,7 +23,7 @@ function Signup() {
   const handleSubmit = (e) => {
     e.preventDefault();
     if (formData.password !== formData.confirmPassword) {
-      alert("Passwords don't match!");
+      alert("Mật khẩu không khớp!");
       return;
     }
 
@@ -57,7 +57,7 @@ function Signup() {
             animate={{ opacity: 1 }}
             transition={{ delay: 0.3 }}
           >
-            Create Account
+            Tạo Tài Khoản
           </motion.h2>
 
           <form onSubmit={handleSubmit} className="space-y-5">
@@ -69,7 +69,7 @@ function Signup() {
               <input
                 type="text"
                 name="name"
-                placeholder="Full Name"
+                placeholder="Họ và Tên"
                 value={formData.name}
                 onChange={handleChange}
                 required
@@ -85,7 +85,7 @@ function Signup() {
               <input
                 type="email"
                 name="email"
-                placeholder="Email Address"
+                placeholder="Địa Chỉ Email"
                 value={formData.email}
                 onChange={handleChange}
                 required
@@ -101,7 +101,7 @@ function Signup() {
               <input
                 type="password"
                 name="password"
-                placeholder="Password"
+                placeholder="Mật Khẩu"
                 value={formData.password}
                 onChange={handleChange}
                 required
@@ -117,7 +117,7 @@ function Signup() {
               <input
                 type="password"
                 name="confirmPassword"
-                placeholder="Confirm Password"
+                placeholder="Xác Nhận Mật Khẩu"
                 value={formData.confirmPassword}
                 onChange={handleChange}
                 required
@@ -134,7 +134,7 @@ function Signup() {
               whileHover={{ scale: 1.03 }}
               whileTap={{ scale: 0.98 }}
             >
-              REGISTER
+              ĐĂNG KÝ
               <svg
                 xmlns="http://www.w3.org/2000/svg"
                 className="h-5 w-5 ml-2"
@@ -155,9 +155,9 @@ function Signup() {
               animate={{ opacity: 1 }}
               transition={{ delay: 0.9 }}
             >
-              <span className="text-gray-600">Already have an account?</span>{" "}
+              <span className="text-gray-600">Đã có tài khoản?</span>{" "}
               <Link to="/login" className="text-blue-600 hover:underline">
-                Sign In
+                Đăng Nhập
               </Link>
             </motion.div>
           </form>
@@ -196,9 +196,9 @@ function Signup() {
             animate={{ opacity: 1, y: 0 }}
             transition={{ delay: 0.4 }}
           >
-            <h1 className="text-4xl font-bold mb-4">Join Us Today</h1>
+            <h1 className="text-4xl font-bold mb-4">Tham Gia Ngay Hôm Nay</h1>
             <p className="mb-8">
-              Create your account and start your healthcare journey
+              Tạo tài khoản và bắt đầu hành trình chăm sóc sức khỏe của bạn
             </p>
             <ul className="space-y-3">
               <li className="flex items-center">
@@ -213,7 +213,7 @@ function Signup() {
                     clipRule="evenodd"
                   ></path>
                 </svg>
-                Personalized healthcare plans
+                Kế hoạch chăm sóc sức khỏe cá nhân hóa
               </li>
               <li className="flex items-center">
                 <svg
@@ -227,7 +227,7 @@ function Signup() {
                     clipRule="evenodd"
                   ></path>
                 </svg>
-                Access your medical records anytime
+                Truy cập hồ sơ y tế của bạn bất kỳ lúc nào
               </li>
             </ul>
           </motion.div>

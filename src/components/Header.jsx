@@ -36,7 +36,7 @@ function Header() {
                       : "text-gray-600 hover:text-blue-600 transition-colors duration-200"
                   }
                 >
-                  Home
+                  Trang Chủ
                 </NavLink>
               </li>
               <li>
@@ -48,7 +48,7 @@ function Header() {
                       : "text-gray-600 hover:text-blue-600 transition-colors duration-200"
                   }
                 >
-                  Services
+                  Dịch Vụ
                 </NavLink>
               </li>
               <li>
@@ -60,7 +60,7 @@ function Header() {
                       : "text-gray-600 hover:text-blue-600 transition-colors duration-200"
                   }
                 >
-                  About
+                  Giới Thiệu
                 </NavLink>
               </li>
               <li>
@@ -72,7 +72,7 @@ function Header() {
                       : "text-gray-600 hover:text-blue-600 transition-colors duration-200"
                   }
                 >
-                  Contact
+                  Liên Hệ
                 </NavLink>
               </li>
               <li>
@@ -84,7 +84,7 @@ function Header() {
                       : "text-gray-600 hover:text-blue-600 transition-colors duration-200"
                   }
                 >
-                  Blogs
+                  Bài Viết
                 </NavLink>
               </li>
 
@@ -106,7 +106,7 @@ function Header() {
                       )}
                     </div>
                     <span className="font-medium">
-                      {currentUser?.name?.split(" ")[0] || "User"}
+                      {currentUser?.name?.split(" ")[0] || "Người Dùng"}
                     </span>
                   </button>
 
@@ -117,14 +117,14 @@ function Header() {
                         className="block px-4 py-2 text-sm text-gray-700 hover:bg-gray-100"
                         onClick={() => setIsProfileMenuOpen(false)}
                       >
-                        Profile
+                        Hồ Sơ
                       </NavLink>
                       <NavLink
                         to="/protected/appointments"
                         className="block px-4 py-2 text-sm text-gray-700 hover:bg-gray-100"
                         onClick={() => setIsProfileMenuOpen(false)}
                       >
-                        Appointments
+                        Lịch Hẹn
                       </NavLink>
                       <button
                         onClick={handleLogout}
@@ -132,7 +132,7 @@ function Header() {
                       >
                         <div className="flex items-center">
                           <LogOut size={16} className="mr-2" />
-                          <span>Logout</span>
+                          <span>Đăng Xuất</span>
                         </div>
                       </button>
                     </div>
@@ -148,7 +148,7 @@ function Header() {
                         : "bg-indigo-600 text-white px-4 py-2 rounded-md hover:bg-indigo-700 transition-colors duration-200"
                     }
                   >
-                    Login
+                    Đăng Nhập
                   </NavLink>
                 </li>
               )}
@@ -186,7 +186,7 @@ function Header() {
                   }
                   onClick={() => setIsMenuOpen(false)}
                 >
-                  Home
+                  Trang Chủ
                 </NavLink>
               </li>
               <li>
@@ -199,7 +199,7 @@ function Header() {
                   }
                   onClick={() => setIsMenuOpen(false)}
                 >
-                  Services
+                  Dịch Vụ
                 </NavLink>
               </li>
               <li>
@@ -212,7 +212,7 @@ function Header() {
                   }
                   onClick={() => setIsMenuOpen(false)}
                 >
-                  About
+                  Giới Thiệu
                 </NavLink>
               </li>
               <li>
@@ -225,7 +225,7 @@ function Header() {
                   }
                   onClick={() => setIsMenuOpen(false)}
                 >
-                  Contact
+                  Liên Hệ
                 </NavLink>
               </li>
               <li>
@@ -238,7 +238,7 @@ function Header() {
                   }
                   onClick={() => setIsMenuOpen(false)}
                 >
-                  Blogs
+                  Bài Viết
                 </NavLink>
               </li>
               {isAuthenticated ? (
@@ -253,7 +253,7 @@ function Header() {
                       }
                       onClick={() => setIsMenuOpen(false)}
                     >
-                      Profile
+                      Hồ Sơ
                     </NavLink>
                   </li>
                   <li>
@@ -266,7 +266,7 @@ function Header() {
                       }
                       onClick={() => setIsMenuOpen(false)}
                     >
-                      Appointments
+                      Lịch Hẹn
                     </NavLink>
                   </li>
                   <li>
@@ -275,7 +275,7 @@ function Header() {
                       className="flex items-center text-red-600 hover:text-red-700"
                     >
                       <LogOut size={16} className="mr-2" />
-                      <span>Logout</span>
+                      <span>Đăng Xuất</span>
                     </button>
                   </li>
                 </>
@@ -286,7 +286,7 @@ function Header() {
                     className="block bg-indigo-600 text-white px-4 py-2 rounded-md hover:bg-indigo-700 text-center"
                     onClick={() => setIsMenuOpen(false)}
                   >
-                    Login
+                    Đăng Nhập
                   </NavLink>
                 </li>
               )}

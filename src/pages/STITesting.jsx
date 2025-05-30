@@ -48,7 +48,7 @@ function STITesting() {
       <nav className="bg-gray-100 py-3 px-4">
         <div className="max-w-7xl mx-auto flex items-center text-sm">
           <Link to="/" className="text-gray-600 hover:text-indigo-600">
-            Home
+            Trang chủ
           </Link>
           <svg
             className="h-4 w-4 mx-2 text-gray-400"
@@ -62,7 +62,7 @@ function STITesting() {
             />
           </svg>
           <Link to="/services" className="text-gray-600 hover:text-indigo-600">
-            Services
+            Dịch vụ
           </Link>
           <svg
             className="h-4 w-4 mx-2 text-gray-400"
@@ -75,7 +75,7 @@ function STITesting() {
               clipRule="evenodd"
             />
           </svg>
-          <span className="text-indigo-600 font-medium">STI Testing</span>
+          <span className="text-indigo-600 font-medium">Xét Nghiệm STI</span>
         </div>
       </nav>
 
@@ -89,11 +89,11 @@ function STITesting() {
             className="text-center mb-8"
           >
             <h1 className="text-4xl font-bold mb-4 sm:text-5xl">
-              Confidential STI Testing Services
+              Dịch Vụ Xét Nghiệm STI Bảo Mật
             </h1>
             <p className="text-xl max-w-3xl mx-auto">
-              Take control of your sexual health with our private,
-              non-judgmental STI testing and treatment services.
+              Kiểm soát sức khỏe tình dục của bạn với các dịch vụ xét nghiệm và 
+              điều trị STI riêng tư, không phán xét.
             </p>
           </motion.div>
 
@@ -107,7 +107,7 @@ function STITesting() {
               href="#appointment"
               className="px-6 py-3 bg-white text-indigo-900 rounded-full font-medium hover:bg-opacity-90 transition-all flex items-center"
             >
-              Book an Appointment
+              Đặt Lịch Hẹn
               <svg
                 xmlns="http://www.w3.org/2000/svg"
                 className="h-5 w-5 ml-1"
@@ -125,7 +125,7 @@ function STITesting() {
               href="#faq"
               className="px-6 py-3 bg-transparent border border-white text-white rounded-full font-medium hover:bg-white hover:bg-opacity-10 transition-all flex items-center"
             >
-              Learn More
+              Tìm Hiểu Thêm
               <svg
                 xmlns="http://www.w3.org/2000/svg"
                 className="h-5 w-5 ml-1"
@@ -154,13 +154,13 @@ function STITesting() {
           className="mb-16"
         >
           <h2 className="text-3xl font-bold text-gray-900 mb-6 text-center">
-            Our STI Testing Services
+            Dịch Vụ Xét Nghiệm STI Của Chúng Tôi
           </h2>
           <div className="bg-white rounded-xl shadow-lg overflow-hidden">
             <div className="grid md:grid-cols-2 gap-6">
               <div className="p-8">
                 <h3 className="text-2xl font-semibold text-gray-900 mb-4">
-                  Why Choose Our STI Testing Services?
+                  Tại Sao Chọn Dịch Vụ Xét Nghiệm STI Của Chúng Tôi?
                 </h3>
                 <ul className="space-y-3">
                   <li className="flex items-start">
@@ -177,11 +177,11 @@ function STITesting() {
                     </svg>
                     <div>
                       <span className="font-medium text-gray-900">
-                        Complete Confidentiality
+                        Hoàn Toàn Bảo Mật
                       </span>
                       <p className="text-gray-600 mt-1">
-                        Your privacy is our top priority. All testing and
-                        results are handled with the utmost confidentiality.
+                        Sự riêng tư của bạn là ưu tiên hàng đầu của chúng tôi. 
+                        Tất cả các xét nghiệm và kết quả đều được xử lý với sự bảo mật tuyệt đối.
                       </p>
                     </div>
                   </li>
@@ -199,11 +199,11 @@ function STITesting() {
                     </svg>
                     <div>
                       <span className="font-medium text-gray-900">
-                        Secure Results Delivery
+                        Gửi Kết Quả An Toàn
                       </span>
                       <p className="text-gray-600 mt-1">
-                        Access your results online through our secure patient
-                        portal, ensuring privacy and quick access.
+                        Truy cập kết quả của bạn trực tuyến thông qua cổng thông tin bệnh nhân 
+                        bảo mật, đảm bảo sự riêng tư và truy cập nhanh chóng.
                       </p>
                     </div>
                   </li>
@@ -221,12 +221,11 @@ function STITesting() {
                     </svg>
                     <div>
                       <span className="font-medium text-gray-900">
-                        Comprehensive Care
+                        Chăm Sóc Toàn Diện
                       </span>
                       <p className="text-gray-600 mt-1">
-                        If testing reveals an infection, our healthcare
-                        providers can prescribe treatment and provide follow-up
-                        care.
+                        Nếu xét nghiệm phát hiện nhiễm trùng, các bác sĩ của chúng tôi 
+                        có thể kê đơn điều trị và cung cấp dịch vụ chăm sóc tiếp theo.
                       </p>
                     </div>
                   </li>
@@ -234,7 +233,7 @@ function STITesting() {
               </div>
               <div className="bg-purple-50 p-8">
                 <h3 className="text-2xl font-semibold text-gray-900 mb-4">
-                  Our Testing Process
+                  Quy Trình Xét Nghiệm Của Chúng Tôi
                 </h3>
                 <ol className="space-y-3">
                   <li className="flex">
@@ -243,10 +242,10 @@ function STITesting() {
                     </div>
                     <div>
                       <p className="font-medium text-gray-900">
-                        Book an appointment
+                        Đặt lịch hẹn
                       </p>
                       <p className="text-gray-600 mt-1">
-                        Schedule online or by phone at your convenience
+                        Đặt lịch trực tuyến hoặc qua điện thoại theo thời gian thuận tiện cho bạn
                       </p>
                     </div>
                   </li>
@@ -256,11 +255,10 @@ function STITesting() {
                     </div>
                     <div>
                       <p className="font-medium text-gray-900">
-                        Visit our clinic
+                        Đến phòng khám của chúng tôi
                       </p>
                       <p className="text-gray-600 mt-1">
-                        Meet with our healthcare professionals in a comfortable,
-                        private setting
+                        Gặp gỡ các chuyên gia y tế của chúng tôi trong môi trường thoải mái, riêng tư
                       </p>
                     </div>
                   </li>
@@ -270,11 +268,10 @@ function STITesting() {
                     </div>
                     <div>
                       <p className="font-medium text-gray-900">
-                        Sample collection
+                        Thu thập mẫu
                       </p>
                       <p className="text-gray-600 mt-1">
-                        Quick and easy sample collection by trained
-                        professionals
+                        Thu thập mẫu nhanh chóng và dễ dàng bởi các chuyên gia được đào tạo
                       </p>
                     </div>
                   </li>
@@ -284,10 +281,10 @@ function STITesting() {
                     </div>
                     <div>
                       <p className="font-medium text-gray-900">
-                        Receive results
+                        Nhận kết quả
                       </p>
                       <p className="text-gray-600 mt-1">
-                        Get results securely online within 2-3 days
+                        Nhận kết quả an toàn trực tuyến trong vòng 2-3 ngày
                       </p>
                     </div>
                   </li>
@@ -297,10 +294,10 @@ function STITesting() {
                     </div>
                     <div>
                       <p className="font-medium text-gray-900">
-                        Treatment (if needed)
+                        Điều trị (nếu cần)
                       </p>
                       <p className="text-gray-600 mt-1">
-                        Receive treatment options and follow-up care
+                        Nhận các phương án điều trị và chăm sóc tiếp theo
                       </p>
                     </div>
                   </li>
@@ -319,21 +316,20 @@ function STITesting() {
           className="mb-16"
         >
           <h2 className="text-3xl font-bold text-gray-900 mb-6 text-center">
-            Testing Options
+            Các Gói Xét Nghiệm
           </h2>
           <div className="grid grid-cols-1 md:grid-cols-3 gap-8">
             {/* Basic STI Test */}
             <div className="bg-white rounded-xl shadow-md overflow-hidden border border-gray-200 hover:shadow-lg transition-shadow">
               <div className="p-6">
                 <h3 className="text-xl font-semibold text-gray-900 mb-2">
-                  Basic STI Test
+                  Xét Nghiệm STI Cơ Bản
                 </h3>
                 <p className="text-gray-600 mb-4">
-                  Testing for the most common infections including chlamydia and
-                  gonorrhea.
+                  Xét nghiệm các bệnh nhiễm trùng phổ biến nhất bao gồm chlamydia và lậu.
                 </p>
                 <div className="mb-4 text-2xl font-bold text-indigo-600">
-                  $79
+                  1.800.000đ
                 </div>
                 <ul className="mb-6 space-y-2">
                   <li className="flex items-center text-sm text-gray-600">
@@ -348,7 +344,7 @@ function STITesting() {
                         clipRule="evenodd"
                       ></path>
                     </svg>
-                    Chlamydia testing
+                    Xét nghiệm Chlamydia
                   </li>
                   <li className="flex items-center text-sm text-gray-600">
                     <svg
@@ -362,7 +358,7 @@ function STITesting() {
                         clipRule="evenodd"
                       ></path>
                     </svg>
-                    Gonorrhea testing
+                    Xét nghiệm bệnh lậu
                   </li>
                   <li className="flex items-center text-sm text-gray-600">
                     <svg
@@ -376,14 +372,14 @@ function STITesting() {
                         clipRule="evenodd"
                       ></path>
                     </svg>
-                    Results in 2-3 days
+                    Có kết quả trong 2-3 ngày
                   </li>
                 </ul>
                 <a
                   href="#appointment"
                   className="inline-block w-full px-4 py-2 bg-white text-indigo-600 border border-indigo-600 rounded-md text-center font-medium hover:bg-indigo-50 transition-colors"
                 >
-                  Book Now
+                  Đặt Ngay
                 </a>
               </div>
             </div>
@@ -392,19 +388,18 @@ function STITesting() {
             <div className="bg-indigo-50 rounded-xl shadow-lg overflow-hidden border-2 border-indigo-500 hover:shadow-xl transition-shadow transform scale-105">
               <div className="absolute inset-x-0 -top-4 flex justify-center">
                 <span className="inline-block px-4 py-3 rounded-full bg-indigo-600 text-white text-xs font-semibold uppercase tracking-wider">
-                  Most Popular
+                  Phổ Biến Nhất
                 </span>
               </div>
               <div className="p-6 pt-8">
                 <h3 className="text-xl font-semibold text-gray-900 mb-2">
-                  Comprehensive STI Test
+                  Xét Nghiệm STI Toàn Diện
                 </h3>
                 <p className="text-gray-600 mb-4">
-                  Complete testing package for all common sexually transmitted
-                  infections.
+                  Gói xét nghiệm đầy đủ cho tất cả các bệnh lây truyền qua đường tình dục phổ biến.
                 </p>
                 <div className="mb-4 text-2xl font-bold text-indigo-600">
-                  $149
+                  3.400.000đ
                 </div>
                 <ul className="mb-6 space-y-2">
                   <li className="flex items-center text-sm text-gray-600">
@@ -419,7 +414,7 @@ function STITesting() {
                         clipRule="evenodd"
                       ></path>
                     </svg>
-                    Tests for all common STIs
+                    Xét nghiệm tất cả STI phổ biến
                   </li>
                   <li className="flex items-center text-sm text-gray-600">
                     <svg
@@ -433,7 +428,7 @@ function STITesting() {
                         clipRule="evenodd"
                       ></path>
                     </svg>
-                    HIV & Hepatitis testing
+                    Xét nghiệm HIV & Viêm gan
                   </li>
                   <li className="flex items-center text-sm text-gray-600">
                     <svg
@@ -447,7 +442,7 @@ function STITesting() {
                         clipRule="evenodd"
                       ></path>
                     </svg>
-                    Doctor consultation included
+                    Bao gồm tư vấn với bác sĩ
                   </li>
                   <li className="flex items-center text-sm text-gray-600">
                     <svg
@@ -461,7 +456,7 @@ function STITesting() {
                         clipRule="evenodd"
                       ></path>
                     </svg>
-                    Expedited results (1-2 days)
+                    Kết quả nhanh (1-2 ngày)
                   </li>
                   <li className="flex items-center text-sm text-gray-600">
                     <svg
@@ -475,14 +470,14 @@ function STITesting() {
                         clipRule="evenodd"
                       ></path>
                     </svg>
-                    Treatment options if needed
+                    Các phương án điều trị nếu cần
                   </li>
                 </ul>
                 <a
                   href="#appointment"
                   className="inline-block w-full px-4 py-2 bg-indigo-600 text-white rounded-md text-center font-medium hover:bg-indigo-700 transition-colors"
                 >
-                  Book Now
+                  Đặt Ngay
                 </a>
               </div>
             </div>
@@ -491,13 +486,13 @@ function STITesting() {
             <div className="bg-white rounded-xl shadow-md overflow-hidden border border-gray-200 hover:shadow-lg transition-shadow">
               <div className="p-6">
                 <h3 className="text-xl font-semibold text-gray-900 mb-2">
-                  Targeted Test
+                  Xét Nghiệm Đích
                 </h3>
                 <p className="text-gray-600 mb-4">
-                  Specific testing based on your concerns or exposure.
+                  Xét nghiệm cụ thể dựa trên mối quan tâm hoặc tiếp xúc của bạn.
                 </p>
                 <div className="mb-4 text-2xl font-bold text-indigo-600">
-                  $99
+                  2.300.000đ
                 </div>
                 <ul className="mb-6 space-y-2">
                   <li className="flex items-center text-sm text-gray-600">
@@ -512,7 +507,7 @@ function STITesting() {
                         clipRule="evenodd"
                       ></path>
                     </svg>
-                    Customized testing plan
+                    Kế hoạch xét nghiệm tùy chỉnh
                   </li>
                   <li className="flex items-center text-sm text-gray-600">
                     <svg
@@ -526,7 +521,7 @@ function STITesting() {
                         clipRule="evenodd"
                       ></path>
                     </svg>
-                    Initial consultation included
+                    Bao gồm tư vấn ban đầu
                   </li>
                   <li className="flex items-center text-sm text-gray-600">
                     <svg
@@ -540,7 +535,7 @@ function STITesting() {
                         clipRule="evenodd"
                       ></path>
                     </svg>
-                    Results within 2-3 days
+                    Kết quả trong vòng 2-3 ngày
                   </li>
                   <li className="flex items-center text-sm text-gray-600">
                     <svg
@@ -554,14 +549,14 @@ function STITesting() {
                         clipRule="evenodd"
                       ></path>
                     </svg>
-                    Follow-up recommendations
+                    Khuyến nghị theo dõi
                   </li>
                 </ul>
                 <a
                   href="#appointment"
                   className="inline-block w-full px-4 py-2 bg-white text-indigo-600 border border-indigo-600 rounded-md text-center font-medium hover:bg-indigo-50 transition-colors"
                 >
-                  Book Now
+                  Đặt Ngay
                 </a>
               </div>
             </div>
@@ -578,7 +573,7 @@ function STITesting() {
           className="mb-16 scroll-mt-24"
         >
           <h2 className="text-3xl font-bold text-gray-900 mb-6 text-center">
-            Book Your STI Testing Appointment
+            Đặt Lịch Xét Nghiệm STI
           </h2>
 
           {submitSuccess ? (
@@ -598,17 +593,17 @@ function STITesting() {
                 />
               </svg>
               <h3 className="text-xl font-semibold text-gray-900 mb-2">
-                Appointment Scheduled!
+                Đặt Lịch Hẹn Thành Công!
               </h3>
               <p className="text-gray-600 mb-4">
-                Your STI testing appointment has been successfully scheduled.
-                You will receive a confirmation email shortly.
+                Lịch hẹn xét nghiệm STI của bạn đã được đặt thành công. 
+                Bạn sẽ nhận được email xác nhận trong thời gian ngắn.
               </p>
               <button
                 onClick={() => setSubmitSuccess(false)}
                 className="px-4 py-2 bg-indigo-600 text-white rounded-md hover:bg-indigo-700 transition-colors"
               >
-                Book Another Appointment
+                Đặt Lịch Hẹn Khác
               </button>
             </div>
           ) : (
@@ -620,7 +615,7 @@ function STITesting() {
                       htmlFor="name"
                       className="block text-sm font-medium text-gray-700 mb-1"
                     >
-                      Full Name *
+                      Họ Tên *
                     </label>
                     <input
                       type="text"
@@ -637,7 +632,7 @@ function STITesting() {
                       htmlFor="email"
                       className="block text-sm font-medium text-gray-700 mb-1"
                     >
-                      Email Address *
+                      Email *
                     </label>
                     <input
                       type="email"
@@ -654,7 +649,7 @@ function STITesting() {
                       htmlFor="phone"
                       className="block text-sm font-medium text-gray-700 mb-1"
                     >
-                      Phone Number *
+                      Số Điện Thoại *
                     </label>
                     <input
                       type="tel"
@@ -671,7 +666,7 @@ function STITesting() {
                       htmlFor="testType"
                       className="block text-sm font-medium text-gray-700 mb-1"
                     >
-                      Test Type *
+                      Loại Xét Nghiệm *
                     </label>
                     <select
                       id="testType"
@@ -681,11 +676,11 @@ function STITesting() {
                       onChange={handleChange}
                       className="w-full px-4 py-2 border border-gray-300 rounded-md focus:ring-indigo-500 focus:border-indigo-500"
                     >
-                      <option value="basic">Basic STI Test ($79)</option>
+                      <option value="basic">Xét Nghiệm STI Cơ Bản (1.800.000đ)</option>
                       <option value="comprehensive">
-                        Comprehensive STI Test ($149)
+                        Xét Nghiệm STI Toàn Diện (3.400.000đ)
                       </option>
-                      <option value="targeted">Targeted Test ($99)</option>
+                      <option value="targeted">Xét Nghiệm Đích (2.300.000đ)</option>
                     </select>
                   </div>
                   <div>
@@ -693,7 +688,7 @@ function STITesting() {
                       htmlFor="date"
                       className="block text-sm font-medium text-gray-700 mb-1"
                     >
-                      Preferred Date *
+                      Ngày Mong Muốn *
                     </label>
                     <input
                       type="date"
@@ -710,7 +705,7 @@ function STITesting() {
                       htmlFor="time"
                       className="block text-sm font-medium text-gray-700 mb-1"
                     >
-                      Preferred Time *
+                      Giờ Mong Muốn *
                     </label>
                     <select
                       id="time"
@@ -720,14 +715,14 @@ function STITesting() {
                       onChange={handleChange}
                       className="w-full px-4 py-2 border border-gray-300 rounded-md focus:ring-indigo-500 focus:border-indigo-500"
                     >
-                      <option value="">Select a time</option>
-                      <option value="9:00 AM">9:00 AM</option>
-                      <option value="10:00 AM">10:00 AM</option>
-                      <option value="11:00 AM">11:00 AM</option>
-                      <option value="1:00 PM">1:00 PM</option>
-                      <option value="2:00 PM">2:00 PM</option>
-                      <option value="3:00 PM">3:00 PM</option>
-                      <option value="4:00 PM">4:00 PM</option>
+                      <option value="">Chọn thời gian</option>
+                      <option value="9:00 AM">9:00 Sáng</option>
+                      <option value="10:00 AM">10:00 Sáng</option>
+                      <option value="11:00 AM">11:00 Sáng</option>
+                      <option value="1:00 PM">1:00 Chiều</option>
+                      <option value="2:00 PM">2:00 Chiều</option>
+                      <option value="3:00 PM">3:00 Chiều</option>
+                      <option value="4:00 PM">4:00 Chiều</option>
                     </select>
                   </div>
                   <div className="md:col-span-2">
@@ -735,7 +730,7 @@ function STITesting() {
                       htmlFor="notes"
                       className="block text-sm font-medium text-gray-700 mb-1"
                     >
-                      Additional Notes (Optional)
+                      Ghi Chú Bổ Sung (Tùy chọn)
                     </label>
                     <textarea
                       id="notes"
@@ -744,22 +739,22 @@ function STITesting() {
                       value={formData.notes}
                       onChange={handleChange}
                       className="w-full px-4 py-2 border border-gray-300 rounded-md focus:ring-indigo-500 focus:border-indigo-500"
-                      placeholder="Any specific concerns or questions you'd like to discuss?"
+                      placeholder="Bất kỳ mối quan tâm hoặc câu hỏi cụ thể nào bạn muốn thảo luận?"
                     ></textarea>
                   </div>
                 </div>
 
                 <div className="mt-6">
                   <p className="text-sm text-gray-500 mb-4">
-                    Your information will be kept strictly confidential. By
-                    submitting this form, you agree to our{" "}
+                    Thông tin của bạn sẽ được giữ bí mật nghiêm ngặt. Khi gửi biểu mẫu này,
+                    bạn đồng ý với{" "}
                     <Link
                       to="/privacy-policy"
                       className="text-indigo-600 hover:text-indigo-500"
                     >
-                      privacy policy
+                      chính sách bảo mật
                     </Link>
-                    .
+                    {" "}của chúng tôi.
                   </p>
                   <button
                     type="submit"
@@ -790,10 +785,10 @@ function STITesting() {
                             d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"
                           ></path>
                         </svg>
-                        Processing...
+                        Đang xử lý...
                       </span>
                     ) : (
-                      "Schedule Appointment"
+                      "Đặt Lịch Hẹn"
                     )}
                   </button>
                 </div>
@@ -818,7 +813,7 @@ function STITesting() {
           className="mb-16 scroll-mt-24"
         >
           <h2 className="text-3xl font-bold text-gray-900 mb-6 text-center">
-            Frequently Asked Questions
+            Câu Hỏi Thường Gặp
           </h2>
           <div className="max-w-3xl mx-auto">
             <div className="bg-white rounded-xl shadow-md overflow-hidden">
@@ -826,83 +821,79 @@ function STITesting() {
                 {/* FAQ Item 1 */}
                 <div className="p-6">
                   <h3 className="text-lg font-medium text-gray-900 mb-2">
-                    How long does STI testing take?
+                    Xét nghiệm STI mất bao lâu?
                   </h3>
                   <p className="text-gray-600">
-                    The actual testing process usually takes about 15-20
-                    minutes. Most of this time is spent on paperwork and
-                    consultation. The sample collection itself is quick and
-                    minimally invasive.
+                    Quá trình xét nghiệm thường mất khoảng 15-20 phút. Phần lớn thời gian này 
+                    dành cho thủ tục giấy tờ và tư vấn. Việc thu thập mẫu xét nghiệm diễn ra 
+                    nhanh chóng và ít xâm lấn.
                   </p>
                 </div>
 
                 {/* FAQ Item 2 */}
                 <div className="p-6">
                   <h3 className="text-lg font-medium text-gray-900 mb-2">
-                    How soon will I receive my results?
+                    Tôi sẽ nhận kết quả trong bao lâu?
                   </h3>
                   <p className="text-gray-600">
-                    Results are typically available within 2-3 days for standard
-                    tests and 1-2 days for expedited services. You'll receive a
-                    secure notification when your results are ready to view in
-                    our patient portal.
+                    Kết quả thường có trong vòng 2-3 ngày đối với các xét nghiệm tiêu chuẩn và 
+                    1-2 ngày đối với dịch vụ nhanh. Bạn sẽ nhận được thông báo bảo mật khi 
+                    kết quả của bạn đã sẵn sàng để xem trên cổng thông tin bệnh nhân của chúng tôi.
                   </p>
                 </div>
 
                 {/* FAQ Item 3 */}
                 <div className="p-6">
                   <h3 className="text-lg font-medium text-gray-900 mb-2">
-                    Is STI testing confidential?
+                    Xét nghiệm STI có bảo mật không?
                   </h3>
                   <p className="text-gray-600">
-                    Absolutely. We take your privacy very seriously. All testing
-                    is completely confidential, and your results are only
-                    accessible to you and your healthcare provider. Our online
-                    portal uses encryption to keep your information secure.
+                    Hoàn toàn bảo mật. Chúng tôi rất coi trọng quyền riêng tư của bạn. Tất cả các 
+                    xét nghiệm đều hoàn toàn bảo mật, và kết quả của bạn chỉ có thể truy cập được 
+                    bởi bạn và nhà cung cấp dịch vụ chăm sóc sức khỏe của bạn. Cổng thông tin trực 
+                    tuyến của chúng tôi sử dụng mã hóa để giữ thông tin của bạn an toàn.
                   </p>
                 </div>
 
                 {/* FAQ Item 4 */}
                 <div className="p-6">
                   <h3 className="text-lg font-medium text-gray-900 mb-2">
-                    What should I do if my test is positive?
+                    Tôi nên làm gì nếu kết quả xét nghiệm dương tính?
                   </h3>
                   <p className="text-gray-600">
-                    If your test comes back positive, don't panic. Many STIs are
-                    easily treatable. Our healthcare providers will guide you
-                    through treatment options and can prescribe medication if
-                    necessary. We also offer counseling services and partner
-                    notification assistance if desired.
+                    Nếu kết quả xét nghiệm của bạn dương tính, đừng hoảng sợ. Nhiều STI có thể 
+                    dễ dàng điều trị. Các chuyên gia y tế của chúng tôi sẽ hướng dẫn bạn các 
+                    phương pháp điều trị và có thể kê đơn thuốc nếu cần thiết. Chúng tôi cũng 
+                    cung cấp dịch vụ tư vấn và hỗ trợ thông báo cho bạn tình nếu được yêu cầu.
                   </p>
                 </div>
 
                 {/* FAQ Item 5 */}
                 <div className="p-6">
                   <h3 className="text-lg font-medium text-gray-900 mb-2">
-                    How often should I get tested?
+                    Tôi nên xét nghiệm thường xuyên như thế nào?
                   </h3>
                   <p className="text-gray-600">
-                    The frequency of testing depends on your individual risk
-                    factors. Generally, we recommend annual testing for sexually
-                    active individuals. However, more frequent testing (every
-                    3-6 months) may be appropriate for those with multiple
-                    partners or other risk factors. Our healthcare providers can
-                    help determine the best testing schedule for you.
+                    Tần suất xét nghiệm phụ thuộc vào các yếu tố rủi ro cá nhân của bạn. Nhìn chung, 
+                    chúng tôi khuyến nghị xét nghiệm hàng năm cho những người có đời sống tình dục 
+                    hoạt động. Tuy nhiên, xét nghiệm thường xuyên hơn (mỗi 3-6 tháng) có thể phù hợp 
+                    cho những người có nhiều bạn tình hoặc các yếu tố rủi ro khác. Các nhà cung cấp 
+                    dịch vụ chăm sóc sức khỏe của chúng tôi có thể giúp xác định lịch xét nghiệm 
+                    phù hợp nhất cho bạn.
                   </p>
                 </div>
 
                 {/* FAQ Item 6 */}
                 <div className="p-6">
                   <h3 className="text-lg font-medium text-gray-900 mb-2">
-                    Do I need to prepare for STI testing?
+                    Tôi có cần chuẩn bị gì cho xét nghiệm STI không?
                   </h3>
                   <p className="text-gray-600">
-                    For most STI tests, no special preparation is required.
-                    However, for certain tests, you may be advised to avoid
-                    urinating for 1-2 hours before your appointment. If you're
-                    scheduled for a blood test, you can eat and drink normally
-                    beforehand. Our staff will provide specific instructions if
-                    needed when you book your appointment.
+                    Đối với hầu hết các xét nghiệm STI, không cần chuẩn bị đặc biệt. Tuy nhiên, với 
+                    một số xét nghiệm nhất định, bạn có thể được khuyên không nên đi tiểu trong 
+                    1-2 giờ trước cuộc hẹn. Nếu bạn được lên lịch xét nghiệm máu, bạn có thể ăn và 
+                    uống bình thường trước đó. Nhân viên của chúng tôi sẽ cung cấp hướng dẫn cụ thể 
+                    nếu cần khi bạn đặt lịch hẹn.
                   </p>
                 </div>
               </div>
@@ -920,30 +911,30 @@ function STITesting() {
         >
           <div className="bg-gradient-to-r from-purple-800 to-indigo-900 text-white py-10 px-6 rounded-xl">
             <h2 className="text-2xl md:text-3xl font-bold mb-4">
-              Take control of your sexual health today
+              Kiểm soát sức khỏe tình dục của bạn ngay hôm nay
             </h2>
             <p className="max-w-2xl mx-auto text-lg mb-6">
-              Regular STI testing is an important part of maintaining your
-              overall health. Book your confidential appointment now.
+              Xét nghiệm STI định kỳ là một phần quan trọng trong việc duy trì sức khỏe tổng thể 
+              của bạn. Đặt lịch hẹn bảo mật của bạn ngay bây giờ.
             </p>{" "}
             <div className="flex flex-wrap justify-center gap-4">
               <a
                 href="#appointment"
                 className="px-6 py-3 bg-white text-indigo-900 rounded-md font-medium hover:bg-opacity-90 transition-all"
               >
-                Book an Appointment
+                Đặt Lịch Hẹn
               </a>
               <Link
                 to="/contact"
                 className="px-6 py-3 bg-transparent border border-white text-white rounded-md font-medium hover:bg-white hover:bg-opacity-10 transition-all"
               >
-                Contact Us
+                Liên Hệ Chúng Tôi
               </Link>
               <Link
                 to="/services"
                 className="px-6 py-3 bg-transparent border border-white text-white rounded-md font-medium hover:bg-white hover:bg-opacity-10 transition-all"
               >
-                View All Services
+                Xem Tất Cả Dịch Vụ
               </Link>
             </div>
           </div>

@@ -24,8 +24,8 @@ const users = [
   {
     id: 3,
     name: "Dr. Jamie Wilson",
-    email: "doctor@example.com",
-    password: "doctor123",
+    email: "admin@gmail.com",
+    password: "123",
     role: "doctor",
     gender: "male",
     specialty: "OB/GYN",

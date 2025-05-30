@@ -11,7 +11,7 @@ const TrackerDashboard = () => {
     <div className="bg-gray-50 min-h-screen py-12">
       <div className="container mx-auto px-4">
         <h1 className="text-3xl font-bold text-center text-indigo-600 mb-8">
-          Menstrual Cycle Tracking
+          Theo Dõi Chu Kì Kinh Nguyệt
         </h1>
         
         <div className="bg-white rounded-lg shadow-lg overflow-hidden">
@@ -26,7 +26,7 @@ const TrackerDashboard = () => {
               }`}
             >
               <Calendar className="w-5 h-5 mr-2" />
-              Cycle Calendar
+              Lịch Chu Kỳ
             </button>
             <button
               onClick={() => setActiveTab('ovulation')}
@@ -37,7 +37,7 @@ const TrackerDashboard = () => {
               }`}
             >
               <Clock className="w-5 h-5 mr-2" />
-              Ovulation Predictor
+              Dự Đoán Rụng Trứng
             </button>
             <button
               onClick={() => setActiveTab('reminders')}
@@ -48,7 +48,7 @@ const TrackerDashboard = () => {
               }`}
             >
               <Bell className="w-5 h-5 mr-2" />
-              Reminders
+              Nhắc nhở
             </button>
           </div>
 
@@ -56,9 +56,9 @@ const TrackerDashboard = () => {
           <div className="p-6">
             {activeTab === 'calendar' && (
               <div>
-                <h2 className="text-xl font-semibold mb-4">Monthly Cycle Calendar</h2>
+                <h2 className="text-xl font-semibold mb-4">Lịch Chu Kỳ Hằng Tháng</h2>
                 <p className="text-gray-600 mb-4">
-                  Track your period, symptoms, and fertile window with our easy-to-use calendar.
+                Theo dõi kỳ kinh nguyệt, triệu chứng và thời kỳ dễ thụ thai bằng lịch dễ sử dụng của chúng tôi.
                 </p>
                 <CycleCalendar />
               </div>
@@ -66,9 +66,9 @@ const TrackerDashboard = () => {
 
             {activeTab === 'ovulation' && (
               <div>
-                <h2 className="text-xl font-semibold mb-4">Ovulation Predictor</h2>
+                <h2 className="text-xl font-semibold mb-4">Dự Đoán Rụng Trứng</h2>
                 <p className="text-gray-600 mb-4">
-                  Predict your most fertile days based on your cycle history.
+                Dự đoán những ngày dễ thụ thai nhất dựa trên lịch sử chu kỳ của bạn.
                 </p>
                 <OvulationPredictor />
               </div>
@@ -76,9 +76,9 @@ const TrackerDashboard = () => {
 
             {activeTab === 'reminders' && (
               <div>
-                <h2 className="text-xl font-semibold mb-4">Health Reminders</h2>
+                <h2 className="text-xl font-semibold mb-4">Nhắc Nhở Sức Khỏe</h2>
                 <p className="text-gray-600 mb-4">
-                  Set up reminders for birth control, health checks, and more.
+                Thiết lập nhắc nhở cho việc uống thuốc ngừa thai, kiểm tra sức khỏe và nhiều hơn nữa.
                 </p>
                 <ReminderSettings />
               </div>

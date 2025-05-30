@@ -94,15 +94,15 @@ const CycleCalendar = () => {
       <div className="mt-6 flex justify-center space-x-6 text-base">
         <div className="flex items-center">
           <span className="w-5 h-5 bg-red-500 rounded-full mr-2"></span>
-          <span className="text-gray-700 font-medium">Period</span>
+          <span className="text-gray-700 font-medium">Kinh nguyệt</span>
         </div>
         <div className="flex items-center">
           <span className="w-5 h-5 bg-blue-500 rounded-full mr-2"></span>
-          <span className="text-gray-700 font-medium">Fertile</span>
+          <span className="text-gray-700 font-medium">Dễ thụ thai</span>
         </div>
         <div className="flex items-center">
           <span className="w-5 h-5 bg-purple-500 rounded-full mr-2"></span>
-          <span className="text-gray-700 font-medium">Ovulation</span>
+          <span className="text-gray-700 font-medium">Rụng trứng</span>
         </div>
       </div>
       

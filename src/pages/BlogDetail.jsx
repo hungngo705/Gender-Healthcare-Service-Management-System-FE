@@ -57,17 +57,17 @@ function BlogDetail() {
     return (
       <div className="min-h-screen bg-gray-50 flex flex-col items-center justify-center p-4">
         <h1 className="text-2xl font-bold text-gray-800 mb-4">
-          Post not found
+          Không tìm thấy bài viết
         </h1>
         <p className="text-gray-600 mb-8">
-          The article you are looking for does not exist or has been deleted.
+          Bài viết bạn đang tìm kiếm không tồn tại hoặc đã bị xóa.
         </p>
         <Link
           to="/blog"
           className="flex items-center text-indigo-600 hover:text-indigo-800 transition-colors"
         >
           <ArrowLeft className="w-5 h-5 mr-2" />
-          <span>Back to news page</span>
+          <span>Quay lại trang tin tức</span>
         </Link>
       </div>
     );
@@ -113,7 +113,7 @@ function BlogDetail() {
         break;
       case "copy":
         navigator.clipboard.writeText(shareUrl);
-        alert("Link copied!");
+        alert("Đã sao chép liên kết!");
         break;
       default:
         break;
@@ -143,7 +143,7 @@ function BlogDetail() {
                   <h3 className="text-lg font-medium text-gray-900">
                     {blog.author}
                   </h3>
-                  <p className="text-sm text-gray-600">Specialist Doctor</p>
+                  <p className="text-sm text-gray-600">Bác sĩ Chuyên khoa</p>
                 </div>
               </div>
 
@@ -151,7 +151,7 @@ function BlogDetail() {
                 <div className="flex items-center mr-6 text-gray-600">
                   <Calendar className="w-4 h-4 mr-1" />
                   <span className="text-sm">
-                    {new Date(blog.date).toLocaleDateString("en-US", {
+                    {new Date(blog.date).toLocaleDateString("vi-VN", {
                       year: "numeric",
                       month: "long",
                       day: "numeric",
@@ -160,7 +160,7 @@ function BlogDetail() {
                 </div>
                 <div className="flex items-center text-gray-600">
                   <Clock className="w-4 h-4 mr-1" />
-                  <span className="text-sm">{blog.readingTime} minute read</span>
+                  <span className="text-sm">{blog.readingTime} phút đọc</span>
                 </div>
               </div>
             </div>
@@ -205,7 +205,7 @@ function BlogDetail() {
               className="flex items-center text-indigo-600 hover:text-indigo-800 transition-colors"
             >
               <ArrowLeft className="w-5 h-5 mr-2" />
-              <span>Back to articles</span>
+              <span>Quay lại danh sách</span>
             </Link>
             <div className="flex space-x-4">
               <div className="relative">
@@ -214,14 +214,14 @@ function BlogDetail() {
                   className="flex items-center text-gray-600 hover:text-indigo-600 transition-colors"
                 >
                   <Share2 className="w-5 h-5 mr-1" />
-                  <span>Share</span>
+                  <span>Chia sẻ</span>
                 </button>
 
                 {showSharePopup && (
                   <div className="absolute right-0 bottom-12 w-64 bg-white rounded-lg shadow-lg p-4 border border-gray-100 z-50">
                     <div className="flex justify-between items-center mb-3">
                       <h4 className="font-medium text-gray-800">
-                        Share article
+                        Chia sẻ bài viết
                       </h4>
                       <button
                         onClick={() => setShowSharePopup(false)}
@@ -265,7 +265,7 @@ function BlogDetail() {
                         className="flex flex-col items-center p-2 rounded hover:bg-blue-50 transition-colors"
                       >
                         <LinkIcon className="w-6 h-6 text-gray-600 mb-1" />
-                        <span className="text-xs text-gray-600">Copy</span>
+                        <span className="text-xs text-gray-600">Sao chép</span>
                       </button>
                     </div>
                   </div>
@@ -273,7 +273,7 @@ function BlogDetail() {
               </div>
               <button className="flex items-center text-gray-600 hover:text-indigo-600 transition-colors">
                 <Bookmark className="w-5 h-5 mr-1" />
-                <span>Save</span>
+                <span>Lưu</span>
               </button>
             </div>
           </div>
@@ -282,7 +282,7 @@ function BlogDetail() {
         {relatedPosts.length > 0 && (
           <div className="mt-16 max-w-5xl mx-auto">
             <h2 className="text-2xl font-bold text-gray-900 mb-6">
-              Related articles
+              Bài viết liên quan
             </h2>
             <div className="grid gap-8 md:grid-cols-3">
               {relatedPosts.map((post) => (
@@ -325,18 +325,18 @@ function BlogDetail() {
         {/* Newsletter subscription */}
         <div className="mt-16 max-w-5xl mx-auto bg-gradient-to-r from-indigo-600 to-purple-600 rounded-lg shadow-lg overflow-hidden">
           <div className="p-8 md:p-10 text-white">
-            <h3 className="text-2xl font-bold mb-4">Subscribe to newsletter</h3>
+            <h3 className="text-2xl font-bold mb-4">Đăng ký nhận bản tin</h3>
             <p className="mb-6 opacity-90">
-              Receive the latest gender health information via email. We won't spam or share your information.
+              Nhận thông tin sức khỏe giới tính mới nhất qua email. Chúng tôi sẽ không gửi thư rác hoặc chia sẻ thông tin của bạn.
             </p>
             <div className="flex flex-col sm:flex-row">
               <input
                 type="email"
-                placeholder="Your email"
+                placeholder="Email của bạn"
                 className="px-4 py-3 w-full sm:w-auto rounded-l text-white focus:outline-none border border-white focus:ring-2 focus:ring-indigo-300 focus:border-transparent transition-colors"
               />
               <button className="mt-2 sm:mt-0 bg-white text-indigo-700 font-medium px-6 py-3 rounded-r hover:bg-gray-200 transition-colors">
-                Subscribe
+                Đăng ký
               </button>
             </div>
           </div>

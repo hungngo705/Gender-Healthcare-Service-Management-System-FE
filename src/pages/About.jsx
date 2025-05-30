@@ -15,7 +15,7 @@ function About() {
               transition={{ duration: 0.5 }}
               className="text-4xl font-extrabold tracking-tight sm:text-5xl"
             >
-              About Us
+              Về Chúng Tôi
             </motion.h1>
             <motion.p
               initial={{ opacity: 0, y: 20 }}
@@ -23,8 +23,9 @@ function About() {
               transition={{ duration: 0.5, delay: 0.2 }}
               className="mt-4 text-xl max-w-3xl mx-auto"
             >
-              We are dedicated to providing gender-sensitive healthcare services
-              that meet the unique needs of all individuals.
+              Chúng tôi chuyên cung cấp các dịch vụ chăm sóc sức khỏe 
+              có tính nhạy cảm về giới tính, đáp ứng nhu cầu đặc biệt 
+              của mỗi cá nhân.
             </motion.p>
           </div>
         </div>
@@ -40,21 +41,21 @@ function About() {
             viewport={{ once: true, amount: 0.1 }}
           >
             <h2 className="text-3xl font-bold text-gray-900 mb-6">
-              Our Mission
+              Sứ Mệnh Của Chúng Tôi
             </h2>
             <p className="text-lg text-gray-600">
-              Our mission is to deliver high-quality, gender-sensitive
-              healthcare services that respect and address the unique needs of
-              all individuals, regardless of gender identity or expression. We
-              strive to create a safe, inclusive, and supportive environment
-              where everyone can access the care they deserve.
+              Sứ mệnh của chúng tôi là cung cấp các dịch vụ chăm sóc sức khỏe 
+              chất lượng cao, nhạy cảm về giới tính, tôn trọng và đáp ứng những 
+              nhu cầu đặc biệt của tất cả mọi người, bất kể bản dạng giới hay 
+              biểu hiện giới tính. Chúng tôi nỗ lực tạo ra một môi trường an toàn, 
+              hòa nhập và hỗ trợ, nơi mọi người có thể tiếp cận sự chăm sóc mà họ xứng đáng.
             </p>
             <div className="mt-8">
               <Link
                 to="/appointment"
                 className="inline-flex items-center justify-center px-6 py-3 border border-transparent text-base font-medium rounded-md text-white bg-indigo-600 hover:bg-indigo-700 transition-colors duration-300"
               >
-                Book an Appointment
+                Đặt Lịch Hẹn
               </Link>
             </div>
           </motion.div>
@@ -67,7 +68,7 @@ function About() {
           >
             <img
               src="https://images.unsplash.com/photo-1576765608535-5f04d1e3f289?ixlib=rb-1.2.1&auto=format&fit=crop&q=80&w=1887&h=1200"
-              alt="Healthcare professionals"
+              alt="Chuyên gia y tế"
               className="w-full h-full object-cover"
             />
             <div className="absolute inset-0 bg-gradient-to-t from-indigo-900/40 to-transparent"></div>
@@ -82,57 +83,50 @@ function About() {
           className="bg-white rounded-xl shadow-lg p-8 mb-16"
         >
           <h2 className="text-3xl font-bold text-gray-900 mb-6 text-center">
-            Our Vision
+            Tầm Nhìn Của Chúng Tôi
           </h2>
           <p className="text-lg text-gray-600 max-w-3xl mx-auto text-center">
-            We envision a healthcare system where gender-specific needs are
-            recognized, respected, and addressed with the highest standards of
-            care. We are committed to advancing healthcare practices and
-            policies that eliminate disparities and promote equity for all
-            genders.
+            Chúng tôi hướng tới một hệ thống y tế nơi các nhu cầu đặc biệt về giới tính 
+            được công nhận, tôn trọng và giải quyết với các tiêu chuẩn chăm sóc cao nhất. 
+            Chúng tôi cam kết thúc đẩy các phương pháp và chính sách chăm sóc sức khỏe 
+            nhằm xóa bỏ sự chênh lệch và thúc đẩy bình đẳng cho mọi giới tính.
           </p>
         </motion.div>
 
         <div className="bg-gradient-to-r from-indigo-50 to-purple-50 rounded-xl p-8 mb-16">
           <h2 className="text-3xl font-bold text-gray-900 mb-8 text-center">
-            Our Core Values
+            Giá Trị Cốt Lõi
           </h2>
           <div className="grid md:grid-cols-3 gap-8">
             {[
               {
-                value: "Respect",
-                description:
-                  "We respect the dignity, autonomy, and unique identities of all individuals.",
+                value: "Tôn Trọng",
+                description: "Chúng tôi tôn trọng phẩm giá, quyền tự quyết, và bản sắc độc đáo của mỗi cá nhân.",
                 icon: "🤝",
               },
               {
-                value: "Inclusivity",
-                description:
-                  "We create a welcoming environment for people of all genders and backgrounds.",
+                value: "Hòa Nhập",
+                description: "Chúng tôi tạo ra môi trường thân thiện cho mọi người thuộc mọi giới tính và nguồn gốc.",
                 icon: "🌈",
               },
               {
-                value: "Excellence",
-                description:
-                  "We provide the highest quality of care using evidence-based practices.",
+                value: "Xuất Sắc",
+                description: "Chúng tôi cung cấp dịch vụ chăm sóc chất lượng cao nhất dựa trên các phương pháp khoa học.",
                 icon: "🌟",
               },
               {
-                value: "Compassion",
-                description:
-                  "We approach each person with empathy and understanding.",
+                value: "Lòng Trắc Ẩn",
+                description: "Chúng tôi tiếp cận mỗi người với sự cảm thông và thấu hiểu.",
                 icon: "❤️",
               },
               {
-                value: "Education",
-                description:
-                  "We are committed to continuous learning and professional development.",
+                value: "Giáo Dục",
+                description: "Chúng tôi cam kết học hỏi liên tục và phát triển chuyên môn.",
                 icon: "📚",
               },
               {
-                value: "Privacy",
-                description:
-                  "We protect the privacy and confidentiality of each client's information.",
+                value: "Bảo Mật",
+                description: "Chúng tôi bảo vệ quyền riêng tư và bảo mật thông tin của mỗi khách hàng.",
                 icon: "🔒",
               },
             ].map((item, index) => (
@@ -157,27 +151,27 @@ function About() {
         {/* Team Section */}
         <div className="mb-16">
           <h2 className="text-3xl font-bold text-gray-900 mb-8 text-center">
-            Our Team
+            Đội Ngũ Của Chúng Tôi
           </h2>
           <div className="grid md:grid-cols-3 gap-8">
             {[
               {
-                name: "Dr. Sarah Johnson",
-                role: "Medical Director",
+                name: "Bác sĩ Sarah Johnson",
+                role: "Giám đốc Y tế",
                 image: "https://randomuser.me/api/portraits/women/32.jpg",
-                bio: "OB/GYN specialist with over 15 years of experience in reproductive health.",
+                bio: "Chuyên gia OB/GYN với hơn 15 năm kinh nghiệm trong lĩnh vực sức khỏe sinh sản.",
               },
               {
-                name: "Dr. Michael Chen",
-                role: "Psychological Counselor",
+                name: "Bác sĩ Michael Chen",
+                role: "Cố vấn Tâm lý",
                 image: "https://randomuser.me/api/portraits/men/45.jpg",
-                bio: "Psychologist specializing in sexual and gender identity with a focus on youth issues.",
+                bio: "Nhà tâm lý học chuyên về giới tính và bản dạng giới, tập trung vào các vấn đề thanh thiếu niên.",
               },
               {
-                name: "Dr. Emily Rodriguez",
-                role: "OB/GYN Specialist",
+                name: "Bác sĩ Emily Rodriguez",
+                role: "Chuyên gia OB/GYN",
                 image: "https://randomuser.me/api/portraits/women/68.jpg",
-                bio: "Expert in family planning and sexually transmitted infection treatment.",
+                bio: "Chuyên gia về kế hoạch hóa gia đình và điều trị nhiễm trùng lây truyền qua đường tình dục.",
               },
             ].map((member, index) => (
               <motion.div
@@ -208,18 +202,16 @@ function About() {
         {/* Testimonials */}
         <div className="bg-indigo-700 text-white rounded-xl p-8 mb-16">
           <h2 className="text-3xl font-bold mb-8 text-center">
-            What Our Clients Say
+            Khách Hàng Nói Gì Về Chúng Tôi
           </h2>
           <div className="grid md:grid-cols-2 gap-8">
             {[
               {
-                quote:
-                  "The counseling service has truly changed my life. The staff was so respectful and understanding of my needs.",
+                quote: "Dịch vụ tư vấn đã thực sự thay đổi cuộc sống của tôi. Đội ngũ nhân viên rất tôn trọng và thấu hiểu nhu cầu của tôi.",
                 author: "Jessica M., 28",
               },
               {
-                quote:
-                  "I felt heard and respected. There was no pressure or judgment, just professional support.",
+                quote: "Tôi cảm thấy được lắng nghe và tôn trọng. Không có áp lực hay phán xét, chỉ có sự hỗ trợ chuyên nghiệp.",
                 author: "Thomas W., 35",
               },
             ].map((testimonial, index) => (
@@ -247,24 +239,24 @@ function About() {
           className="text-center"
         >
           <h2 className="text-3xl font-bold text-gray-900 mb-4">
-            Ready to Experience Our Services?
+            Sẵn Sàng Trải Nghiệm Dịch Vụ Của Chúng Tôi?
           </h2>
           <p className="text-xl text-gray-600 mb-8 max-w-2xl mx-auto">
-            Don't hesitate to reach out for high-quality, gender-sensitive
-            healthcare.
+            Đừng ngần ngại liên hệ để được chăm sóc sức khỏe chất lượng cao, 
+            có tính nhạy cảm về giới tính.
           </p>
           <div className="flex flex-col sm:flex-row gap-4 justify-center">
             <Link
               to="/appointment"
               className="inline-flex items-center justify-center px-6 py-3 border border-transparent text-base font-medium rounded-md text-white bg-indigo-600 hover:bg-indigo-700 transition-colors"
             >
-              Book an Appointment
+              Đặt Lịch Hẹn
             </Link>
             <Link
               to="/contact"
               className="inline-flex items-center justify-center px-6 py-3 border border-indigo-600 text-base font-medium rounded-md text-indigo-600 bg-white hover:bg-indigo-50 transition-colors"
             >
-              Contact Us
+              Liên Hệ Với Chúng Tôi
             </Link>
           </div>
         </motion.div>
