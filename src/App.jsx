@@ -138,10 +138,12 @@ function App() {
               }
             />
             <Route
-              path="appointments"
+              commentMore
+              actions
+              path="services/booking"
               element={
-                <ProtectedRoute roleRequired="customer">
-                  <div>Appointments Page</div>
+                <ProtectedRoute>
+                  <Booking />
                 </ProtectedRoute>
               }
             />

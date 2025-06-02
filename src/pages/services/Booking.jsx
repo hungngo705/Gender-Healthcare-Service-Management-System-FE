@@ -172,122 +172,132 @@ const Booking = () => {
   };
 
   return (
-    <div className="max-w-7xl mx-auto px-4 py-12 sm:px-6 lg:px-8">
-      <div className="text-center mb-12">
-        <h1 className="text-4xl font-bold text-gray-900">Đặt Lịch Tư Vấn</h1>
-        <p className="mt-4 text-lg text-gray-600">
-          Chọn tư vấn viên và thời gian phù hợp để đặt lịch hẹn tư vấn sức khỏe
-        </p>
-      </div>
-
-      {bookingSuccess ? (
-        <BookingSuccess onReset={resetBooking} />
-      ) : (
-        <div className="bg-white shadow overflow-hidden rounded-xl">
-          <div className="md:grid md:grid-cols-3">
-            {/* Phần chọn tư vấn viên */}
-            <ConsultantList
-              consultants={consultants}
-              selectedConsultant={selectedConsultant}
-              onSelectConsultant={handleConsultantSelect}
-            />
-
-            {/* Phần chọn ngày và ca */}
-            <div className="border-r border-gray-200">
-              <div className="px-6 py-4 border-b border-gray-200">
-                <h2 className="text-lg font-medium text-gray-900">Chọn Ngày & Giờ</h2>
-              </div>
-              {selectedConsultant ? (
-                <div>
-                  {/* Lựa chọn ngày */}
-                  <DateSelector
-                    dateOptions={dateOptions}
-                    selectedDate={selectedDate}
-                    onDateSelect={handleDateSelect}
-                  />
-
-                  {/* Lựa chọn ca làm việc */}
-                  <TimeSlotSelector
-                    timeSlots={timeSlots}
-                    selectedTimeSlot={selectedTimeSlot}
-                    onTimeSlotSelect={handleTimeSlotSelect}
-                    checkIfBooked={isTimeSlotBooked}
-                  />
-                </div>
-              ) : (
-                <div className="px-6 py-12 text-center">
-                  <svg
-                    className="mx-auto h-12 w-12 text-gray-400"
-                    fill="none"
-                    viewBox="0 0 24 24"
-                    stroke="currentColor"
-                    aria-hidden="true"
-                  >
-                    <path
-                      strokeLinecap="round"
-                      strokeLinejoin="round"
-                      strokeWidth={2}
-                      d="M12 6v6m0 0v6m0-6h6m-6 0H6"
-                    />
-                  </svg>
-                  <h3 className="mt-2 text-sm font-medium text-gray-900">
-                    Chưa chọn tư vấn viên
-                  </h3>
-                  <p className="mt-1 text-sm text-gray-500">
-                    Vui lòng chọn tư vấn viên từ danh sách bên trái để xem lịch làm việc
-                  </p>
-                </div>
-              )}
-            </div>
-
-            {/* Phần thông tin đặt lịch */}
-            <div>
-              <div className="px-6 py-4 border-b border-gray-200">
-                <h2 className="text-lg font-medium text-gray-900">Chi Tiết Đặt Lịch</h2>
-              </div>
-              {selectedConsultant && selectedTimeSlot ? (
-                <BookingForm
-                  selectedConsultant={selectedConsultant}
-                  selectedDate={selectedDate}
-                  selectedTimeSlot={selectedTimeSlot}
-                  formData={formData}
-                  onInputChange={handleInputChange}
-                  onSubmit={handleSubmit}
-                  isSubmitting={isSubmitting}
-                />
-              ) : (
-                <div className="px-6 py-12 text-center">
-                  <svg
-                    className="mx-auto h-12 w-12 text-gray-400"
-                    fill="none"
-                    viewBox="0 0 24 24"
-                    stroke="currentColor"
-                    aria-hidden="true"
-                  >
-                    <path
-                      strokeLinecap="round"
-                      strokeLinejoin="round"
-                      strokeWidth={2}
-                      d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z"
-                    />
-                  </svg>
-                  <h3 className="mt-2 text-sm font-medium text-gray-900">
-                    Chưa chọn đủ thông tin
-                  </h3>
-                  <p className="mt-1 text-sm text-gray-500">
-                    Vui lòng chọn tư vấn viên và ca làm việc phù hợp để tiếp tục
-                  </p>
-                </div>
-              )}
-            </div>
+    <div className="w-full">
+      {/* Banner Section */}
+      <div className="relative bg-gradient-to-r from-blue-500 to-purple-600 py-16">
+        <div className="absolute inset-0 opacity-30 bg-pattern"></div>
+        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 relative z-10">
+          <div className="text-center">
+            <h1 className="text-4xl font-extrabold tracking-tight text-white sm:text-5xl lg:text-6xl">
+              Đặt Lịch Tư Vấn
+            </h1>
+            <p className="mt-6 text-xl text-white text-opacity-80 max-w-3xl mx-auto">
+              Chọn tư vấn viên chuyên nghiệp và thời gian phù hợp để nhận được dịch vụ tư vấn sức khỏe tốt nhất
+            </p>
           </div>
         </div>
-      )}
+      </div>
 
-      {/* Hiển thị thông tin chi tiết tư vấn viên */}
-      {selectedConsultant && !bookingSuccess && (
-        <ConsultantDetail consultant={selectedConsultant} />
-      )}
+      <div className="max-w-7xl mx-auto px-4 py-12 sm:px-6 lg:px-8">
+        {bookingSuccess ? (
+          <BookingSuccess onReset={resetBooking} />
+        ) : (
+          <div className="bg-white shadow overflow-hidden rounded-xl">
+            <div className="md:grid md:grid-cols-3">
+              {/* Phần chọn tư vấn viên */}
+              <ConsultantList
+                consultants={consultants}
+                selectedConsultant={selectedConsultant}
+                onSelectConsultant={handleConsultantSelect}
+              />
+
+              {/* Phần chọn ngày và ca */}
+              <div className="border-r border-gray-200">
+                <div className="px-6 py-4 border-b border-gray-200">
+                  <h2 className="text-lg font-medium text-gray-900">Chọn Ngày & Giờ</h2>
+                </div>
+                {selectedConsultant ? (
+                  <div>
+                    {/* Lựa chọn ngày */}
+                    <DateSelector
+                      dateOptions={dateOptions}
+                      selectedDate={selectedDate}
+                      onDateSelect={handleDateSelect}
+                    />
+
+                    {/* Lựa chọn ca làm việc */}
+                    <TimeSlotSelector
+                      timeSlots={timeSlots}
+                      selectedTimeSlot={selectedTimeSlot}
+                      onTimeSlotSelect={handleTimeSlotSelect}
+                      checkIfBooked={isTimeSlotBooked}
+                    />
+                  </div>
+                ) : (
+                  <div className="px-6 py-12 text-center">
+                    <svg
+                      className="mx-auto h-12 w-12 text-gray-400"
+                      fill="none"
+                      viewBox="0 0 24 24"
+                      stroke="currentColor"
+                      aria-hidden="true"
+                    >
+                      <path
+                        strokeLinecap="round"
+                        strokeLinejoin="round"
+                        strokeWidth={2}
+                        d="M12 6v6m0 0v6m0-6h6m-6 0H6"
+                      />
+                    </svg>
+                    <h3 className="mt-2 text-sm font-medium text-gray-900">
+                      Chưa chọn tư vấn viên
+                    </h3>
+                    <p className="mt-1 text-sm text-gray-500">
+                      Vui lòng chọn tư vấn viên từ danh sách bên trái để xem lịch làm việc
+                    </p>
+                  </div>
+                )}
+              </div>
+
+              {/* Phần thông tin đặt lịch */}
+              <div>
+                <div className="px-6 py-4 border-b border-gray-200">
+                  <h2 className="text-lg font-medium text-gray-900">Chi Tiết Đặt Lịch</h2>
+                </div>
+                {selectedConsultant && selectedTimeSlot ? (
+                  <BookingForm
+                    selectedConsultant={selectedConsultant}
+                    selectedDate={selectedDate}
+                    selectedTimeSlot={selectedTimeSlot}
+                    formData={formData}
+                    onInputChange={handleInputChange}
+                    onSubmit={handleSubmit}
+                    isSubmitting={isSubmitting}
+                  />
+                ) : (
+                  <div className="px-6 py-12 text-center">
+                    <svg
+                      className="mx-auto h-12 w-12 text-gray-400"
+                      fill="none"
+                      viewBox="0 0 24 24"
+                      stroke="currentColor"
+                      aria-hidden="true"
+                    >
+                      <path
+                        strokeLinecap="round"
+                        strokeLinejoin="round"
+                        strokeWidth={2}
+                        d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z"
+                      />
+                    </svg>
+                    <h3 className="mt-2 text-sm font-medium text-gray-900">
+                      Chưa chọn đủ thông tin
+                    </h3>
+                    <p className="mt-1 text-sm text-gray-500">
+                      Vui lòng chọn tư vấn viên và ca làm việc phù hợp để tiếp tục
+                    </p>
+                  </div>
+                )}
+              </div>
+            </div>
+          </div>
+        )}
+
+        {/* Hiển thị thông tin chi tiết tư vấn viên */}
+        {selectedConsultant && !bookingSuccess && (
+          <ConsultantDetail consultant={selectedConsultant} />
+        )}
+      </div>
     </div>
   );
 };
