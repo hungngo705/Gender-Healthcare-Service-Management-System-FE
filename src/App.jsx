@@ -35,6 +35,9 @@ const STITesting = lazy(() =>
 const Tracking = lazy(() =>
   import(/* webpackChunkName: "tracking" */ "./pages/Tracking")
 );
+const Booking = lazy(() =>
+  import(/* webpackChunkName: "Booking" */ "./pages/services/Booking")
+);
 const CustomerProfile = lazy(() =>
   import(/* webpackChunkName: "customer-profile" */ "./pages/CustomerProfile")
 );

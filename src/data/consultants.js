@@ -45,7 +45,19 @@ const consultants = [
         duration: "60 phút",
         description: "Đánh giá nguyên nhân và tư vấn các phương pháp hỗ trợ sinh sản"
       }
-    ]
+    ],
+    languages: ["Tiếng Việt", "Tiếng Anh"],
+    specializations: ["Kế hoạch hóa gia đình", "Khám sức khỏe tiền hôn nhân", "Tư vấn vô sinh"],
+    certifications: ["Hội Sản Phụ Khoa Việt Nam", "Hiệp hội Sức khỏe Sinh sản Châu Á"],
+    availableShifts: {
+      monday: [0, 1, 3],      // 0: 8h-10h, 1: 10h-12h, 2: 13h-15h, 3: 15h-17h
+      tuesday: [1, 2],
+      wednesday: [0, 2, 3],
+      thursday: [0, 1],
+      friday: [2, 3],
+      saturday: [0, 1],
+      sunday: []
+    }
   },
   {
     id: 2,
@@ -87,7 +99,20 @@ const consultants = [
         duration: "60 phút",
         description: "Đánh giá nguyên nhân và đưa ra phương pháp điều trị vô sinh nam giới"
       }
-    ]
+    ],
+    languages: ["Tiếng Việt", "Tiếng Anh", "Tiếng Pháp"],
+    specializations: ["STI/STD", "HIV/AIDS", "Tư vấn tình dục an toàn", "Sức khỏe nam giới"],
+    certifications: ["Hiệp hội Y tế Công cộng Việt Nam", "Chương trình phòng chống HIV/AIDS Quốc gia"],
+    availableShifts: {
+      monday: [2, 3],
+      tuesday: [0, 1, 3],
+      wednesday: [1, 2],
+      thursday: [0, 2, 3],
+      friday: [0, 1],
+      saturday: [0, 3],
+      sunday: []
+    }
+
   },
   {
     id: 3,
@@ -129,7 +154,19 @@ const consultants = [
         duration: "50 phút",
         description: "Hỗ trợ các cá nhân khám phá và chấp nhận bản dạng giới của mình"
       }
-    ]
+    ],
+    languages: ["Tiếng Việt", "Tiếng Anh"],
+    specializations: ["Tư vấn tâm lý", "Căng thẳng và lo âu", "Xác định giới tính", "Rối loạn tâm lý liên quan đến tình dục"],
+    certifications: ["Hiệp hội Tâm lý học Việt Nam", "Hiệp hội Tâm lý học Lâm sàng Châu Á"],
+    availableShifts: {
+      monday: [0, 1],
+      tuesday: [2, 3],
+      wednesday: [0, 3],
+      thursday: [1, 2],
+      friday: [0, 1, 2],
+      saturday: [1, 2],
+      sunday: [0]
+    }
   },
   {
     id: 4,
@@ -171,7 +208,19 @@ const consultants = [
         duration: "90 phút",
         description: "Tổ chức các buổi hội thảo giáo dục giới tính cho nhóm nhỏ"
       }
-    ]
+    ],
+    languages: ["Tiếng Việt", "Tiếng Anh"],
+    specializations: ["Sức khỏe LGBTQ+", "Tư vấn chuyển giới", "Tư vấn tâm lý", "Liệu pháp hormone"],
+    certifications: ["Mạng lưới Sức khỏe LGBTQ+ Đông Nam Á", "Chứng chỉ chuyên môn về Y tế Giới tính"],
+    availableShifts: {
+      monday: [1, 2, 3],
+      tuesday: [0, 3],
+      wednesday: [1, 2],
+      thursday: [0, 3],
+      friday: [0, 1],
+      saturday: [2, 3],
+      sunday: [1]
+    }
   }
 ];
 

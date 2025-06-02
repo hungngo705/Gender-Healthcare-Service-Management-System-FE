@@ -442,7 +442,7 @@ function Home() {
                 và bất kỳ mối quan tâm nào bạn có thể có.
               </p>
               <Link
-                to="/consultations"
+                to="/services/booking"
                 className="inline-flex items-center text-blue-700 font-medium hover:text-blue-900"
               >
                 Đặt lịch tư vấn
@@ -651,7 +651,7 @@ function Home() {
           </p>
           <div className="flex flex-col sm:flex-row justify-center space-y-4 sm:space-y-0 sm:space-x-4">
             <Link
-              to="/appointment"
+              to="/services/booking"
               className="inline-flex items-center bg-indigo-600 hover:bg-indigo-700 text-white font-medium px-6 py-3 rounded-lg shadow-md transition duration-300"
             >
               Đặt Lịch Hẹn
