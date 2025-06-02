@@ -1,48 +1,88 @@
-import React, { useState, useEffect } from "react";
-import { Navigate } from "react-router-dom";
+import { useState, useEffect } from "react";
+import { useNavigate } from "react-router-dom";
 import { useAuth } from "../contexts/AuthContext";
-import {
-  getDashboardConfig,
-  getTimeBasedGreeting,
-} from "../utils/dashboardUtils";
+import { getDashboardConfig } from "../utils/dashboardUtils";
 
-// Import các component đã tách
-import DashboardHeader from "../components/dashboard/DashboardHeader";
+// Dashboard Components
 import WelcomeBanner from "../components/dashboard/WelcomeBanner";
 import Sidebar from "../components/dashboard/Sidebar";
+import DashboardHeader from "../components/dashboard/DashboardHeader";
+
+// Tab Components
 import OverviewTab from "../components/dashboard/tabs/OverviewTab";
 import AppointmentsTab from "../components/dashboard/tabs/AppointmentsTab";
 import CustomersTab from "../components/dashboard/tabs/CustomersTab";
+import PatientsTab from "../components/dashboard/tabs/PatientsTab";
+
+// Lucide Icons
+import {
+  LayoutDashboard,
+  X,
+  Users,
+  Calendar,
+  ClipboardList,
+  MessageSquare,
+  BarChart3,
+  FileText,
+  Settings,
+  Package2,
+  UserCog,
+  Receipt,
+} from "lucide-react";
 
 function Dashboard() {
+  const { currentUser, logout } = useAuth();
+  const navigate = useNavigate();
+  const [sidebarOpen, setSidebarOpen] = useState(false);
   const [activeTab, setActiveTab] = useState("overview");
-  const { currentUser, userRole, isStaffOrHigher } = useAuth();
-  const [greeting, setGreeting] = useState("");
+  const [greeting, setGreeting] = useState("Chào buổi sáng");
+  const [searchQuery, setSearchQuery] = useState("");
 
-  // Set greeting based on time of day
+  // Xác định lời chào dựa trên thời gian trong ngày
   useEffect(() => {
-    setGreeting(getTimeBasedGreeting());
+    const hour = new Date().getHours();
+    if (hour < 12) {
+      setGreeting("Chào buổi sáng");
+    } else if (hour < 18) {
+      setGreeting("Chào buổi chiều");
+    } else {
+      setGreeting("Chào buổi tối");
+    }
   }, []);
 
-  // Redirect non-staff users if they try to access the dashboard
-  if (!isStaffOrHigher()) {
-    return (
-      <Navigate
-        to="/unauthorized"
-        replace
-        state={{
-          from: "/dashboard",
-          requiredRole: "staff",
-          currentRole: userRole,
-        }}
-      />
-    );
-  }
+  // Handle logout
+  const handleLogout = () => {
+    logout();
+    navigate("/login");
+  };
 
-  // Get dashboard configuration based on user role
-  const config = getDashboardConfig(userRole);
+  const userRole = currentUser?.role || "staff";
+  const dashboardConfig = getDashboardConfig(userRole);
+  // Get menu items from config with icons
+  const menuItems = dashboardConfig.menuItems.map((item) => {
+    // Mapping from icon names to actual Lucide icon components
+    const iconMap = {
+      "chart-pie": <BarChart3 size={20} />,
+      calendar: <Calendar size={20} />,
+      users: <Users size={20} />,
+      chat: <MessageSquare size={20} />,
+      document: <FileText size={20} />,
+      archive: <Package2 size={20} />,
+      "user-group": <UserCog size={20} />,
+      "chart-bar": <BarChart3 size={20} />,
+      clipboard: <ClipboardList size={20} />,
+      cash: <Receipt size={20} />,
+      cog: <Settings size={20} />,
+      "document-text": <FileText size={20} />,
+    };
 
-  // Nội dung tab
+    return {
+      ...item,
+      iconComponent: iconMap[item.icon] || <LayoutDashboard size={20} />,
+    };
+  });
+
+  // Xác định tab nội dung hiện tại
   const renderTabContent = () => {
     switch (activeTab) {
       case "overview":
@@ -51,39 +91,123 @@ function Dashboard() {
         return <AppointmentsTab />;
       case "customers":
         return <CustomersTab />;
-      // For simplicity, only include the implemented tabs
-      // Add placeholder for other tabs
+      case "records":
+      case "patients":
+        return <PatientsTab />;
       default:
         return (
-          <div className="p-8 text-center text-gray-500">
-            <p>Tab "{activeTab}" đang được phát triển</p>
+          <div className="flex items-center justify-center h-64 bg-gray-50 rounded-lg">
+            <p className="text-gray-500">Tab đang được phát triển</p>
           </div>
         );
     }
   };
-
   return (
-    <div className="min-h-screen bg-gray-50">
-      {/* Header */}
-      <DashboardHeader title={config.title} />
+    <div className="flex flex-col h-screen bg-gray-100">
+      {/* Dashboard Header */}
+      <DashboardHeader
+        title={dashboardConfig.title}
+        activeTabLabel={menuItems.find((item) => item.id === activeTab)?.label}
+        searchQuery={searchQuery}
+        setSearchQuery={setSearchQuery}
+        currentUser={currentUser}
+        setSidebarOpen={setSidebarOpen}
+      />
 
-      <div className="max-w-7xl mx-auto py-6 px-4 sm:px-6 lg:px-8">
-        {/* Welcome banner */}
-        <WelcomeBanner greeting={greeting} userName={currentUser?.name} />
-
-        {/* Main content */}
-        <div className="flex flex-col lg:flex-row gap-6">
-          {/* Sidebar */}
+      <div className="flex flex-1 overflow-hidden">
+        {" "}
+        {/* Sidebar - Desktop */}
+        <div className="hidden lg:block lg:w-64 flex-shrink-0">
           <Sidebar
-            menuItems={config.menuItems}
+            menuItems={menuItems}
             activeTab={activeTab}
             setActiveTab={setActiveTab}
+            onLogout={handleLogout}
           />
-
-          {/* Content area */}
-          <div className="flex-1 bg-white rounded-lg shadow p-6">
-            {renderTabContent()}
+        </div>
+        {/* Mobile sidebar backdrop */}
+        {sidebarOpen && (
+          <div
+            className="fixed inset-0 z-40 bg-gray-600 bg-opacity-75 lg:hidden"
+            onClick={() => setSidebarOpen(false)}
+            role="button"
+            tabIndex={0}
+            onKeyDown={(e) => {
+              if (e.key === "Escape") setSidebarOpen(false);
+            }}
+            aria-label="Close sidebar"
+          ></div>
+        )}
+        {/* Sidebar - Mobile */}
+        <div
+          className={`fixed inset-y-0 left-0 z-50 w-64 bg-white shadow-lg transform ${
+            sidebarOpen ? "translate-x-0" : "-translate-x-full"
+          } lg:hidden transition duration-300 ease-in-out`}
+        >
+          <div className="flex items-center justify-between h-16 px-6 bg-indigo-600 text-white">
+            <div className="flex items-center">
+              <LayoutDashboard className="h-6 w-6 mr-2" />
+              <span className="font-medium">Gender HealthCare</span>
+            </div>
+            <button
+              className="lg:hidden"
+              onClick={() => setSidebarOpen(false)}
+              aria-label="Close sidebar"
+            >
+              <X className="h-5 w-5" />
+            </button>
           </div>
+
+          <div className="h-full overflow-y-auto">
+            <div className="px-4 py-2">
+              <div className="flex items-center p-3 mb-4">
+                <div className="w-10 h-10 bg-indigo-100 rounded-full flex items-center justify-center text-indigo-600">
+                  {currentUser?.profilePicture ? (
+                    <img
+                      src={currentUser.profilePicture}
+                      alt={currentUser.name}
+                      className="w-10 h-10 rounded-full object-cover"
+                    />
+                  ) : (
+                    <span className="font-medium text-lg">
+                      {currentUser?.name?.charAt(0)?.toUpperCase() || "U"}
+                    </span>
+                  )}
+                </div>
+                <div className="ml-3">
+                  <div className="font-medium text-sm">
+                    {currentUser?.name || "Người dùng"}
+                  </div>
+                  <div className="text-xs text-gray-500">
+                    {currentUser?.role === "admin" && "Quản trị viên"}
+                    {currentUser?.role === "manager" && "Quản lý"}
+                    {currentUser?.role === "consultant" && "Bác sĩ tư vấn"}
+                    {currentUser?.role === "staff" && "Nhân viên"}
+                  </div>
+                </div>
+              </div>{" "}
+              <Sidebar
+                menuItems={menuItems}
+                activeTab={activeTab}
+                setActiveTab={(tab) => {
+                  setActiveTab(tab);
+                  setSidebarOpen(false);
+                }}
+                onLogout={handleLogout}
+              />
+            </div>
+          </div>
+        </div>{" "}
+        {/* Main Content */}
+        <div className="flex-1 flex flex-col overflow-hidden">
+          {/* Content */}
+          <main className="flex-1 overflow-auto p-4 lg:p-8">
+            <WelcomeBanner greeting={greeting} userName={currentUser?.name} />
+
+            <div className="bg-white rounded-lg shadow-sm p-6 mt-6">
+              {renderTabContent()}
+            </div>
+          </main>
         </div>
       </div>
     </div>

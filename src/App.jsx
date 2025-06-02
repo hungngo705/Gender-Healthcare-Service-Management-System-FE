@@ -4,6 +4,7 @@ import "./App.css";
 import Layout from "./components/Layout";
 import ProtectedRoute from "./components/ProtectedRoute";
 import LoadingSpinner from "./components/LoadingSpinner";
+import { useAuth } from "./contexts/AuthContext";
 
 // Lazy load all page components with named chunks for better debugging
 const Login = lazy(() =>
@@ -32,17 +33,50 @@ const STITesting = lazy(() =>
 const Tracking = lazy(() =>
   import(/* webpackChunkName: "tracking" */ "./pages/Tracking")
 );
+const CustomerProfile = lazy(() =>
+  import(/* webpackChunkName: "customer-profile" */ "./pages/CustomerProfile")
+);
+
+const Dashboard = lazy(() =>
+  import(/* webpackChunkName: "dashboard" */ "./pages/Dashboard")
+);
+
+const Unauthorized = lazy(() =>
+  import(/* webpackChunkName: "unauthorized" */ "./pages/Unauthorized")
+);
 
 function App() {
-  // Using AuthContext to get authentication state - now handled directly in ProtectedRoute
-  // const { isAuthenticated } = useAuth();
+  const { isStaffOrHigher } = useAuth();
 
+  // Chuyển hướng các nhân viên trực tiếp đến trang Dashboard
+  if (isStaffOrHigher()) {
+    return (
+      <Suspense fallback={<LoadingSpinner />}>
+        <Routes>
+          <Route path="/login" element={<Login />} />
+          <Route path="/signup" element={<Signup />} />
+          <Route path="/unauthorized" element={<Unauthorized />} />
+          <Route
+            path="/dashboard/*"
+            element={
+              <ProtectedRoute roleRequired="staff">
+                <Dashboard />
+              </ProtectedRoute>
+            }
+          />
+          <Route path="*" element={<Navigate to="/dashboard" replace />} />
+        </Routes>
+      </Suspense>
+    );
+  }
+
+  // Giao diện cho khách hàng và khách
   return (
     <Suspense fallback={<LoadingSpinner />}>
       <Routes>
-        {/* Auth routes */}
         <Route path="/login" element={<Login />} />
-        <Route path="/signup" element={<Signup />} />{" "}
+        <Route path="/signup" element={<Signup />} />
+        <Route path="/unauthorized" element={<Unauthorized />} />
         {/* Tất cả các trang với Layout chung */}
         <Route path="/" element={<Layout />}>
           {/* Các trang công khai */}
@@ -52,12 +86,11 @@ function App() {
           <Route path="contact" element={<Contact />} />
           <Route path="blog" element={<Blog />} />
           <Route path="blog/:id" element={<BlogDetail />} />
-
           {/* Các trang STI Testing và Tracking */}
           <Route
             path="services/sti-testing"
             element={
-              <ProtectedRoute>
+              <ProtectedRoute roleRequired={"customer"}>
                 <STITesting />
               </ProtectedRoute>
             }
@@ -65,32 +98,33 @@ function App() {
           <Route
             path="services/tracking"
             element={
-              <ProtectedRoute>
+              <ProtectedRoute roleRequired={"customer"}>
                 <Tracking />
-              </ProtectedRoute>
-            }
-          />
-          <Route
-            path="profile"
-            element={
-              <ProtectedRoute>
-                <div>Profile Page</div>
               </ProtectedRoute>
             }
           />
           <Route
             path="appointments"
             element={
-              <ProtectedRoute>
+              <ProtectedRoute roleRequired="customer">
                 <div>Appointments Page</div>
               </ProtectedRoute>
             }
-          />
+          />{" "}
           <Route
             path="medical-records"
             element={
-              <ProtectedRoute>
+              <ProtectedRoute roleRequired="customer">
                 <div>Medical Records</div>
+              </ProtectedRoute>
+            }
+          />
+          {/* Trang hồ sơ khách hàng */}
+          <Route
+            path="profile"
+            element={
+              <ProtectedRoute roleRequired="customer">
+                <CustomerProfile />
               </ProtectedRoute>
             }
           />
