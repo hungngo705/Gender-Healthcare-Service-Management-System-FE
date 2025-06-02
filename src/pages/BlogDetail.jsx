@@ -1,6 +1,5 @@
 import React, { useEffect, useState } from "react";
 import { useParams, Link } from "react-router-dom";
-import { motion } from "framer-motion";
 import {
   ArrowLeft,
   Clock,
@@ -327,7 +326,8 @@ function BlogDetail() {
           <div className="p-8 md:p-10 text-white">
             <h3 className="text-2xl font-bold mb-4">Đăng ký nhận bản tin</h3>
             <p className="mb-6 opacity-90">
-              Nhận thông tin sức khỏe giới tính mới nhất qua email. Chúng tôi sẽ không gửi thư rác hoặc chia sẻ thông tin của bạn.
+              Nhận thông tin sức khỏe giới tính mới nhất qua email. Chúng tôi sẽ
+              không gửi thư rác hoặc chia sẻ thông tin của bạn.
             </p>
             <div className="flex flex-col sm:flex-row">
               <input

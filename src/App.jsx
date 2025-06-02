@@ -37,6 +37,10 @@ const CustomerProfile = lazy(() =>
   import(/* webpackChunkName: "customer-profile" */ "./pages/CustomerProfile")
 );
 
+const ConsultantDetail = lazy(() =>
+  import(/* webpackChunkName: "consultant-detail" */ "./pages/ConsultantDetail")
+);
+
 const Dashboard = lazy(() =>
   import(/* webpackChunkName: "dashboard" */ "./pages/Dashboard")
 );
@@ -80,12 +84,13 @@ function App() {
         {/* Tất cả các trang với Layout chung */}
         <Route path="/" element={<Layout />}>
           {/* Các trang công khai */}
-          <Route index element={<Home />} />
+          <Route index element={<Home />} />{" "}
           <Route path="services" element={<Services />} />
           <Route path="about" element={<About />} />
           <Route path="contact" element={<Contact />} />
           <Route path="blog" element={<Blog />} />
           <Route path="blog/:id" element={<BlogDetail />} />
+          <Route path="consultants/:id" element={<ConsultantDetail />} />
           {/* Các trang STI Testing và Tracking */}
           <Route
             path="services/sti-testing"

@@ -321,7 +321,9 @@ function Home() {
                       ({consultant.reviewCount} đánh giá)
                     </span>
                   </div>
-                  <p className="text-gray-600 text-sm mb-4">{consultant.bio}</p>
+                  <p className="text-gray-600 text-sm mb-4 line-clamp-4 h-20 overflow-hidden">
+                    {consultant.bio}
+                  </p>
                   <Link
                     to={`/consultants/${consultant.id}`}
                     className="inline-block w-full text-center py-2 border border-indigo-600 text-indigo-600 rounded-md hover:bg-indigo-600 hover:text-white transition duration-300"
