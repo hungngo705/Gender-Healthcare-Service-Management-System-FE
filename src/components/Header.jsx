@@ -128,7 +128,7 @@ function Header() {
                       )}
                     </div>
                     <span className="font-medium">
-                      {currentUser?.name?.split(" ")[0] || "Người Dùng"}
+                      {currentUser?.name?.split(" ").pop() || "Người Dùng"} {/* Chỉ hiện thị tên chứ không hiển thị họ tên */}
                     </span>
                   </button>
 

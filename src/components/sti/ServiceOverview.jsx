@@ -4,13 +4,13 @@ function ServiceOverview() {
   return (
     <div className="mb-16">
       <h2 className="text-3xl font-bold text-gray-900 mb-6 text-center">
-        Our STI Testing Services
+        Dịch Vụ Xét Nghiệm STI Của Chúng Tôi
       </h2>
       <div className="bg-white rounded-xl shadow-lg overflow-hidden">
         <div className="grid md:grid-cols-2 gap-6">
           <div className="p-8">
             <h3 className="text-2xl font-semibold text-gray-900 mb-4">
-              Why Choose Our STI Testing Services?
+              Tại Sao Chọn Dịch Vụ Xét Nghiệm STI Của Chúng Tôi?
             </h3>
             <ul className="space-y-3">
               <li className="flex items-start">
@@ -27,11 +27,11 @@ function ServiceOverview() {
                 </svg>
                 <div>
                   <span className="font-medium text-gray-900">
-                    Complete Confidentiality
+                    Bảo Mật Hoàn Toàn
                   </span>
                   <p className="text-gray-600 mt-1">
-                    Your privacy is our top priority. All testing and results
-                    are handled with the utmost confidentiality.
+                    Quyền riêng tư của bạn là ưu tiên hàng đầu của chúng tôi. Tất cả các xét nghiệm và kết quả 
+                    được xử lý với sự bảo mật tối đa.
                   </p>
                 </div>
               </li>
@@ -49,11 +49,11 @@ function ServiceOverview() {
                 </svg>
                 <div>
                   <span className="font-medium text-gray-900">
-                    Secure Results Delivery
+                    Gửi Kết Quả An Toàn
                   </span>
                   <p className="text-gray-600 mt-1">
-                    Access your results online through our secure customer
-                    portal, ensuring privacy and quick access.
+                    Truy cập kết quả của bạn trực tuyến thông qua cổng thông tin khách hàng an toàn, 
+                    đảm bảo quyền riêng tư và truy cập nhanh chóng.
                   </p>
                 </div>
               </li>
@@ -71,11 +71,11 @@ function ServiceOverview() {
                 </svg>
                 <div>
                   <span className="font-medium text-gray-900">
-                    Comprehensive Care
+                    Chăm Sóc Toàn Diện
                   </span>
                   <p className="text-gray-600 mt-1">
-                    If testing reveals an infection, our healthcare providers
-                    can prescribe treatment and provide follow-up care.
+                    Nếu xét nghiệm phát hiện nhiễm trùng, các nhà cung cấp dịch vụ y tế của chúng tôi 
+                    có thể kê đơn điều trị và cung cấp dịch vụ chăm sóc theo dõi.
                   </p>
                 </div>
               </li>
@@ -83,7 +83,7 @@ function ServiceOverview() {
           </div>
           <div className="bg-purple-50 p-8">
             <h3 className="text-2xl font-semibold text-gray-900 mb-4">
-              Our Testing Process
+              Quy Trình Xét Nghiệm Của Chúng Tôi
             </h3>
             <ol className="space-y-3">
               <li className="flex">
@@ -92,10 +92,10 @@ function ServiceOverview() {
                 </div>
                 <div>
                   <p className="font-medium text-gray-900">
-                    Book an appointment
+                    Đặt lịch hẹn
                   </p>
                   <p className="text-gray-600 mt-1">
-                    Schedule online or by phone at your convenience
+                    Đặt lịch trực tuyến hoặc qua điện thoại theo sự thuận tiện của bạn
                   </p>
                 </div>
               </li>
@@ -104,10 +104,9 @@ function ServiceOverview() {
                   2
                 </div>
                 <div>
-                  <p className="font-medium text-gray-900">Visit our clinic</p>
+                  <p className="font-medium text-gray-900">Đến phòng khám của chúng tôi</p>
                   <p className="text-gray-600 mt-1">
-                    Meet with our healthcare professionals in a comfortable,
-                    private setting
+                    Gặp gỡ các chuyên gia y tế của chúng tôi trong môi trường thoải mái, riêng tư
                   </p>
                 </div>
               </li>
@@ -116,9 +115,9 @@ function ServiceOverview() {
                   3
                 </div>
                 <div>
-                  <p className="font-medium text-gray-900">Sample collection</p>
+                  <p className="font-medium text-gray-900">Thu thập mẫu xét nghiệm</p>
                   <p className="text-gray-600 mt-1">
-                    Quick and easy sample collection by trained professionals
+                    Thu thập mẫu nhanh chóng và dễ dàng bởi các chuyên gia được đào tạo
                   </p>
                 </div>
               </li>
@@ -127,9 +126,9 @@ function ServiceOverview() {
                   4
                 </div>
                 <div>
-                  <p className="font-medium text-gray-900">Receive results</p>
+                  <p className="font-medium text-gray-900">Nhận kết quả</p>
                   <p className="text-gray-600 mt-1">
-                    Get results securely online within 2-3 days
+                    Nhận kết quả an toàn trực tuyến trong vòng 2-3 ngày
                   </p>
                 </div>
               </li>
@@ -139,10 +138,10 @@ function ServiceOverview() {
                 </div>
                 <div>
                   <p className="font-medium text-gray-900">
-                    Treatment (if needed)
+                    Điều trị (nếu cần thiết)
                   </p>
                   <p className="text-gray-600 mt-1">
-                    Receive treatment options and follow-up care
+                    Nhận các phương án điều trị và chăm sóc theo dõi
                   </p>
                 </div>
               </li>

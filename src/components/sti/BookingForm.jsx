@@ -44,7 +44,7 @@ function BookingForm() {
   return (
     <div id="appointment" className="mb-16 scroll-mt-24">
       <h2 className="text-3xl font-bold text-gray-900 mb-6 text-center">
-        Book Your STI Testing Appointment
+        Đặt Lịch Hẹn Xét Nghiệm STI
       </h2>
 
       {submitSuccess ? (
@@ -64,17 +64,16 @@ function BookingForm() {
             />
           </svg>
           <h3 className="text-xl font-semibold text-gray-900 mb-2">
-            Appointment Scheduled!
+            Lịch Hẹn Đã Được Đặt!
           </h3>
           <p className="text-gray-600 mb-4">
-            Your STI testing appointment has been successfully scheduled. You
-            will receive a confirmation email shortly.
+            Lịch hẹn xét nghiệm STI của bạn đã được đặt thành công. Bạn sẽ nhận được email xác nhận trong thời gian ngắn.
           </p>
           <button
             onClick={() => setSubmitSuccess(false)}
             className="px-4 py-2 bg-indigo-600 text-white rounded-md hover:bg-indigo-700 transition-colors"
           >
-            Book Another Appointment
+            Đặt Lịch Hẹn Khác
           </button>
         </div>
       ) : (
@@ -86,7 +85,7 @@ function BookingForm() {
                   htmlFor="name"
                   className="block text-sm font-medium text-gray-700 mb-1"
                 >
-                  Full Name *
+                  Họ Và Tên *
                 </label>
                 <input
                   type="text"
@@ -103,7 +102,7 @@ function BookingForm() {
                   htmlFor="email"
                   className="block text-sm font-medium text-gray-700 mb-1"
                 >
-                  Email Address *
+                  Địa Chỉ Email *
                 </label>
                 <input
                   type="email"
@@ -120,7 +119,7 @@ function BookingForm() {
                   htmlFor="phone"
                   className="block text-sm font-medium text-gray-700 mb-1"
                 >
-                  Phone Number *
+                  Số Điện Thoại *
                 </label>
                 <input
                   type="tel"
@@ -137,7 +136,7 @@ function BookingForm() {
                   htmlFor="testType"
                   className="block text-sm font-medium text-gray-700 mb-1"
                 >
-                  Test Type *
+                  Loại Xét Nghiệm *
                 </label>
                 <select
                   id="testType"
@@ -147,11 +146,11 @@ function BookingForm() {
                   onChange={handleChange}
                   className="w-full px-4 py-2 border border-gray-300 rounded-md focus:ring-indigo-500 focus:border-indigo-500"
                 >
-                  <option value="basic">Basic STI Test ($79)</option>
+                  <option value="basic">Xét Nghiệm STI Cơ Bản (79$)</option>
                   <option value="comprehensive">
-                    Comprehensive STI Test ($149)
+                    Xét Nghiệm STI Toàn Diện (149$)
                   </option>
-                  <option value="targeted">Targeted Test ($99)</option>
+                  <option value="targeted">Xét Nghiệm Mục Tiêu (99$)</option>
                 </select>
               </div>
               <div>
@@ -159,7 +158,7 @@ function BookingForm() {
                   htmlFor="date"
                   className="block text-sm font-medium text-gray-700 mb-1"
                 >
-                  Preferred Date *
+                  Ngày Mong Muốn *
                 </label>
                 <input
                   type="date"
@@ -176,7 +175,7 @@ function BookingForm() {
                   htmlFor="time"
                   className="block text-sm font-medium text-gray-700 mb-1"
                 >
-                  Preferred Time *
+                  Thời Gian Mong Muốn *
                 </label>
                 <select
                   id="time"
@@ -186,14 +185,14 @@ function BookingForm() {
                   onChange={handleChange}
                   className="w-full px-4 py-2 border border-gray-300 rounded-md focus:ring-indigo-500 focus:border-indigo-500"
                 >
-                  <option value="">Select a time</option>
-                  <option value="9:00 AM">9:00 AM</option>
-                  <option value="10:00 AM">10:00 AM</option>
-                  <option value="11:00 AM">11:00 AM</option>
-                  <option value="1:00 PM">1:00 PM</option>
-                  <option value="2:00 PM">2:00 PM</option>
-                  <option value="3:00 PM">3:00 PM</option>
-                  <option value="4:00 PM">4:00 PM</option>
+                  <option value="">Chọn thời gian</option>
+                  <option value="9:00 AM">9:00 Sáng</option>
+                  <option value="10:00 AM">10:00 Sáng</option>
+                  <option value="11:00 AM">11:00 Sáng</option>
+                  <option value="1:00 PM">1:00 Chiều</option>
+                  <option value="2:00 PM">2:00 Chiều</option>
+                  <option value="3:00 PM">3:00 Chiều</option>
+                  <option value="4:00 PM">4:00 Chiều</option>
                 </select>
               </div>
               <div className="md:col-span-2">
@@ -201,7 +200,7 @@ function BookingForm() {
                   htmlFor="notes"
                   className="block text-sm font-medium text-gray-700 mb-1"
                 >
-                  Additional Notes (Optional)
+                  Ghi Chú Bổ Sung (Không Bắt Buộc)
                 </label>
                 <textarea
                   id="notes"
@@ -210,22 +209,21 @@ function BookingForm() {
                   value={formData.notes}
                   onChange={handleChange}
                   className="w-full px-4 py-2 border border-gray-300 rounded-md focus:ring-indigo-500 focus:border-indigo-500"
-                  placeholder="Any specific concerns or questions you'd like to discuss?"
+                  placeholder="Bạn có bất kỳ mối quan ngại hoặc câu hỏi cụ thể nào muốn thảo luận không?"
                 ></textarea>
               </div>
             </div>
 
             <div className="mt-6">
               <p className="text-sm text-gray-500 mb-4">
-                Your information will be kept strictly confidential. By
-                submitting this form, you agree to our{" "}
+                Thông tin của bạn sẽ được giữ bí mật nghiêm ngặt. Bằng cách gửi mẫu đơn này, bạn đồng ý với{" "}
                 <Link
                   to="/privacy-policy"
                   className="text-indigo-600 hover:text-indigo-500"
                 >
-                  privacy policy
+                  chính sách bảo mật
                 </Link>
-                .
+                {" "}của chúng tôi.
               </p>
               <button
                 type="submit"
@@ -256,10 +254,10 @@ function BookingForm() {
                         d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"
                       ></path>
                     </svg>
-                    Processing...
+                    Đang xử lý...
                   </span>
                 ) : (
-                  "Schedule Appointment"
+                  "Đặt Lịch Hẹn"
                 )}
               </button>
             </div>

@@ -6,11 +6,11 @@ function HeroSection() {
       <div className="max-w-5xl mx-auto">
         <div className="text-center mb-8">
           <h1 className="text-4xl font-bold mb-4 sm:text-5xl">
-            Confidential STI Testing Services
+            Dịch Vụ Xét Nghiệm STI Bảo Mật
           </h1>
           <p className="text-xl max-w-3xl mx-auto">
-            Take control of your sexual health with our private, non-judgmental
-            STI testing and treatment services.
+            Kiểm soát sức khỏe tình dục của bạn với dịch vụ xét nghiệm và điều
+            trị STI riêng tư, không phán xét của chúng tôi.
           </p>
         </div>
 
@@ -19,7 +19,7 @@ function HeroSection() {
             href="#appointment"
             className="px-6 py-3 bg-white text-indigo-900 rounded-full font-medium hover:bg-opacity-90 transition-all flex items-center"
           >
-            Book an Appointment
+            Đặt Lịch Hẹn Ngay
             <svg
               xmlns="http://www.w3.org/2000/svg"
               className="h-5 w-5 ml-1"
@@ -37,7 +37,7 @@ function HeroSection() {
             href="#faq"
             className="px-6 py-3 bg-transparent border border-white text-white rounded-full font-medium hover:bg-white hover:bg-opacity-10 transition-all flex items-center"
           >
-            Learn More
+            Tìm Hiểu Thêm
             <svg
               xmlns="http://www.w3.org/2000/svg"
               className="h-5 w-5 ml-1"
