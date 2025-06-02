@@ -2,11 +2,13 @@ import { useState, useEffect } from "react";
 import { useNavigate } from "react-router-dom";
 import { useAuth } from "../contexts/AuthContext";
 import { getDashboardConfig } from "../utils/dashboardUtils";
+import userUtils from "../utils/userUtils";
 
 // Dashboard Components
 import WelcomeBanner from "../components/dashboard/WelcomeBanner";
 import Sidebar from "../components/dashboard/Sidebar";
 import DashboardHeader from "../components/dashboard/DashboardHeader";
+import UserAvatar from "../components/user/UserAvatar";
 
 // Tab Components
 import OverviewTab from "../components/dashboard/tabs/OverviewTab";
@@ -104,16 +106,15 @@ function Dashboard() {
   };
   return (
     <div className="flex flex-col h-screen bg-gray-100">
+      {" "}
       {/* Dashboard Header */}
       <DashboardHeader
         title={dashboardConfig.title}
         activeTabLabel={menuItems.find((item) => item.id === activeTab)?.label}
         searchQuery={searchQuery}
         setSearchQuery={setSearchQuery}
-        currentUser={currentUser}
         setSidebarOpen={setSidebarOpen}
       />
-
       <div className="flex flex-1 overflow-hidden">
         {" "}
         {/* Sidebar - Desktop */}
@@ -160,29 +161,15 @@ function Dashboard() {
 
           <div className="h-full overflow-y-auto">
             <div className="px-4 py-2">
+              {" "}
               <div className="flex items-center p-3 mb-4">
-                <div className="w-10 h-10 bg-indigo-100 rounded-full flex items-center justify-center text-indigo-600">
-                  {currentUser?.profilePicture ? (
-                    <img
-                      src={currentUser.profilePicture}
-                      alt={currentUser.name}
-                      className="w-10 h-10 rounded-full object-cover"
-                    />
-                  ) : (
-                    <span className="font-medium text-lg">
-                      {currentUser?.name?.charAt(0)?.toUpperCase() || "U"}
-                    </span>
-                  )}
-                </div>
+                <UserAvatar size="sm" />
                 <div className="ml-3">
                   <div className="font-medium text-sm">
-                    {currentUser?.name || "Người dùng"}
+                    {userUtils.useUserInfo().displayName}
                   </div>
                   <div className="text-xs text-gray-500">
-                    {currentUser?.role === "admin" && "Quản trị viên"}
-                    {currentUser?.role === "manager" && "Quản lý"}
-                    {currentUser?.role === "consultant" && "Bác sĩ tư vấn"}
-                    {currentUser?.role === "staff" && "Nhân viên"}
+                    {userUtils.useUserInfo().formattedRole}
                   </div>
                 </div>
               </div>{" "}
@@ -202,7 +189,7 @@ function Dashboard() {
         <div className="flex-1 flex flex-col overflow-hidden">
           {/* Content */}
           <main className="flex-1 overflow-auto p-4 lg:p-8">
-            <WelcomeBanner greeting={greeting} userName={currentUser?.name} />
+            <WelcomeBanner greeting={greeting} />
 
             <div className="bg-white rounded-lg shadow-sm p-6 mt-6">
               {renderTabContent()}

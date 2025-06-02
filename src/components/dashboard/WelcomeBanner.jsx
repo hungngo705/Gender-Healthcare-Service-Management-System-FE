@@ -1,13 +1,16 @@
 import React from "react";
 import PropTypes from "prop-types";
+import userUtils from "../../utils/userUtils";
 
-function WelcomeBanner({ greeting, userName }) {
+function WelcomeBanner({ greeting }) {
+  const { displayName } = userUtils.useUserInfo();
+
   return (
     <div className="bg-gradient-to-r from-indigo-500 to-purple-600 rounded-lg shadow-md p-6 mb-6 text-white">
       <div className="flex items-center justify-between">
         <div>
           <h2 className="text-2xl font-bold">
-            {greeting}, {userName || ""}!
+            {greeting}, {displayName}!
           </h2>
           <p className="opacity-90 mt-1">
             Chào mừng bạn quay trở lại hệ thống quản lý Gender Healthcare
@@ -25,7 +28,6 @@ function WelcomeBanner({ greeting, userName }) {
 
 WelcomeBanner.propTypes = {
   greeting: PropTypes.string.isRequired,
-  userName: PropTypes.string,
 };
 
 export default WelcomeBanner;

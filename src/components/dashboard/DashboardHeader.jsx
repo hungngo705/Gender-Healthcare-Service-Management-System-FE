@@ -3,13 +3,13 @@ import PropTypes from "prop-types";
 import logo from "../../assets/logo2.svg";
 import { Link } from "react-router-dom";
 import { Bell, Search, Menu } from "lucide-react";
+import UserAvatar from "../user/UserAvatar";
 
 function DashboardHeader({
   title,
   activeTabLabel,
   searchQuery,
   setSearchQuery,
-  currentUser,
   setSidebarOpen,
 }) {
   return (
@@ -61,7 +61,6 @@ function DashboardHeader({
               />
               <Search className="h-5 w-5 text-gray-400 absolute right-3 top-1/2 transform -translate-y-1/2" />
             </div>
-
             <div className="relative">
               <button
                 className="relative p-1 text-gray-500 hover:text-gray-600 focus:outline-none"
@@ -71,27 +70,14 @@ function DashboardHeader({
                 <span className="absolute top-0 right-0 h-2 w-2 rounded-full bg-red-500"></span>
               </button>
             </div>
-
-            <div className="border-l h-6 mx-2 border-gray-200"></div>
-
+            <div className="border-l h-6 mx-2 border-gray-200"></div>{" "}
             <div className="relative">
               <button
                 className="flex items-center focus:outline-none"
                 aria-label="User profile"
               >
-                <div className="w-8 h-8 bg-indigo-100 rounded-full flex items-center justify-center text-indigo-600">
-                  {currentUser?.profilePicture ? (
-                    <img
-                      src={currentUser.profilePicture}
-                      alt={currentUser.name}
-                      className="w-8 h-8 rounded-full object-cover"
-                    />
-                  ) : (
-                    <span className="font-medium">
-                      {currentUser?.name?.charAt(0)?.toUpperCase() || "U"}
-                    </span>
-                  )}
-                </div>
+                {/* currentUser is now used indirectly through useUserInfo in UserAvatar */}
+                <UserAvatar size="sm" />
               </button>
             </div>
           </div>
@@ -106,7 +92,6 @@ DashboardHeader.propTypes = {
   activeTabLabel: PropTypes.string,
   searchQuery: PropTypes.string,
   setSearchQuery: PropTypes.func,
-  currentUser: PropTypes.object,
   setSidebarOpen: PropTypes.func,
 };
 
