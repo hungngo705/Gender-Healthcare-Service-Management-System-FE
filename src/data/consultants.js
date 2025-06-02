@@ -1,40 +1,179 @@
 const consultants = [
   {
     id: 1,
-    name: "Lê Nguyễn Nam Phương",
-    specialty: "Chuyên Gia Sức Khỏe Sinh Sản",
-    image: "https://randomuser.me/api/portraits/women/44.jpg",
+    name: "TS. Nguyễn Thị Minh",
+    specialty: "Sức khỏe sinh sản",
+    shortBio: "Chuyên gia với hơn 15 năm kinh nghiệm về sức khỏe sinh sản phụ nữ",
+    image: "https://images.unsplash.com/photo-1559839734-2b71ea197ec2?q=80&w=500&auto=format&fit=crop",
     rating: 4.9,
-    reviewCount: 124,
-    bio: "Với hơn 15 năm kinh nghiệm trong lĩnh vực sức khỏe sinh sản, Tiến sĩ Châu chuyên về kế hoạch hóa gia đình và các vấn đề về khả năng sinh sản.",
+    reviewCount: 127,
+    yearsExperience: 15,
+    bio: "TS. Nguyễn Thị Minh tốt nghiệp Đại học Y Hà Nội và hoàn thành chương trình Tiến sĩ về Sức khỏe Sinh sản tại Đại học Melbourne, Úc. Bà có hơn 15 năm kinh nghiệm trong lĩnh vực phụ khoa và sức khỏe sinh sản phụ nữ.\n\nBà đã được đào tạo chuyên sâu về các vấn đề sức khỏe sinh sản như vô sinh, kế hoạch hóa gia đình, viêm nhiễm phụ khoa và các vấn đề liên quan đến kinh nguyệt. TS. Minh nổi tiếng với phương pháp tiếp cận toàn diện, kết hợp kiến thức y học hiện đại và sự quan tâm đến các khía cạnh tâm lý, xã hội của sức khỏe phụ nữ.",
+    experience: [
+      {
+        role: "Trưởng khoa Phụ Sản",
+        workplace: "Bệnh viện Quốc tế Vinmec, TP. HCM",
+        period: "2018 - Hiện tại",
+        description: "Quản lý chuyên môn và điều phối đội ngũ y tế của khoa Phụ Sản"
+      },
+      {
+        role: "Bác sĩ tư vấn cao cấp",
+        workplace: "Phòng khám Đa khoa Quốc tế, TP. HCM",
+        period: "2012 - 2018",
+        description: "Tư vấn và điều trị các vấn đề sức khỏe sinh sản phụ nữ"
+      },
+      {
+        role: "Nghiên cứu viên",
+        workplace: "Đại học Y Melbourne, Úc",
+        period: "2008 - 2012",
+        description: "Nghiên cứu về vô sinh và các phương pháp hỗ trợ sinh sản"
+      }
+    ],
+    services: [
+      {
+        name: "Tư vấn sức khỏe sinh sản",
+        duration: "45 phút",
+        description: "Đánh giá toàn diện sức khỏe sinh sản và tư vấn các biện pháp phòng ngừa bệnh"
+      },
+      {
+        name: "Tư vấn kế hoạch hóa gia đình",
+        duration: "30 phút",
+        description: "Tư vấn các biện pháp tránh thai và lập kế hoạch gia đình phù hợp"
+      },
+      {
+        name: "Tư vấn vô sinh",
+        duration: "60 phút",
+        description: "Đánh giá nguyên nhân và tư vấn các phương pháp hỗ trợ sinh sản"
+      }
+    ]
   },
   {
     id: 2,
-    name: "Trần Đức Viễn",
-    specialty: "Chuyên Gia Sức Khỏe Tình Dục",
-    image: "https://randomuser.me/api/portraits/men/46.jpg",
-    rating: 4.8,
+    name: "BS. Trần Văn Nam",
+    specialty: "Nam khoa",
+    shortBio: "Chuyên gia nam khoa với kinh nghiệm điều trị các vấn đề sức khỏe nam giới",
+    image: "https://images.unsplash.com/photo-1612349317150-e413f6a5b16d?q=80&w=500&auto=format&fit=crop",
+    rating: 4.7,
     reviewCount: 98,
-    bio: "Tiến sĩ Viễn đã dành sự nghiệp của mình cho giáo dục và điều trị sức khỏe tình dục, với trọng tâm đặc biệt là phòng ngừa các bệnh lây truyền qua đường tình dục.",
+    yearsExperience: 12,
+    bio: "BS. Trần Văn Nam là bác sĩ chuyên khoa Nam học với hơn 12 năm kinh nghiệm. Ông tốt nghiệp Đại học Y Dược TP.HCM và hoàn thành chương trình chuyên khoa sâu về Nam học và Y học giới tính tại Singapore.\n\nBS. Nam đặc biệt chú trọng đến việc tạo môi trường thoải mái cho bệnh nhân nam giới khi thảo luận về các vấn đề nhạy cảm liên quan đến sức khỏe sinh sản và tình dục. Ông nổi tiếng với phương pháp tư vấn thân thiện và cởi mở, giúp bệnh nhân vượt qua tâm lý e ngại khi tìm kiếm sự giúp đỡ y tế.",
+    experience: [
+      {
+        role: "Trưởng phòng khám Nam khoa",
+        workplace: "Bệnh viện Đa khoa Tâm Anh, TP. HCM",
+        period: "2016 - Hiện tại",
+        description: "Điều trị và tư vấn các vấn đề sức khỏe nam giới"
+      },
+      {
+        role: "Bác sĩ Nam khoa",
+        workplace: "Bệnh viện Đại học Y Dược TP. HCM",
+        period: "2010 - 2016",
+        description: "Khám và điều trị các bệnh lý về nam khoa và sức khỏe sinh sản nam"
+      }
+    ],
+    services: [
+      {
+        name: "Khám sức khỏe tổng quát nam giới",
+        duration: "45 phút",
+        description: "Đánh giá tổng thể sức khỏe và tư vấn phòng ngừa bệnh lý nam giới"
+      },
+      {
+        name: "Tư vấn sức khỏe tình dục",
+        duration: "30 phút",
+        description: "Tư vấn về các vấn đề liên quan đến sức khỏe tình dục và sinh lý nam"
+      },
+      {
+        name: "Tư vấn vô sinh nam",
+        duration: "60 phút",
+        description: "Đánh giá nguyên nhân và đưa ra phương pháp điều trị vô sinh nam giới"
+      }
+    ]
   },
   {
     id: 3,
-    name: "Lê Thị Thanh",
-    specialty: "Cố Vấn Sức Khỏe Tâm Thần",
-    image: "https://randomuser.me/api/portraits/women/65.jpg",
-    rating: 4.9,
+    name: "ThS. Lê Thị Hương",
+    specialty: "Tư vấn tâm lý",
+    shortBio: "Nhà tư vấn tâm lý chuyên về các vấn đề giới tính và tình dục",
+    image: "https://images.unsplash.com/photo-1614608682850-e0d6ed316d47?q=80&w=500&auto=format&fit=crop",
+    rating: 4.8,
     reviewCount: 156,
-    bio: "Là một nhà trị liệu chuyên về sức khỏe tâm thần liên quan đến giới tính, Tiến sĩ Thanh cung cấp dịch vụ tư vấn đầy cảm thông.",
+    yearsExperience: 10,
+    bio: "ThS. Lê Thị Hương là nhà tư vấn tâm lý với hơn 10 năm kinh nghiệm trong lĩnh vực tư vấn sức khỏe tâm lý liên quan đến giới tính và tình dục. Bà tốt nghiệp Thạc sĩ Tâm lý học Lâm sàng tại Đại học Khoa học Xã hội và Nhân văn, ĐHQG TP.HCM và được đào tạo chuyên sâu về Tư vấn Tình dục học tại Hoa Kỳ.\n\nThS. Hương có kinh nghiệm phong phú trong việc hỗ trợ các cá nhân và cặp đôi vượt qua các thách thức về mối quan hệ, bản dạng giới, xu hướng tính dục và sức khỏe tình dục. Bà nổi tiếng với phương pháp tiếp cận không phán xét và tôn trọng đa dạng văn hóa.",
+    experience: [
+      {
+        role: "Nhà tư vấn tâm lý cao cấp",
+        workplace: "Trung tâm Tư vấn Tâm lý Thăng Long, TP. HCM",
+        period: "2015 - Hiện tại",
+        description: "Tư vấn các vấn đề tâm lý liên quan đến giới tính và tình dục"
+      },
+      {
+        role: "Giảng viên",
+        workplace: "Khoa Tâm lý học, Đại học Khoa học Xã hội và Nhân văn, ĐHQG TP.HCM",
+        period: "2012 - Hiện tại",
+        description: "Giảng dạy các môn học về tâm lý học giới tính và tư vấn tâm lý"
+      }
+    ],
+    services: [
+      {
+        name: "Tư vấn tâm lý cá nhân",
+        duration: "50 phút",
+        description: "Hỗ trợ giải quyết các vấn đề tâm lý liên quan đến giới tính và tình dục"
+      },
+      {
+        name: "Tư vấn tâm lý cặp đôi",
+        duration: "75 phút",
+        description: "Hỗ trợ cải thiện mối quan hệ và giải quyết các vấn đề tình dục trong quan hệ cặp đôi"
+      },
+      {
+        name: "Tư vấn bản dạng giới",
+        duration: "50 phút",
+        description: "Hỗ trợ các cá nhân khám phá và chấp nhận bản dạng giới của mình"
+      }
+    ]
   },
   {
     id: 4,
-    name: "Võ Huy Hùng",
-    specialty: "Người Ủng Hộ Sức Khỏe LGBTQ+",
-    image: "https://randomuser.me/api/portraits/men/22.jpg",
-    rating: 4.7,
-    reviewCount: 87,
-    bio: "Tiến sĩ Hùng tập trung vào việc cung cấp dịch vụ chăm sóc sức khỏe toàn diện cho cộng đồng LGBTQ+ với sự nhạy cảm và thấu hiểu.",
-  },
+    name: "BS. Phạm Thị Lan Anh",
+    specialty: "Tư vấn sức khỏe giới tính",
+    shortBio: "Bác sĩ chuyên về giáo dục giới tính và sức khỏe tình dục cho thanh thiếu niên",
+    image: "https://images.unsplash.com/photo-1651008376811-b90baee60c1f?q=80&w=500&auto=format&fit=crop",
+    rating: 4.6,
+    reviewCount: 78,
+    yearsExperience: 8,
+    bio: "BS. Phạm Thị Lan Anh là bác sĩ chuyên về sức khỏe sinh sản và giáo dục giới tính với 8 năm kinh nghiệm. Bà tốt nghiệp Đại học Y Hà Nội và được đào tạo thêm về Tư vấn Sức khỏe Tình dục cho Thanh thiếu niên tại Thái Lan.\n\nBS. Lan Anh đặc biệt quan tâm đến việc cung cấp thông tin chính xác và phù hợp với độ tuổi về sức khỏe sinh sản và tình dục cho thanh thiếu niên. Bà có kinh nghiệm trong việc thiết kế và triển khai các chương trình giáo dục giới tính tại nhiều trường học và cộng đồng khác nhau.",
+    experience: [
+      {
+        role: "Bác sĩ tư vấn",
+        workplace: "Trung tâm Chăm sóc Sức khỏe Sinh sản Thanh niên, TP. HCM",
+        period: "2016 - Hiện tại",
+        description: "Tư vấn và giáo dục về sức khỏe sinh sản và tình dục cho thanh thiếu niên"
+      },
+      {
+        role: "Điều phối viên dự án",
+        workplace: "Tổ chức Marie Stopes International Việt Nam",
+        period: "2013 - 2016",
+        description: "Quản lý các dự án về sức khỏe sinh sản cho thanh niên tại các vùng nông thôn"
+      }
+    ],
+    services: [
+      {
+        name: "Tư vấn sức khỏe sinh sản cho thanh thiếu niên",
+        duration: "45 phút",
+        description: "Tư vấn phù hợp lứa tuổi về các vấn đề sức khỏe sinh sản"
+      },
+      {
+        name: "Tư vấn phương pháp tránh thai",
+        duration: "30 phút",
+        description: "Tư vấn các biện pháp tránh thai an toàn và phù hợp"
+      },
+      {
+        name: "Buổi hội thảo giáo dục giới tính",
+        duration: "90 phút",
+        description: "Tổ chức các buổi hội thảo giáo dục giới tính cho nhóm nhỏ"
+      }
+    ]
+  }
 ];
 
-export default consultants;
+export default consultants; // Export mặc định
+export { consultants }; // Export có tên

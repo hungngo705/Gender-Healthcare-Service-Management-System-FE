@@ -28,11 +28,33 @@ export function AuthProvider({ children }) {
     localStorage.removeItem("user");
   };
 
+  // Kiểm tra nếu người dùng là staff hoặc cao hơn
+  const isStaffOrHigher = () => {
+    if (!currentUser) return false;
+    const staffRoles = ["admin", "manager", "consultant", "staff"];
+    return staffRoles.includes(currentUser.role);
+  };
+
+  // Kiểm tra nếu người dùng là customer hoặc guest
+  const isCustomerOrGuest = () => {
+    if (!currentUser) return true; // Nếu chưa đăng nhập thì là guest
+    return currentUser.role === "customer" || currentUser.role === "guest";
+  };
+
+  // Kiểm tra vai trò cụ thể
+  const hasRole = (role) => {
+    if (!currentUser) return false;
+    return currentUser.role === role;
+  };
+
   const value = {
     currentUser,
     login,
     logout,
     isAuthenticated: !!currentUser,
+    isStaffOrHigher,
+    isCustomerOrGuest,
+    hasRole,
   };
 
   return (

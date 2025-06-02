@@ -1,7 +1,10 @@
-import React, { useState } from "react";
+import React, { useState, useEffect } from "react";
 import { Link } from "react-router-dom";
+import { useAuth } from "../../contexts/AuthContext";
 
 function BookingForm() {
+  const { currentUser } = useAuth();
+
   // State for appointment form
   const [formData, setFormData] = useState({
     name: "",
@@ -12,6 +15,18 @@ function BookingForm() {
     testType: "comprehensive",
     notes: "",
   });
+
+  // Tự động điền thông tin người dùng đang đăng nhập
+  useEffect(() => {
+    if (currentUser) {
+      setFormData((prevData) => ({
+        ...prevData,
+        name: currentUser.name || prevData.name,
+        email: currentUser.email || prevData.email,
+        phone: currentUser.phone || prevData.phone,
+      }));
+    }
+  }, [currentUser]);
   // State for form submission
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [submitSuccess, setSubmitSuccess] = useState(false);
@@ -67,7 +82,8 @@ function BookingForm() {
             Lịch Hẹn Đã Được Đặt!
           </h3>
           <p className="text-gray-600 mb-4">
-            Lịch hẹn xét nghiệm STI của bạn đã được đặt thành công. Bạn sẽ nhận được email xác nhận trong thời gian ngắn.
+            Lịch hẹn xét nghiệm STI của bạn đã được đặt thành công. Bạn sẽ nhận
+            được email xác nhận trong thời gian ngắn.
           </p>
           <button
             onClick={() => setSubmitSuccess(false)}
@@ -146,11 +162,11 @@ function BookingForm() {
                   onChange={handleChange}
                   className="w-full px-4 py-2 border border-gray-300 rounded-md focus:ring-indigo-500 focus:border-indigo-500"
                 >
-                  <option value="basic">Xét Nghiệm STI Cơ Bản (79$)</option>
+                  <option value="basic">Xét Nghiệm STI Cơ Bản (79k)</option>
                   <option value="comprehensive">
-                    Xét Nghiệm STI Toàn Diện (149$)
+                    Xét Nghiệm STI Toàn Diện (149k)
                   </option>
-                  <option value="targeted">Xét Nghiệm Mục Tiêu (99$)</option>
+                  <option value="targeted">Xét Nghiệm Mục Tiêu (99k)</option>
                 </select>
               </div>
               <div>
@@ -216,14 +232,15 @@ function BookingForm() {
 
             <div className="mt-6">
               <p className="text-sm text-gray-500 mb-4">
-                Thông tin của bạn sẽ được giữ bí mật nghiêm ngặt. Bằng cách gửi mẫu đơn này, bạn đồng ý với{" "}
+                Thông tin của bạn sẽ được giữ bí mật nghiêm ngặt. Bằng cách gửi
+                mẫu đơn này, bạn đồng ý với{" "}
                 <Link
                   to="/privacy-policy"
                   className="text-indigo-600 hover:text-indigo-500"
                 >
                   chính sách bảo mật
-                </Link>
-                {" "}của chúng tôi.
+                </Link>{" "}
+                của chúng tôi.
               </p>
               <button
                 type="submit"
