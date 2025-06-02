@@ -12,7 +12,6 @@ function Login() {
   const [isLoggingIn, setIsLoggingIn] = useState(false);
   const navigate = useNavigate();
   const { login } = useAuth();
-
   const handleSubmit = async (e) => {
     e.preventDefault();
 
@@ -23,13 +22,30 @@ function Login() {
 
     setIsLoggingIn(true);
     setError("");
-
     try {
+      // Use the enhanced authService that includes toast notifications
       const user = await authService.login(email, password);
-      login(user); // Sử dụng AuthContext để lưu thông tin người dùng và cập nhật trạng thái xác thực
-      navigate("/"); // Chuyển đến trang chủ sau khi đăng nhập thành công
+
+      if (!user) {
+        throw new Error("Không nhận được dữ liệu người dùng từ máy chủ");
+      }
+
+      // Kiểm tra role và chuyển hướng tương ứng
+      const loginSuccess = login(user);
+      if (loginSuccess) {
+        if (user.role && user.role.toLowerCase() === "admin") {
+          navigate("/dashboard"); // Đối với admin, chuyển đến trang dashboard
+        } else {
+          navigate("/"); // Đối với người dùng thông thường, chuyển đến trang chủ
+        }
+      }
     } catch (err) {
-      setError(err.message || "Đăng nhập thất bại. Vui lòng kiểm tra thông tin đăng nhập của bạn.");
+      // Error toast is handled by the axios interceptor
+      setError(
+        err.message ||
+          "Đăng nhập thất bại. Vui lòng kiểm tra thông tin đăng nhập của bạn."
+      );
+      console.error("Login error details:", err);
     } finally {
       setIsLoggingIn(false);
     }
@@ -76,7 +92,9 @@ function Login() {
             transition={{ delay: 0.3 }}
           >
             <h1 className="text-3xl font-bold mb-4">Chào Mừng Trở Lại</h1>
-            <p className="opacity-90">Đăng nhập vào tài khoản chăm sóc sức khỏe của bạn</p>
+            <p className="opacity-90">
+              Đăng nhập vào tài khoản chăm sóc sức khỏe của bạn
+            </p>
           </motion.div>
 
           <motion.div

@@ -1,8 +1,10 @@
 import React from "react";
 import PropTypes from "prop-types";
 import { User, Calendar, FileText, Bell, Lock, CreditCard } from "lucide-react";
+import UserAvatar from "../user/UserAvatar";
+import userUtils from "../../utils/userUtils";
 
-function ProfileSidebar({ currentUser, activeTab, setActiveTab }) {
+function ProfileSidebar({ activeTab, setActiveTab }) {
   const tabs = [
     {
       id: "profile",
@@ -39,27 +41,20 @@ function ProfileSidebar({ currentUser, activeTab, setActiveTab }) {
   return (
     <aside className="w-full md:w-64 flex-shrink-0">
       <div className="bg-white rounded-lg shadow overflow-hidden">
+        {" "}
         {/* User Info */}
         <div className="p-6 text-center border-b border-gray-200">
-          <div className="w-24 h-24 rounded-full bg-indigo-100 flex items-center justify-center text-indigo-600 mx-auto mb-4">
-            {currentUser?.profilePicture ? (
-              <img
-                src={currentUser.profilePicture}
-                alt={currentUser.name}
-                className="w-24 h-24 rounded-full object-cover"
-              />
-            ) : (
-              <User size={40} />
-            )}
-          </div>
+          <div className="mx-auto mb-4">
+            <UserAvatar size="lg" />
+          </div>{" "}
           <h3 className="text-lg font-medium text-gray-900">
-            {currentUser?.name || "Người dùng"}
+            {userUtils.useUserInfo().displayName}
           </h3>
           <p className="text-sm text-gray-500 mt-1">
-            {currentUser?.email || "Email chưa cập nhật"}
+            {userUtils.useUserInfo().currentUser?.email ||
+              "Email chưa cập nhật"}
           </p>
         </div>
-
         {/* Navigation */}
         <nav className="p-4">
           <ul className="space-y-1">
@@ -86,7 +81,6 @@ function ProfileSidebar({ currentUser, activeTab, setActiveTab }) {
 }
 
 ProfileSidebar.propTypes = {
-  currentUser: PropTypes.object,
   activeTab: PropTypes.string.isRequired,
   setActiveTab: PropTypes.func.isRequired,
 };

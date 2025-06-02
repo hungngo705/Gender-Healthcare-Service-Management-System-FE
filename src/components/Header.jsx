@@ -3,11 +3,13 @@ import { NavLink, useNavigate } from "react-router-dom";
 import logo from "../assets/logo2.svg";
 import { Menu, X, User, LogOut } from "lucide-react";
 import { useAuth } from "../contexts/AuthContext";
+import userUtils from "../utils/userUtils";
 
 function Header() {
   const [isMenuOpen, setIsMenuOpen] = useState(false);
   const [isProfileMenuOpen, setIsProfileMenuOpen] = useState(false);
-  const { currentUser, logout, isAuthenticated, isStaffOrHigher } = useAuth();
+  const { logout, isAuthenticated, isStaffOrHigher } = useAuth();
+  const { displayName, avatarInfo } = userUtils.useUserInfo();
   const navigate = useNavigate();
 
   const handleLogout = () => {
@@ -116,20 +118,23 @@ function Header() {
                     onClick={() => setIsProfileMenuOpen(!isProfileMenuOpen)}
                     className="flex items-center space-x-1 text-gray-600 hover:text-blue-600"
                   >
+                    {" "}
                     <div className="w-8 h-8 bg-indigo-600 rounded-full flex items-center justify-center text-white">
-                      {currentUser?.profilePicture ? (
+                      {avatarInfo.imageUrl ? (
                         <img
-                          src={currentUser.profilePicture}
-                          alt={currentUser.name}
+                          src={avatarInfo.imageUrl}
+                          alt={displayName}
                           className="w-8 h-8 rounded-full object-cover"
                         />
+                      ) : avatarInfo.initial ? (
+                        <span className="font-semibold">
+                          {avatarInfo.initial}
+                        </span>
                       ) : (
                         <User size={18} />
                       )}
-                    </div>
-                    <span className="font-medium">
-                      {currentUser?.name?.split(" ").pop() || "Người Dùng"} {/* Chỉ hiện thị tên chứ không hiển thị họ tên */}
-                    </span>
+                    </div>{" "}
+                    <span className="font-medium">{displayName}</span>
                   </button>
 
                   {isProfileMenuOpen && (

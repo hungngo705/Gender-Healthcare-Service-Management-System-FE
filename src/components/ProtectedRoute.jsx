@@ -1,6 +1,7 @@
 import { Navigate, Outlet } from "react-router-dom";
 import { useAuth } from "../contexts/AuthContext";
 import PropTypes from "prop-types";
+import userUtils from "../utils/userUtils";
 
 function ProtectedRoute({ isLoggedIn, children, roleRequired }) {
   const { currentUser, isAuthenticated } = useAuth();
@@ -13,48 +14,101 @@ function ProtectedRoute({ isLoggedIn, children, roleRequired }) {
   if (!isUserLoggedIn) {
     return <Navigate to="/login" replace />;
   }
-
   // Check if role requirement is specified and user has the required role
   if (roleRequired) {
-    const userRole = currentUser?.role || "guest";
+    const userRoleData = userUtils.getUserRole(currentUser);
+    let userRoles = [];
 
-    // Staff role check (staff, consultant, manager, admin)
-    if (roleRequired === "staff") {
-      const staffRoles = ["admin", "manager", "consultant", "staff"];
-      if (!staffRoles.includes(userRole)) {
+    // Chuyển đổi userRoleData thành mảng để dễ kiểm tra
+    if (Array.isArray(userRoleData)) {
+      // Nếu đã là mảng thì giữ nguyên
+      userRoles = userRoleData.map((r) =>
+        typeof r === "string"
+          ? r.toLowerCase()
+          : r.name
+          ? r.name.toLowerCase()
+          : r.role
+          ? r.role.toLowerCase()
+          : ""
+      );
+    } else if (typeof userRoleData === "string") {
+      // Nếu là chuỗi thì chuyển thành mảng một phần tử
+      userRoles = [userRoleData.toLowerCase()];
+    } else if (userRoleData && typeof userRoleData === "object") {
+      // Nếu là đối tượng, trích xuất tên vai trò
+      const roleName =
+        userRoleData.name || userRoleData.role || userRoleData.type;
+      if (roleName) {
+        userRoles = [roleName.toLowerCase()];
+      }
+    }
+
+    // Thêm 'guest' nếu không có vai trò nào
+    if (userRoles.length === 0) {
+      userRoles = ["guest"];
+    }
+
+    // Chuẩn hóa roleRequired
+    const requiredRole = roleRequired.toLowerCase();
+
+    // Kiểm tra vai trò nhân viên (staff, consultant, manager, admin)
+    if (requiredRole === "staff") {
+      const staffRoles = [
+        "admin",
+        "administrator",
+        "manager",
+        "consultant",
+        "doctor",
+        "staff",
+      ];
+      // Kiểm tra xem người dùng có bất kỳ vai trò nhân viên nào không
+      const hasStaffRole = userRoles.some((role) => staffRoles.includes(role));
+
+      if (!hasStaffRole) {
         return (
           <Navigate
             to="/unauthorized"
             replace
             state={{
               requiredRole: roleRequired,
-              userRole: userRole,
+              userRole: userUtils.formatRole(userRoleData),
             }}
           />
         );
       }
     }
 
-    // Customer role check
-    else if (roleRequired === "customer") {
-      const customerRoles = ["customer", "guest"];
-      if (!customerRoles.includes(userRole)) {
+    // Kiểm tra vai trò khách hàng
+    else if (requiredRole === "customer") {
+      const customerRoles = ["customer", "guest", "patient", "user"];
+      // Kiểm tra xem tất cả vai trò của người dùng có phải là vai trò khách hàng
+      const isOnlyCustomer = !userRoles.some(
+        (role) => !customerRoles.includes(role)
+      );
+
+      if (!isOnlyCustomer) {
+        // Nếu người dùng có vai trò cao hơn, chuyển hướng đến dashboard
         return <Navigate to="/dashboard" replace />;
       }
     }
 
-    // For specific role requirements
-    else if (userRole !== roleRequired) {
-      return (
-        <Navigate
-          to="/unauthorized"
-          replace
-          state={{
-            requiredRole: roleRequired,
-            userRole: userRole,
-          }}
-        />
-      );
+    // Kiểm tra vai trò cụ thể
+    else {
+      // Kiểm tra xem người dùng có vai trò yêu cầu không
+      const hasRequiredRole = userRoles.includes(requiredRole);
+
+      if (!hasRequiredRole) {
+        return (
+          <Navigate
+            to="/unauthorized"
+            replace
+            state={{
+              requiredRole: roleRequired,
+              userRole: userUtils.formatRole(userRoleData),
+            }}
+          />
+        );
+      }
     }
   }
 

@@ -6,8 +6,79 @@
 const config = {
   // API URLs
   api: {
-    baseURL: import.meta.env.VITE_API_URL || "https://api.example.com",
-    timeout: 10000, // 10 seconds
+    baseURL: import.meta.env.VITE_API_URL || "https://localhost:7050",
+    timeout: 10000, // 10 seconds    // Auth endpoints
+    auth: {
+      login: "/api/v1/login",
+      register: "/api/v1/register",
+      refreshToken: "/api/v1/refresh-token",
+      logout: "/api/v1/logout",
+      verifyEmail: "/api/v1/verify-email",
+      forgotPassword: "/api/v1/forgot-password",
+      resetPassword: "/api/v1/reset-password",
+    },
+
+    // User endpoints
+    users: {
+      getAll: "/api/v1/user/getall",
+      create: "/api/v1/user/create",
+      getById: (id) => `/api/v1/user/${id}`,
+      update: (id) => `/api/v1/user/${id}`,
+      delete: (id) => `/api/v1/user/${id}`,
+      profile: "/api/v1/user/profile",
+      changePassword: "/api/v1/user/change-password",
+    },
+
+    // Consultant endpoints
+    consultants: {
+      getAll: "/api/v1/consultant/getall",
+      getById: (id) => `/api/v1/consultant/${id}`,
+      create: "/api/v1/consultant/create",
+      update: (id) => `/api/v1/consultant/${id}`,
+      delete: (id) => `/api/v1/consultant/${id}`,
+      getAvailability: (id) => `/api/v1/consultant/${id}/availability`,
+    },
+
+    // Appointment endpoints
+    appointments: {
+      getAll: "/api/v1/appointment/getall",
+      create: "/api/v1/appointment/create",
+      getById: (id) => `/api/v1/appointment/${id}`,
+      update: (id) => `/api/v1/appointment/${id}`,
+      cancel: (id) => `/api/v1/appointment/${id}/cancel`,
+      getByUser: (userId) => `/api/v1/appointment/user/${userId}`,
+      getByConsultant: (consultantId) =>
+        `/api/v1/appointment/consultant/${consultantId}`,
+    },
+
+    // STI testing endpoints
+    stiTesting: {
+      getAll: "/api/v1/sti-test/getall",
+      create: "/api/v1/sti-test/create",
+      getById: (id) => `/api/v1/sti-test/${id}`,
+      getByUser: (userId) => `/api/v1/sti-test/user/${userId}`,
+      updateResult: (id) => `/api/v1/sti-test/${id}/result`,
+    },
+
+    // Blog endpoints
+    blog: {
+      getAll: "/api/v1/blog/getall",
+      create: "/api/v1/blog/create",
+      getById: (id) => `/api/v1/blog/${id}`,
+      update: (id) => `/api/v1/blog/${id}`,
+      delete: (id) => `/api/v1/blog/${id}`,
+      getComments: (blogId) => `/api/v1/blog/${blogId}/comments`,
+      addComment: (blogId) => `/api/v1/blog/${blogId}/comments`,
+    },
+
+    // Service endpoints
+    services: {
+      getAll: "/api/v1/service/getall",
+      create: "/api/v1/service/create",
+      getById: (id) => `/api/v1/service/${id}`,
+      update: (id) => `/api/v1/service/${id}`,
+      delete: (id) => `/api/v1/service/${id}`,
+    },
   },
 
   // Feature flags
