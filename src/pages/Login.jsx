@@ -42,10 +42,9 @@ function Login() {
     } catch (err) {
       // Error toast is handled by the axios interceptor
       setError(
-        err.message ||
+        err.response.data ||
           "Đăng nhập thất bại. Vui lòng kiểm tra thông tin đăng nhập của bạn."
       );
-      console.error("Login error details:", err);
     } finally {
       setIsLoggingIn(false);
     }
@@ -184,15 +183,7 @@ function Login() {
           >
             Đăng Nhập
           </motion.h2>
-          {error && (
-            <motion.div
-              className="bg-red-50 border-l-4 border-red-500 p-4 mb-6 rounded-md text-red-700"
-              initial={{ opacity: 0 }}
-              animate={{ opacity: 1 }}
-            >
-              {error}
-            </motion.div>
-          )}
+          
           <form onSubmit={handleSubmit} className="space-y-6">
             <motion.div
               initial={{ opacity: 0, y: 20 }}

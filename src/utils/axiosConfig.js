@@ -129,7 +129,13 @@ apiClient.interceptors.response.use(
 
       // Handle 500 Internal Server Error
       if (error.response.status >= 500) {
-        toastService.error("A server error occurred. Please try again later.");
+        // Print out the response message if  available
+        console.log("Alo:" + error.response.data);
+        if (error.response.data) {
+          toastService.error(error.response.data);
+        } else {
+          toastService.error("A server error occurred. Please try again later.");
+        }
       }
     } else if (error.request) {
       // The request was made but no response was received
