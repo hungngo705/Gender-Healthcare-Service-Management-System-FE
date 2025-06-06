@@ -25,18 +25,21 @@ function Footer() {
             <div className="flex space-x-4">
               <a
                 href="https://facebook.com"
+                target="_blank"
                 className="hover:text-white transition-colors duration-300"
               >
                 <Facebook size={20} />
               </a>
               <a
                 href="https://twitter.com"
+                target="_blank"
                 className="hover:text-white transition-colors duration-300"
               >
                 <Twitter size={20} />
               </a>
               <a
                 href="https://instagram.com"
+                target="_blank"
                 className="hover:text-white transition-colors duration-300"
               >
                 <Instagram size={20} />
@@ -97,42 +100,26 @@ function Footer() {
             <ul className="space-y-2">
               <li>
                 <NavLink
-                  to="/services/maternal-health"
+                  to="/services/tracking"
                   className="hover:text-white transition-colors duration-300"
                 >
-                  Sức Khỏe Bà Mẹ
+                  Theo dõi chu kì kinh nguyệt
                 </NavLink>
               </li>
               <li>
                 <NavLink
-                  to="/services/reproductive-health"
+                  to="/services/booking"
                   className="hover:text-white transition-colors duration-300"
                 >
-                  Sức Khỏe Sinh Sản
+                  Đặt lịch tư vấn
                 </NavLink>
               </li>
               <li>
                 <NavLink
-                  to="/services/pediatric-care"
+                  to="/services/sti-testing"
                   className="hover:text-white transition-colors duration-300"
                 >
-                  Chăm Sóc Nhi Khoa
-                </NavLink>
-              </li>
-              <li>
-                <NavLink
-                  to="/services/womens-wellness"
-                  className="hover:text-white transition-colors duration-300"
-                >
-                  Sức Khỏe Phụ Nữ
-                </NavLink>
-              </li>
-              <li>
-                <NavLink
-                  to="/services/mens-wellness"
-                  className="hover:text-white transition-colors duration-300"
-                >
-                  Sức Khỏe Nam Giới
+                  Xét nghiệm STI
                 </NavLink>
               </li>
             </ul>
@@ -152,7 +139,7 @@ function Footer() {
               </li>
               <li className="flex items-center space-x-3">
                 <Mail size={20} className="flex-shrink-0" />
-                <span>contact@ghsms.com</span>
+                <span>EverwellHealthcare@proton.me</span>
               </li>
             </ul>
           </div>

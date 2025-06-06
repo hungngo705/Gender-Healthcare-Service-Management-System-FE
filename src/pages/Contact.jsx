@@ -83,7 +83,7 @@ function Contact() {
             {
               icon: <MapPin className="h-8 w-8 text-indigo-600" />,
               title: "Địa Chỉ",
-              info: ["123 Đại lộ Y Tế", "Thành phố Hồ Chí Minh"],
+              info: ["17 Đ. D1, Long Thạnh Mỹ, Thủ Đức, Hồ Chí Minh 700000, Vietnam"],
             },
             {
               icon: <Phone className="h-8 w-8 text-indigo-600" />,
@@ -94,8 +94,7 @@ function Contact() {
               icon: <Mail className="h-8 w-8 text-indigo-600" />,
               title: "Email",
               info: [
-                "info@genderhealthcare.com",
-                "support@genderhealthcare.com",
+                "EverwellHealthcare@proton.me",
               ],
             },
             {
@@ -335,7 +334,7 @@ function Contact() {
             <iframe
               title="Vị trí Google Maps"
               className="w-full h-full rounded-lg"
-              src="https://www.google.com/maps/embed?pb=!1m18!1m12!1m3!1d3022.215150859785!2d-73.98784332418535!3d40.7488443793285!2m3!1f0!2f0!3f0!3m2!1i1024!2i768!4f13.1!3m3!1m2!1s0x89c259a9b30eac9f%3A0xaca8d880c5d9d1!2sEmpire%20State%20Building!5e0!3m2!1sen!2sus!4v1621332458179!5m2!1sen!2sus"
+              src="https://www.google.com/maps/embed?pb=!1m18!1m12!1m3!1d3918.610010537023!2d106.80730807577771!3d10.841127589311585!2m3!1f0!2f0!3f0!3m2!1i1024!2i768!4f13.1!3m3!1m2!1s0x31752731176b07b1%3A0xb752b24b379bae5e!2sFPT%20University%20HCMC!5e0!3m2!1sen!2s!4v1749194132376!5m2!1sen!2s"
               frameBorder="0"
               style={{ border: 0 }}
               allowFullScreen=""
