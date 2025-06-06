@@ -1,6 +1,9 @@
 import React, { useState } from "react";
+import PropTypes from "prop-types";
 
-function CustomersTab() {
+function CustomersTab({ role }) {
+  // Use role for role-specific functionality
+  console.log(`CustomersTab rendered with role: ${role}`);
   const [searchTerm, setSearchTerm] = useState("");
 
   // Sample customers data - in a real app, you would fetch this from an API
@@ -107,6 +110,7 @@ function CustomersTab() {
         <table className="min-w-full divide-y divide-gray-200">
           <thead className="bg-gray-50">
             <tr>
+              {" "}
               <th
                 scope="col"
                 className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider"
@@ -131,6 +135,15 @@ function CustomersTab() {
               >
                 Tình trạng
               </th>
+              {/* Admin and Manager can see payment status */}
+              {(role === "admin" || role === "manager") && (
+                <th
+                  scope="col"
+                  className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider"
+                >
+                  Thanh toán
+                </th>
+              )}
               <th
                 scope="col"
                 className="px-6 py-3 text-right text-xs font-medium text-gray-500 uppercase tracking-wider"
@@ -165,10 +178,26 @@ function CustomersTab() {
                 </td>
                 <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-500">
                   {new Date(customer.lastVisit).toLocaleDateString("vi-VN")}
-                </td>
+                </td>{" "}
                 <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-500">
                   {customer.condition}
                 </td>
+                {/* Show payment status column for admin and manager roles */}
+                {(role === "admin" || role === "manager") && (
+                  <td className="px-6 py-4 whitespace-nowrap">
+                    <span
+                      className={`px-2 py-1 inline-flex text-xs leading-5 font-semibold rounded-full ${
+                        customer.id % 2 === 0
+                          ? "bg-green-100 text-green-800"
+                          : "bg-yellow-100 text-yellow-800"
+                      }`}
+                    >
+                      {customer.id % 2 === 0
+                        ? "Đã thanh toán"
+                        : "Chờ thanh toán"}
+                    </span>
+                  </td>
+                )}
                 <td className="px-6 py-4 whitespace-nowrap text-right text-sm font-medium">
                   <button className="text-indigo-600 hover:text-indigo-900 mr-3">
                     Hồ sơ
@@ -176,9 +205,12 @@ function CustomersTab() {
                   <button className="text-green-600 hover:text-green-900 mr-3">
                     Đặt lịch hẹn
                   </button>
-                  <button className="text-gray-600 hover:text-gray-900">
-                    Chỉnh sửa
-                  </button>
+                  {/* Only admin and manager can edit customer profiles */}
+                  {(role === "admin" || role === "manager") && (
+                    <button className="text-gray-600 hover:text-gray-900">
+                      Chỉnh sửa
+                    </button>
+                  )}
                 </td>
               </tr>
             ))}
@@ -188,5 +220,9 @@ function CustomersTab() {
     </div>
   );
 }
+
+CustomersTab.propTypes = {
+  role: PropTypes.string.isRequired,
+};
 
 export default CustomersTab;

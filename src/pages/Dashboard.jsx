@@ -1,4 +1,4 @@
-import { useState, useEffect } from "react";
+import { useState, useEffect, useCallback } from "react";
 import { useNavigate } from "react-router-dom";
 import { useAuth } from "../contexts/AuthContext";
 import { getDashboardConfig } from "../utils/dashboardUtils";
@@ -15,6 +15,13 @@ import OverviewTab from "../components/dashboard/tabs/OverviewTab";
 import AppointmentsTab from "../components/dashboard/tabs/AppointmentsTab";
 import CustomersTab from "../components/dashboard/tabs/CustomersTab";
 import PatientsTab from "../components/dashboard/tabs/PatientsTab";
+
+// New Role-Based Tab Components
+import ConsultantAppointmentsTab from "../components/dashboard/tabs/ConsultantAppointmentsTab";
+import TestProcessingTab from "../components/dashboard/tabs/TestProcessingTab";
+import BlogManagementTab from "../components/dashboard/tabs/BlogManagementTab";
+import ServicesManagementTab from "../components/dashboard/tabs/ServicesManagementTab";
+import UserManagementTab from "../components/dashboard/tabs/UserManagementTab";
 
 // Lucide Icons
 import {
@@ -33,10 +40,13 @@ import {
 } from "lucide-react";
 
 function Dashboard() {
-  const { currentUser, logout } = useAuth();
+  const { logout } = useAuth();
   const navigate = useNavigate();
   const [sidebarOpen, setSidebarOpen] = useState(false);
-  const [activeTab, setActiveTab] = useState("overview");
+  const [activeTab, setActiveTab] = useState("overview"); // Custom setter for activeTab
+  const handleSetActiveTab = useCallback((tabId) => {
+    setActiveTab(tabId);
+  }, []);
   const [greeting, setGreeting] = useState("Chào buổi sáng");
   const [searchQuery, setSearchQuery] = useState("");
 
@@ -56,10 +66,47 @@ function Dashboard() {
   const handleLogout = () => {
     logout();
     navigate("/login");
-  };
+  }; // Get user role information using the useUserInfo hook from userUtils
+  const { userRole: currentUserRole } = userUtils.useUserInfo();
+  // Determine the user's role with proper prioritization
+  let userRole = currentUserRole?.toLowerCase() || "staff";
 
-  const userRole = currentUser?.role || "staff";
+  // Bỏ qua logic xác định vai trò ban đầu để debug
+  /*
+  // Define role priority order (higher priority roles first)
+  const priorityOrder = ["admin", "manager", "consultant", "staff"];
+
+  // Check if user has multiple roles and get the highest priority one
+  if (rolesList && rolesList.length > 0) {
+    for (const role of priorityOrder) {
+      if (
+        rolesList.some((r) => {
+          const roleLower =
+            typeof r === "string"
+              ? r.toLowerCase()
+              : r?.name?.toLowerCase() || r?.role?.toLowerCase() || "";
+          return roleLower === role;
+        })
+      ) {
+        userRole = role;
+        break;
+      }
+    }
+  } else if (currentUserRole) {
+    // If single role, normalize it
+    if (typeof currentUserRole === "string") {
+      userRole = currentUserRole.toLowerCase();
+    } else if (typeof currentUserRole === "object") {
+      const roleName =
+        currentUserRole.name || currentUserRole.role || currentUserRole.type;
+      if (roleName) {
+        userRole = roleName.toLowerCase();
+      }
+    }
+  }
+  */
   const dashboardConfig = getDashboardConfig(userRole);
+
   // Get menu items from config with icons
   const menuItems = dashboardConfig.menuItems.map((item) => {
     // Mapping from icon names to actual Lucide icon components
@@ -82,21 +129,96 @@ function Dashboard() {
       ...item,
       iconComponent: iconMap[item.icon] || <LayoutDashboard size={20} />,
     };
-  });
+  }); // Kiểm tra quyền truy cập tab dựa trên vai trò
+  const checkTabAccess = useCallback(
+    (tabId) => {
+      // Define role-based tab access permissions
+      const tabPermissions = {
+        // Tabs for all roles
+        overview: ["admin", "manager", "staff", "consultant"],
+
+        // Consultant-specific tabs
+        consultantAppointments: ["consultant"],
+        testProcessing: ["consultant"],
+
+        // Staff-specific tabs
+        blogManagement: ["staff", "manager", "admin"],
+        appointments: ["staff", "manager", "admin", "consultant"],
+
+        // Manager-specific tabs
+        servicesManagement: ["manager", "admin"],
+        reports: ["manager", "admin"],
+
+        // Admin-specific tabs
+        userManagement: ["admin"],
+        system: ["admin"],
+        logs: ["admin"],
+
+        // Common tabs with different content based on role
+        customers: ["staff", "manager", "admin", "consultant"],
+        patients: ["staff", "manager", "admin", "consultant"],
+      };
+
+      // Check if the current user has permission for the tab
+      const permissions = tabPermissions[tabId] || [];
+      const hasAccess = permissions.includes(userRole);
+      return hasAccess;
+    },
+    [userRole]
+  ); // Mở tab đầu tiên có quyền truy cập khi tải trang
+  useEffect(() => {
+    // Find first accessible tab from menu items
+    const firstAccessibleTab =
+      menuItems.find((item) => checkTabAccess(item.id))?.id || "overview"; // Only set the active tab on initial load or if the current one is invalid
+    if (!activeTab || !menuItems.find((item) => item.id === activeTab)) {
+      handleSetActiveTab(firstAccessibleTab);
+    }
+  }, [userRole, menuItems, checkTabAccess, activeTab, handleSetActiveTab]);
 
   // Xác định tab nội dung hiện tại
   const renderTabContent = () => {
+    // Check if user has access to this tab, if not redirect to overview
+    if (!checkTabAccess(activeTab)) {
+      return (
+        <div className="flex items-center justify-center h-64 bg-gray-50 rounded-lg">
+          <p className="text-red-500">
+            Bạn không có quyền truy cập chức năng này
+          </p>
+        </div>
+      );
+    }
     switch (activeTab) {
       case "overview":
         return <OverviewTab role={userRole} />;
       case "appointments":
-        return <AppointmentsTab />;
+        console.log(`Rendering AppointmentsTab with role: ${userRole}`);
+        return <AppointmentsTab role={userRole} />;
+      case "consultantAppointments":
+        console.log(
+          `Rendering ConsultantAppointmentsTab with role: ${userRole}`
+        );
+        return <ConsultantAppointmentsTab role={userRole} />;
+      case "testProcessing":
+        console.log(`Rendering TestProcessingTab with role: ${userRole}`);
+        return <TestProcessingTab role={userRole} />;
+      case "blogManagement":
+        console.log(`Rendering BlogManagementTab with role: ${userRole}`);
+        return <BlogManagementTab role={userRole} />;
+      case "servicesManagement":
+        console.log(`Rendering ServicesManagementTab with role: ${userRole}`);
+        return <ServicesManagementTab role={userRole} />;
+      case "userManagement":
+        console.log(`Rendering UserManagementTab with role: ${userRole}`);
+        return <UserManagementTab role={userRole} />;
       case "customers":
-        return <CustomersTab />;
+        console.log(`Rendering CustomersTab with role: ${userRole}`);
+        return <CustomersTab role={userRole} />;
       case "records":
       case "patients":
-        return <PatientsTab />;
+        console.log(`Rendering PatientsTab with role: ${userRole}`);
+        return <PatientsTab role={userRole} />;
       default:
+        console.log(`Tab ${activeTab} is under development`);
         return (
           <div className="flex items-center justify-center h-64 bg-gray-50 rounded-lg">
             <p className="text-gray-500">Tab đang được phát triển</p>
@@ -119,10 +241,11 @@ function Dashboard() {
         {" "}
         {/* Sidebar - Desktop */}
         <div className="hidden lg:block lg:w-64 flex-shrink-0">
+          {" "}
           <Sidebar
             menuItems={menuItems}
             activeTab={activeTab}
-            setActiveTab={setActiveTab}
+            setActiveTab={handleSetActiveTab}
             onLogout={handleLogout}
           />
         </div>
@@ -157,8 +280,7 @@ function Dashboard() {
             >
               <X className="h-5 w-5" />
             </button>
-          </div>
-
+          </div>{" "}
           <div className="h-full overflow-y-auto">
             <div className="px-4 py-2">
               {" "}
@@ -177,7 +299,7 @@ function Dashboard() {
                 menuItems={menuItems}
                 activeTab={activeTab}
                 setActiveTab={(tab) => {
-                  setActiveTab(tab);
+                  handleSetActiveTab(tab);
                   setSidebarOpen(false);
                 }}
                 onLogout={handleLogout}

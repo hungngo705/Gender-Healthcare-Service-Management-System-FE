@@ -70,14 +70,16 @@ function App() {
           pauseOnHover
         />
         <Suspense fallback={<LoadingSpinner />}>
+          {" "}
           <Routes>
             <Route path="/login" element={<Login />} />
             <Route path="/signup" element={<Signup />} />
-            <Route path="/unauthorized" element={<Unauthorized />} />
+            <Route path="/unauthorized" element={<Unauthorized />} />{" "}
             <Route
               path="/dashboard/*"
               element={
-                <ProtectedRoute roleRequired="staff">
+                <ProtectedRoute roleRequired="admin,manager,staff,consultant">
+                  {/* Dashboard will determine the appropriate content based on user role */}
                   <Dashboard />
                 </ProtectedRoute>
               }

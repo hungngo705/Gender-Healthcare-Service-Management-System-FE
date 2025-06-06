@@ -49,13 +49,12 @@ const userUtils = {
     }
 
     return { initial: "?", imageUrl: null };
-  }
+  },
   /**
    * Format vai trò người dùng để hiển thị
    * @param {String|Array|Object} role - Vai trò người dùng có thể là string, array hoặc object
    * @returns {String} - Vai trò đã định dạng
-   */,
-  formatRole: (role) => {
+   */ formatRole: (role) => {
     // Nếu không có vai trò
     if (!role) return "Chưa có vai trò";
 
@@ -65,12 +64,7 @@ const userUtils = {
       staff: "Nhân viên",
       consultant: "Chuyên gia tư vấn",
       manager: "Quản lý",
-
       // Thêm các role tiếng Anh khác nếu API trả về
-      administrator: "Quản trị viên",
-      user: "Người dùng",
-      doctor: "Bác sĩ",
-      patient: "Bệnh nhân",
     };
 
     // Trường hợp 1: role là string
@@ -94,7 +88,6 @@ const userUtils = {
         "consultant",
         "staff",
         "customer",
-        "user",
       ];
       const highestRole = role
         .map((r) => r.toLowerCase())
@@ -201,14 +194,7 @@ const userUtils = {
    * @returns {Boolean} - Trả về true nếu người dùng là nhân viên hoặc cao hơn
    */
   isStaffOrHigher: (user) => {
-    const staffRoles = [
-      "staff",
-      "consultant",
-      "doctor",
-      "manager",
-      "admin",
-      "administrator",
-    ];
+    const staffRoles = ["staff", "consultant", "manager", "admin", "customer"];
     return userUtils.hasRole(user, staffRoles);
   },
 

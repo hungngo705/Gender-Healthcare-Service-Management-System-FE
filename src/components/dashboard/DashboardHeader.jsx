@@ -4,6 +4,7 @@ import logo from "../../assets/logo2.svg";
 import { Link } from "react-router-dom";
 import { Bell, Search, Menu } from "lucide-react";
 import UserAvatar from "../user/UserAvatar";
+import userUtils from "../../utils/userUtils";
 
 function DashboardHeader({
   title,
@@ -78,6 +79,9 @@ function DashboardHeader({
               >
                 {/* currentUser is now used indirectly through useUserInfo in UserAvatar */}
                 <UserAvatar size="sm" />
+                <span className="ml-2 text-sm font-medium text-gray-700 hidden md:inline-block">
+                  {userUtils.useUserInfo().formattedRole}
+                </span>
               </button>
             </div>
           </div>

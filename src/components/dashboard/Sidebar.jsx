@@ -3,12 +3,20 @@ import PropTypes from "prop-types";
 import { LogOut } from "lucide-react";
 
 function Sidebar({ menuItems, activeTab, setActiveTab, onLogout }) {
+  // Lấy thông tin userRole trực tiếp từ Dashboard.jsx thông qua props.menuItems
+  // Không áp dụng bộ lọc menu items ở đây vì menuItems đã được lọc từ dashboardConfig
+
+  // Giữ lại toàn bộ menu items được truyền từ Dashboard.jsx
+  const filteredMenuItems = menuItems;
+
   return (
     <div className="w-full h-full lg:w-64 bg-white rounded-lg shadow flex flex-col">
       <nav className="p-4 flex-grow">
         <ul className="space-y-2">
-          {menuItems.map((item) => (
+          {" "}
+          {filteredMenuItems.map((item) => (
             <li key={item.id}>
+              {" "}
               <button
                 className={`w-full flex items-center px-4 py-2 rounded-lg text-left ${
                   activeTab === item.id
