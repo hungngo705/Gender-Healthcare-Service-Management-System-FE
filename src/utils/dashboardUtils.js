@@ -9,39 +9,61 @@ export function getDashboardConfig(userRole) {
       title: "Bảng điều khiển dành cho bác sĩ tư vấn",
       menuItems: [
         { id: "overview", label: "Tổng quan", icon: "chart-pie" },
-        { id: "appointments", label: "Lịch hẹn", icon: "calendar" },
-        { id: "customers", label: "Khách hàng", icon: "users" },
+        {
+          id: "consultantAppointments",
+          label: "Lịch hẹn tư vấn",
+          icon: "calendar",
+        },
+        { id: "testProcessing", label: "Xử lý xét nghiệm", icon: "clipboard" },
+        { id: "customers", label: "Bệnh nhân", icon: "users" },
         { id: "messages", label: "Tin nhắn", icon: "chat" },
       ],
+      description: "Quản lý lịch tư vấn và xử lý xét nghiệm",
     },
     staff: {
       title: "Bảng điều khiển dành cho nhân viên",
       menuItems: [
         { id: "overview", label: "Tổng quan", icon: "chart-pie" },
+        {
+          id: "blogManagement",
+          label: "Quản lý bài viết",
+          icon: "document-text",
+        },
+        { id: "appointments", label: "Lịch hẹn", icon: "calendar" },
         { id: "customers", label: "Khách hàng", icon: "users" },
-        { id: "records", label: "Hồ sơ y tế", icon: "document" },
-        { id: "inventory", label: "Kho vật tư", icon: "archive" },
       ],
+      description: "Tạo các bài đăng và quản lý thông tin khách hàng",
     },
     manager: {
       title: "Bảng điều khiển dành cho quản lý",
       menuItems: [
         { id: "overview", label: "Tổng quan", icon: "chart-pie" },
-        { id: "staff", label: "Quản lý nhân viên", icon: "user-group" },
+        {
+          id: "servicesManagement",
+          label: "Quản lý dịch vụ",
+          icon: "clipboard",
+        },
+        { id: "appointments", label: "Theo dõi lịch hẹn", icon: "calendar" },
         { id: "reports", label: "Báo cáo & Thống kê", icon: "chart-bar" },
-        { id: "services", label: "Quản lý dịch vụ", icon: "clipboard" },
         { id: "finance", label: "Tài chính", icon: "cash" },
       ],
+      description: "Thêm và quản lý các dịch vụ",
     },
     admin: {
       title: "Bảng điều khiển quản trị viên",
       menuItems: [
         { id: "overview", label: "Tổng quan", icon: "chart-pie" },
-        { id: "users", label: "Quản lý người dùng", icon: "users" },
-        { id: "services", label: "Quản lý dịch vụ", icon: "clipboard" },
+        { id: "userManagement", label: "Quản lý người dùng", icon: "users" },
+        {
+          id: "servicesManagement",
+          label: "Quản lý dịch vụ",
+          icon: "clipboard",
+        },
+        { id: "reports", label: "Báo cáo & Thống kê", icon: "chart-bar" },
         { id: "system", label: "Cài đặt hệ thống", icon: "cog" },
         { id: "logs", label: "Nhật ký hệ thống", icon: "document-text" },
       ],
+      description: "Thêm và quản lý người dùng và cài đặt hệ thống",
     },
   };
 

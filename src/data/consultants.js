@@ -3,8 +3,10 @@ const consultants = [
     id: 1,
     name: "TS. Nguyễn Thị Minh",
     specialty: "Sức khỏe sinh sản",
-    shortBio: "Chuyên gia với hơn 15 năm kinh nghiệm về sức khỏe sinh sản phụ nữ",
-    image: "https://images.unsplash.com/photo-1559839734-2b71ea197ec2?q=80&w=500&auto=format&fit=crop",
+    shortBio:
+      "Chuyên gia với hơn 15 năm kinh nghiệm về sức khỏe sinh sản phụ nữ",
+    image:
+      "https://images.unsplash.com/photo-1559839734-2b71ea197ec2?q=80&w=500&auto=format&fit=crop",
     rating: 4.9,
     reviewCount: 127,
     yearsExperience: 15,
@@ -14,43 +16,34 @@ const consultants = [
         role: "Trưởng khoa Phụ Sản",
         workplace: "Bệnh viện Quốc tế Vinmec, TP. HCM",
         period: "2018 - Hiện tại",
-        description: "Quản lý chuyên môn và điều phối đội ngũ y tế của khoa Phụ Sản"
+        description:
+          "Quản lý chuyên môn và điều phối đội ngũ y tế của khoa Phụ Sản",
       },
       {
         role: "Bác sĩ tư vấn cao cấp",
         workplace: "Phòng khám Đa khoa Quốc tế, TP. HCM",
         period: "2012 - 2018",
-        description: "Tư vấn và điều trị các vấn đề sức khỏe sinh sản phụ nữ"
+        description: "Tư vấn và điều trị các vấn đề sức khỏe sinh sản phụ nữ",
       },
       {
         role: "Nghiên cứu viên",
         workplace: "Đại học Y Melbourne, Úc",
         period: "2008 - 2012",
-        description: "Nghiên cứu về vô sinh và các phương pháp hỗ trợ sinh sản"
-      }
-    ],
-    services: [
-      {
-        name: "Tư vấn sức khỏe sinh sản",
-        duration: "45 phút",
-        description: "Đánh giá toàn diện sức khỏe sinh sản và tư vấn các biện pháp phòng ngừa bệnh"
+        description: "Nghiên cứu về vô sinh và các phương pháp hỗ trợ sinh sản",
       },
-      {
-        name: "Tư vấn kế hoạch hóa gia đình",
-        duration: "30 phút",
-        description: "Tư vấn các biện pháp tránh thai và lập kế hoạch gia đình phù hợp"
-      },
-      {
-        name: "Tư vấn vô sinh",
-        duration: "60 phút",
-        description: "Đánh giá nguyên nhân và tư vấn các phương pháp hỗ trợ sinh sản"
-      }
     ],
     languages: ["Tiếng Việt", "Tiếng Anh"],
-    specializations: ["Kế hoạch hóa gia đình", "Khám sức khỏe tiền hôn nhân", "Tư vấn vô sinh"],
-    certifications: ["Hội Sản Phụ Khoa Việt Nam", "Hiệp hội Sức khỏe Sinh sản Châu Á"],
+    specializations: [
+      "Kế hoạch hóa gia đình",
+      "Khám sức khỏe tiền hôn nhân",
+      "Tư vấn vô sinh",
+    ],
+    certifications: [
+      "Hội Sản Phụ Khoa Việt Nam",
+      "Hiệp hội Sức khỏe Sinh sản Châu Á",
+    ],
     bookedShifts: {
-      "6/6/2025": [0,],      // 0: 8h-10h, 1: 10h-12h, 2: 13h-15h, 3: 15h-17h
+      "6/6/2025": [0], // 0: 8h-10h, 1: 10h-12h, 2: 13h-15h, 3: 15h-17h
       "7/6/2025": [1, 2],
       "8/6/2025": [0, 1, 2, 3],
       "9/6/2025": [0, 1],
@@ -65,14 +58,16 @@ const consultants = [
       "18/6/2025": [0, 2, 3],
       "19/6/2025": [0],
       "20/6/2025": [1, 3],
-    }
+    },
   },
   {
     id: 2,
     name: "BS. Trần Văn Nam",
     specialty: "Nam khoa",
-    shortBio: "Chuyên gia nam khoa với kinh nghiệm điều trị các vấn đề sức khỏe nam giới",
-    image: "https://images.unsplash.com/photo-1612349317150-e413f6a5b16d?q=80&w=500&auto=format&fit=crop",
+    shortBio:
+      "Chuyên gia nam khoa với kinh nghiệm điều trị các vấn đề sức khỏe nam giới",
+    image:
+      "https://images.unsplash.com/photo-1612349317150-e413f6a5b16d?q=80&w=500&auto=format&fit=crop",
     rating: 4.7,
     reviewCount: 98,
     yearsExperience: 12,
@@ -82,37 +77,30 @@ const consultants = [
         role: "Trưởng phòng khám Nam khoa",
         workplace: "Bệnh viện Đa khoa Tâm Anh, TP. HCM",
         period: "2016 - Hiện tại",
-        description: "Điều trị và tư vấn các vấn đề sức khỏe nam giới"
+        description: "Điều trị và tư vấn các vấn đề sức khỏe nam giới",
       },
       {
         role: "Bác sĩ Nam khoa",
         workplace: "Bệnh viện Đại học Y Dược TP. HCM",
         period: "2010 - 2016",
-        description: "Khám và điều trị các bệnh lý về nam khoa và sức khỏe sinh sản nam"
-      }
-    ],
-    services: [
-      {
-        name: "Khám sức khỏe tổng quát nam giới",
-        duration: "45 phút",
-        description: "Đánh giá tổng thể sức khỏe và tư vấn phòng ngừa bệnh lý nam giới"
+        description:
+          "Khám và điều trị các bệnh lý về nam khoa và sức khỏe sinh sản nam",
       },
-      {
-        name: "Tư vấn sức khỏe tình dục",
-        duration: "30 phút",
-        description: "Tư vấn về các vấn đề liên quan đến sức khỏe tình dục và sinh lý nam"
-      },
-      {
-        name: "Tư vấn vô sinh nam",
-        duration: "60 phút",
-        description: "Đánh giá nguyên nhân và đưa ra phương pháp điều trị vô sinh nam giới"
-      }
     ],
+
     languages: ["Tiếng Việt", "Tiếng Anh", "Tiếng Pháp"],
-    specializations: ["STI/STD", "HIV/AIDS", "Tư vấn tình dục an toàn", "Sức khỏe nam giới"],
-    certifications: ["Hiệp hội Y tế Công cộng Việt Nam", "Chương trình phòng chống HIV/AIDS Quốc gia"],
+    specializations: [
+      "STI/STD",
+      "HIV/AIDS",
+      "Tư vấn tình dục an toàn",
+      "Sức khỏe nam giới",
+    ],
+    certifications: [
+      "Hiệp hội Y tế Công cộng Việt Nam",
+      "Chương trình phòng chống HIV/AIDS Quốc gia",
+    ],
     bookedShifts: {
-      "6/6/2025": [1, 2],      
+      "6/6/2025": [1, 2],
       "7/6/2025": [0, 3],
       "8/6/2025": [1, 2],
       "9/6/2025": [0, 2, 3],
@@ -127,15 +115,15 @@ const consultants = [
       "18/6/2025": [2, 3],
       "19/6/2025": [0, 1],
       "20/6/2025": [1, 3],
-    }
-
+    },
   },
   {
     id: 3,
     name: "ThS. Lê Thị Hương",
     specialty: "Tư vấn tâm lý",
     shortBio: "Nhà tư vấn tâm lý chuyên về các vấn đề giới tính và tình dục",
-    image: "https://images.unsplash.com/photo-1614608682850-e0d6ed316d47?q=80&w=500&auto=format&fit=crop",
+    image:
+      "https://images.unsplash.com/photo-1614608682850-e0d6ed316d47?q=80&w=500&auto=format&fit=crop",
     rating: 4.8,
     reviewCount: 156,
     yearsExperience: 10,
@@ -145,37 +133,32 @@ const consultants = [
         role: "Nhà tư vấn tâm lý cao cấp",
         workplace: "Trung tâm Tư vấn Tâm lý Thăng Long, TP. HCM",
         period: "2015 - Hiện tại",
-        description: "Tư vấn các vấn đề tâm lý liên quan đến giới tính và tình dục"
+        description:
+          "Tư vấn các vấn đề tâm lý liên quan đến giới tính và tình dục",
       },
       {
         role: "Giảng viên",
-        workplace: "Khoa Tâm lý học, Đại học Khoa học Xã hội và Nhân văn, ĐHQG TP.HCM",
+        workplace:
+          "Khoa Tâm lý học, Đại học Khoa học Xã hội và Nhân văn, ĐHQG TP.HCM",
         period: "2012 - Hiện tại",
-        description: "Giảng dạy các môn học về tâm lý học giới tính và tư vấn tâm lý"
-      }
-    ],
-    services: [
-      {
-        name: "Tư vấn tâm lý cá nhân",
-        duration: "50 phút",
-        description: "Hỗ trợ giải quyết các vấn đề tâm lý liên quan đến giới tính và tình dục"
+        description:
+          "Giảng dạy các môn học về tâm lý học giới tính và tư vấn tâm lý",
       },
-      {
-        name: "Tư vấn tâm lý cặp đôi",
-        duration: "75 phút",
-        description: "Hỗ trợ cải thiện mối quan hệ và giải quyết các vấn đề tình dục trong quan hệ cặp đôi"
-      },
-      {
-        name: "Tư vấn bản dạng giới",
-        duration: "50 phút",
-        description: "Hỗ trợ các cá nhân khám phá và chấp nhận bản dạng giới của mình"
-      }
     ],
+
     languages: ["Tiếng Việt", "Tiếng Anh"],
-    specializations: ["Tư vấn tâm lý", "Căng thẳng và lo âu", "Xác định giới tính", "Rối loạn tâm lý liên quan đến tình dục"],
-    certifications: ["Hiệp hội Tâm lý học Việt Nam", "Hiệp hội Tâm lý học Lâm sàng Châu Á"],
+    specializations: [
+      "Tư vấn tâm lý",
+      "Căng thẳng và lo âu",
+      "Xác định giới tính",
+      "Rối loạn tâm lý liên quan đến tình dục",
+    ],
+    certifications: [
+      "Hiệp hội Tâm lý học Việt Nam",
+      "Hiệp hội Tâm lý học Lâm sàng Châu Á",
+    ],
     bookedShifts: {
-      "6/6/2025": [0, 3],      
+      "6/6/2025": [0, 3],
       "7/6/2025": [],
       "8/6/2025": [1, 3],
       "9/6/2025": [0, 1, 2],
@@ -190,14 +173,16 @@ const consultants = [
       "18/6/2025": [3],
       "19/6/2025": [0, 1, 2],
       "20/6/2025": [1, 2, 3],
-    }
+    },
   },
   {
     id: 4,
     name: "BS. Phạm Thị Lan Anh",
     specialty: "Tư vấn sức khỏe giới tính",
-    shortBio: "Bác sĩ chuyên về giáo dục giới tính và sức khỏe tình dục cho thanh thiếu niên",
-    image: "https://images.unsplash.com/photo-1651008376811-b90baee60c1f?q=80&w=500&auto=format&fit=crop",
+    shortBio:
+      "Bác sĩ chuyên về giáo dục giới tính và sức khỏe tình dục cho thanh thiếu niên",
+    image:
+      "https://images.unsplash.com/photo-1651008376811-b90baee60c1f?q=80&w=500&auto=format&fit=crop",
     rating: 4.6,
     reviewCount: 78,
     yearsExperience: 8,
@@ -207,37 +192,30 @@ const consultants = [
         role: "Bác sĩ tư vấn",
         workplace: "Trung tâm Chăm sóc Sức khỏe Sinh sản Thanh niên, TP. HCM",
         period: "2016 - Hiện tại",
-        description: "Tư vấn và giáo dục về sức khỏe sinh sản và tình dục cho thanh thiếu niên"
+        description:
+          "Tư vấn và giáo dục về sức khỏe sinh sản và tình dục cho thanh thiếu niên",
       },
       {
         role: "Điều phối viên dự án",
         workplace: "Tổ chức Marie Stopes International Việt Nam",
         period: "2013 - 2016",
-        description: "Quản lý các dự án về sức khỏe sinh sản cho thanh niên tại các vùng nông thôn"
-      }
-    ],
-    services: [
-      {
-        name: "Tư vấn sức khỏe sinh sản cho thanh thiếu niên",
-        duration: "45 phút",
-        description: "Tư vấn phù hợp lứa tuổi về các vấn đề sức khỏe sinh sản"
+        description:
+          "Quản lý các dự án về sức khỏe sinh sản cho thanh niên tại các vùng nông thôn",
       },
-      {
-        name: "Tư vấn phương pháp tránh thai",
-        duration: "30 phút",
-        description: "Tư vấn các biện pháp tránh thai an toàn và phù hợp"
-      },
-      {
-        name: "Buổi hội thảo giáo dục giới tính",
-        duration: "90 phút",
-        description: "Tổ chức các buổi hội thảo giáo dục giới tính cho nhóm nhỏ"
-      }
     ],
     languages: ["Tiếng Việt", "Tiếng Anh"],
-    specializations: ["Sức khỏe LGBTQ+", "Tư vấn chuyển giới", "Tư vấn tâm lý", "Liệu pháp hormone"],
-    certifications: ["Mạng lưới Sức khỏe LGBTQ+ Đông Nam Á", "Chứng chỉ chuyên môn về Y tế Giới tính"],
+    specializations: [
+      "Sức khỏe LGBTQ+",
+      "Tư vấn chuyển giới",
+      "Tư vấn tâm lý",
+      "Liệu pháp hormone",
+    ],
+    certifications: [
+      "Mạng lưới Sức khỏe LGBTQ+ Đông Nam Á",
+      "Chứng chỉ chuyên môn về Y tế Giới tính",
+    ],
     bookedShifts: {
-      "6/6/2025": [2, 3],      
+      "6/6/2025": [2, 3],
       "7/6/2025": [0, 1, 2],
       "8/6/2025": [],
       "9/6/2025": [1, 2],
@@ -252,8 +230,8 @@ const consultants = [
       "18/6/2025": [1, 2, 3],
       "19/6/2025": [0, 2],
       "20/6/2025": [0, 1, 3],
-    }
-  }
+    },
+  },
 ];
 
 export default consultants; // Export mặc định

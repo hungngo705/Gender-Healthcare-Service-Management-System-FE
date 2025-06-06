@@ -1,6 +1,9 @@
 import React, { useState } from "react";
+import PropTypes from "prop-types";
 
-function PatientsTab() {
+function PatientsTab({ role }) {
+  // Use role for role-specific functionality
+  console.log(`PatientsTab rendered with role: ${role}`);
   const [searchTerm, setSearchTerm] = useState("");
 
   // Sample patients data - in a real app, you would fetch this from an API
@@ -188,5 +191,9 @@ function PatientsTab() {
     </div>
   );
 }
+
+PatientsTab.propTypes = {
+  role: PropTypes.string.isRequired,
+};
 
 export default PatientsTab;
