@@ -28,15 +28,16 @@ function Login() {
 
       if (!user) {
         throw new Error("Không nhận được dữ liệu người dùng từ máy chủ");
-      }
-
-      // Kiểm tra role và chuyển hướng tương ứng
+      } // Kiểm tra role và chuyển hướng tương ứng
       const loginSuccess = login(user);
       if (loginSuccess) {
-        if (user.role && user.role.toLowerCase() === "admin") {
-          navigate("/dashboard"); // Đối với admin, chuyển đến trang dashboard
+        const userRole = user.role ? user.role.toLowerCase() : "customer";
+
+        // Redirect based on user role
+        if (["admin", "manager", "staff", "consultant"].includes(userRole)) {
+          navigate("/dashboard"); // Đối với nhân viên, chuyển đến dashboard
         } else {
-          navigate("/"); // Đối với người dùng thông thường, chuyển đến trang chủ
+          navigate("/"); // Đối với customer, chuyển đến trang chủ
         }
       }
     } catch (err) {
@@ -183,7 +184,6 @@ function Login() {
           >
             Đăng Nhập
           </motion.h2>
-          
           <form onSubmit={handleSubmit} className="space-y-6">
             <motion.div
               initial={{ opacity: 0, y: 20 }}

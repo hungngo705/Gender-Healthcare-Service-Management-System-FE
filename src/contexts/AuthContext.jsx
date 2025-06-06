@@ -127,7 +127,7 @@ export function AuthProvider({ children }) {
   // Kiểm tra nếu người dùng là customer hoặc guest
   const isCustomerOrGuest = () => {
     if (!currentUser) return true; // Nếu chưa đăng nhập thì là guest
-    const customerRoles = ["customer", "guest", "patient", "user"];
+    const customerRoles = ["customer", "guest"];
     return userUtils.hasRole(currentUser, customerRoles);
   };
 

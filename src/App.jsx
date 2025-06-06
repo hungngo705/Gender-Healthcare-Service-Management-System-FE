@@ -6,7 +6,6 @@ import "./App.css";
 import Layout from "./components/Layout";
 import ProtectedRoute from "./components/ProtectedRoute";
 import LoadingSpinner from "./components/LoadingSpinner";
-import { useAuth } from "./contexts/AuthContext";
 
 // Lazy load all page components with named chunks for better debugging
 const Login = lazy(() =>
@@ -52,46 +51,6 @@ const Unauthorized = lazy(() =>
 );
 
 function App() {
-  const { isStaffOrHigher } = useAuth();
-
-  // Chuyển hướng các nhân viên trực tiếp đến trang Dashboard
-  if (isStaffOrHigher()) {
-    return (
-      <>
-        <ToastContainer
-          position="top-right"
-          autoClose={3000}
-          hideProgressBar={false}
-          newestOnTop
-          closeOnClick
-          rtl={false}
-          pauseOnFocusLoss
-          draggable
-          pauseOnHover
-        />
-        <Suspense fallback={<LoadingSpinner />}>
-          {" "}
-          <Routes>
-            <Route path="/login" element={<Login />} />
-            <Route path="/signup" element={<Signup />} />
-            <Route path="/unauthorized" element={<Unauthorized />} />{" "}
-            <Route
-              path="/dashboard/*"
-              element={
-                <ProtectedRoute roleRequired="admin,manager,staff,consultant">
-                  {/* Dashboard will determine the appropriate content based on user role */}
-                  <Dashboard />
-                </ProtectedRoute>
-              }
-            />
-            <Route path="*" element={<Navigate to="/dashboard" replace />} />
-          </Routes>
-        </Suspense>
-      </>
-    );
-  }
-
-  // Giao diện cho khách hàng và khách
   return (
     <>
       <ToastContainer
@@ -111,7 +70,17 @@ function App() {
           <Route path="/signup" element={<Signup />} />
           <Route path="/unauthorized" element={<Unauthorized />} />
 
-          {/* Tất cả các trang với Layout chung */}
+          {/* Dashboard routes for staff and higher */}
+          <Route
+            path="/dashboard/*"
+            element={
+              <ProtectedRoute roleRequired="admin,manager,staff,consultant">
+                <Dashboard />
+              </ProtectedRoute>
+            }
+          />
+
+          {/* Public and customer routes with Layout */}
           <Route path="/" element={<Layout />}>
             {/* Các trang công khai */}
             <Route index element={<Home />} />

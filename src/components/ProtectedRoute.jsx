@@ -80,19 +80,26 @@ function ProtectedRoute({ isLoggedIn, children, roleRequired }) {
           />
         );
       }
-    }
-
-    // Kiểm tra vai trò khách hàng
+    } // Kiểm tra vai trò khách hàng
     else if (requiredRoles.includes("customer")) {
       const customerRoles = ["customer", "guest"];
-      // Kiểm tra xem tất cả vai trò của người dùng có phải là vai trò khách hàng
-      const isOnlyCustomer = !userRoles.some(
-        (role) => !customerRoles.includes(role)
+      // Kiểm tra xem người dùng có vai trò customer hay guest không
+      const hasCustomerRole = userRoles.some((role) =>
+        customerRoles.includes(role)
       );
 
-      if (!isOnlyCustomer) {
-        // Nếu người dùng có vai trò cao hơn, chuyển hướng đến dashboard
-        return <Navigate to="/dashboard" replace />;
+      if (!hasCustomerRole) {
+        // Nếu không phải customer/guest, chuyển hướng đến unauthorized
+        return (
+          <Navigate
+            to="/unauthorized"
+            replace
+            state={{
+              requiredRole: roleRequired,
+              userRole: userUtils.formatRole(userRoleData),
+            }}
+          />
+        );
       }
     }
 

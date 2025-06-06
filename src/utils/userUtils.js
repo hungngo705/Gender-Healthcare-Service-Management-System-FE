@@ -187,14 +187,13 @@ const userUtils = {
     // Kiểm tra xem người dùng có bất kỳ vai trò nào trong rolesToCheck không
     return userRoles.some((role) => rolesToCheckArray.includes(role));
   },
-
   /**
    * Kiểm tra xem người dùng có phải là nhân viên (staff hoặc cao hơn) không
    * @param {Object} user - Đối tượng người dùng
    * @returns {Boolean} - Trả về true nếu người dùng là nhân viên hoặc cao hơn
    */
   isStaffOrHigher: (user) => {
-    const staffRoles = ["staff", "consultant", "manager", "admin", "customer"];
+    const staffRoles = ["staff", "consultant", "manager", "admin"];
     return userUtils.hasRole(user, staffRoles);
   },
 
