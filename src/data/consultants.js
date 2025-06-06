@@ -49,14 +49,22 @@ const consultants = [
     languages: ["Tiếng Việt", "Tiếng Anh"],
     specializations: ["Kế hoạch hóa gia đình", "Khám sức khỏe tiền hôn nhân", "Tư vấn vô sinh"],
     certifications: ["Hội Sản Phụ Khoa Việt Nam", "Hiệp hội Sức khỏe Sinh sản Châu Á"],
-    availableShifts: {
-      monday: [0, 1, 3],      // 0: 8h-10h, 1: 10h-12h, 2: 13h-15h, 3: 15h-17h
-      tuesday: [1, 2],
-      wednesday: [0, 2, 3],
-      thursday: [0, 1],
-      friday: [2, 3],
-      saturday: [0, 1],
-      sunday: []
+    bookedShifts: {
+      "6/6/2025": [0,],      // 0: 8h-10h, 1: 10h-12h, 2: 13h-15h, 3: 15h-17h
+      "7/6/2025": [1, 2],
+      "8/6/2025": [0, 1, 2, 3],
+      "9/6/2025": [0, 1],
+      "10/6/2025": [2, 3],
+      "11/6/2025": [0, 1],
+      "12/6/2025": [1, 3],
+      "13/6/2025": [0, 3],
+      "14/6/2025": [1, 2, 3],
+      "15/6/2025": [2, 3],
+      "16/6/2025": [],
+      "17/6/2025": [0, 1],
+      "18/6/2025": [0, 2, 3],
+      "19/6/2025": [0],
+      "20/6/2025": [1, 3],
     }
   },
   {
@@ -103,14 +111,22 @@ const consultants = [
     languages: ["Tiếng Việt", "Tiếng Anh", "Tiếng Pháp"],
     specializations: ["STI/STD", "HIV/AIDS", "Tư vấn tình dục an toàn", "Sức khỏe nam giới"],
     certifications: ["Hiệp hội Y tế Công cộng Việt Nam", "Chương trình phòng chống HIV/AIDS Quốc gia"],
-    availableShifts: {
-      monday: [2, 3],
-      tuesday: [0, 1, 3],
-      wednesday: [1, 2],
-      thursday: [0, 2, 3],
-      friday: [0, 1],
-      saturday: [0, 3],
-      sunday: []
+    bookedShifts: {
+      "6/6/2025": [1, 2],      
+      "7/6/2025": [0, 3],
+      "8/6/2025": [1, 2],
+      "9/6/2025": [0, 2, 3],
+      "10/6/2025": [1],
+      "11/6/2025": [],
+      "12/6/2025": [0, 1, 2],
+      "13/6/2025": [3],
+      "14/6/2025": [0, 1],
+      "15/6/2025": [0, 2, 3],
+      "16/6/2025": [1, 2],
+      "17/6/2025": [0, 3],
+      "18/6/2025": [2, 3],
+      "19/6/2025": [0, 1],
+      "20/6/2025": [1, 3],
     }
 
   },
@@ -158,14 +174,22 @@ const consultants = [
     languages: ["Tiếng Việt", "Tiếng Anh"],
     specializations: ["Tư vấn tâm lý", "Căng thẳng và lo âu", "Xác định giới tính", "Rối loạn tâm lý liên quan đến tình dục"],
     certifications: ["Hiệp hội Tâm lý học Việt Nam", "Hiệp hội Tâm lý học Lâm sàng Châu Á"],
-    availableShifts: {
-      monday: [0, 1],
-      tuesday: [2, 3],
-      wednesday: [0, 3],
-      thursday: [1, 2],
-      friday: [0, 1, 2],
-      saturday: [1, 2],
-      sunday: [0]
+    bookedShifts: {
+      "6/6/2025": [0, 3],      
+      "7/6/2025": [],
+      "8/6/2025": [1, 3],
+      "9/6/2025": [0, 1, 2],
+      "10/6/2025": [2, 3],
+      "11/6/2025": [0, 1],
+      "12/6/2025": [1],
+      "13/6/2025": [0, 2, 3],
+      "14/6/2025": [],
+      "15/6/2025": [0, 1, 3],
+      "16/6/2025": [2],
+      "17/6/2025": [0, 1, 2],
+      "18/6/2025": [3],
+      "19/6/2025": [0, 1, 2],
+      "20/6/2025": [1, 2, 3],
     }
   },
   {
@@ -212,14 +236,22 @@ const consultants = [
     languages: ["Tiếng Việt", "Tiếng Anh"],
     specializations: ["Sức khỏe LGBTQ+", "Tư vấn chuyển giới", "Tư vấn tâm lý", "Liệu pháp hormone"],
     certifications: ["Mạng lưới Sức khỏe LGBTQ+ Đông Nam Á", "Chứng chỉ chuyên môn về Y tế Giới tính"],
-    availableShifts: {
-      monday: [1, 2, 3],
-      tuesday: [0, 3],
-      wednesday: [1, 2],
-      thursday: [0, 3],
-      friday: [0, 1],
-      saturday: [2, 3],
-      sunday: [1]
+    bookedShifts: {
+      "6/6/2025": [2, 3],      
+      "7/6/2025": [0, 1, 2],
+      "8/6/2025": [],
+      "9/6/2025": [1, 2],
+      "10/6/2025": [0, 3],
+      "11/6/2025": [0, 1, 2],
+      "12/6/2025": [3],
+      "13/6/2025": [0, 1],
+      "14/6/2025": [1, 2],
+      "15/6/2025": [0, 3],
+      "16/6/2025": [0, 1, 2],
+      "17/6/2025": [],
+      "18/6/2025": [1, 2, 3],
+      "19/6/2025": [0, 2],
+      "20/6/2025": [0, 1, 3],
     }
   }
 ];

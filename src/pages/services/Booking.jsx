@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from "react";
-import { format, addDays } from "date-fns";
+import { format, parse, isValid, isSameDay } from "date-fns";
 import { vi } from "date-fns/locale";
 import consultants from "../../data/consultants";
 
@@ -13,7 +13,7 @@ import ConsultantDetail from "../../components/booking/ConsultantDetail";
 
 const Booking = () => {
   const [selectedConsultant, setSelectedConsultant] = useState(null);
-  const [selectedDate, setSelectedDate] = useState(new Date());
+  const [selectedDate, setSelectedDate] = useState(null);
   const [selectedTimeSlot, setSelectedTimeSlot] = useState(null);
   const [formData, setFormData] = useState({
     name: "",
@@ -23,10 +23,8 @@ const Booking = () => {
   });
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [bookingSuccess, setBookingSuccess] = useState(false);
-  const [bookedSlots, setBookedSlots] = useState({});
-
-  // Tạo các ngày để hiển thị (14 ngày kể từ hôm nay)
-  const dateOptions = Array.from({ length: 14 }, (_, i) => addDays(new Date(), i));
+  const [availableDates, setAvailableDates] = useState([]);
+  const [localBookedSlots, setLocalBookedSlots] = useState({}); // To track newly booked slots in this session
 
   // Danh sách các ca làm việc
   const timeSlots = [
@@ -36,74 +34,59 @@ const Booking = () => {
     { id: 3, label: "Ca 4", time: "15:00 - 17:00" },
   ];
 
-  // Khởi tạo dữ liệu ca đã đặt kết hợp với lịch làm việc cố định của tư vấn viên
+  // Cập nhật danh sách ngày có thể đặt khi chọn tư vấn viên
   useEffect(() => {
-    const generateBookedSlots = () => {
-      const slots = {};
+    if (selectedConsultant) {
+      // Get all dates that have booking information (whether booked or not)
+      const dates = Object.keys(selectedConsultant.bookedShifts)
+        .map(dateStr => {
+          // Parse date from "d/M/yyyy" format
+          const parsedDate = parse(dateStr, "d/M/yyyy", new Date());
+          return isValid(parsedDate) ? parsedDate : null;
+        })
+        .filter(date => date !== null);
       
-      // Khởi tạo cấu trúc dữ liệu cho các lịch đã đặt
-      consultants.forEach(consultant => {
-        slots[consultant.id] = {};
-        
-        // Xử lý cho 14 ngày tới
-        for (let i = 0; i < 14; i++) {
-          const currentDate = addDays(new Date(), i);
-          const dateKey = format(currentDate, "yyyy-MM-dd");
-          const dayOfWeek = format(currentDate, "EEEE", { locale: vi }).toLowerCase();
-          
-          // Tạo mảng rỗng cho ngày này
-          slots[consultant.id][dateKey] = [];
-          
-          // Các ca không làm việc (không có trong availableShifts của ngày) sẽ được đánh dấu là đã đặt
-          const availableShifts = consultant.availableShifts[mapDayToEnglish(dayOfWeek)] || [];
-          
-          // Đánh dấu các ca không có trong lịch làm việc là đã đặt
-          for (let shiftId = 0; shiftId < 4; shiftId++) {
-            if (!availableShifts.includes(shiftId)) {
-              slots[consultant.id][dateKey].push(shiftId);
-            }
-          }
-        }
-        
-      });
+      // Sort dates in ascending order
+      dates.sort((a, b) => a.getTime() - b.getTime());
       
-      setBookedSlots(slots);
-    };
-    
-    generateBookedSlots();
-  }, []);
-
-  // Hàm ánh xạ tên ngày từ tiếng Việt sang tiếng Anh
-  const mapDayToEnglish = (vietnameseDay) => {
-    const dayMapping = {
-      'thứ hai': 'monday',
-      'thứ ba': 'tuesday',
-      'thứ tư': 'wednesday',
-      'thứ năm': 'thursday',
-      'thứ sáu': 'friday',
-      'thứ bảy': 'saturday',
-      'chủ nhật': 'sunday'
-    };
-    
-    return dayMapping[vietnameseDay] || 'monday';
-  };
-
-  // Kiểm tra xem ca nào đã được đặt
-  const isTimeSlotBooked = (slotId) => {
-    if (!selectedConsultant) return false;
-    
-    const dateKey = format(selectedDate, "yyyy-MM-dd");
-    
-    if (!bookedSlots[selectedConsultant.id] || !bookedSlots[selectedConsultant.id][dateKey]) {
-      return false;
+      setAvailableDates(dates);
+      
+      // Select the first date if available
+      if (dates.length > 0) {
+        setSelectedDate(dates[0]);
+      } else {
+        setSelectedDate(null);
+      }
+      
+      // Reset selected time slot
+      setSelectedTimeSlot(null);
+    } else {
+      setAvailableDates([]);
+      setSelectedDate(null);
     }
+  }, [selectedConsultant]);
+
+  // Check if a time slot is booked (unavailable)
+  const isTimeSlotBooked = (slotId) => {
+    if (!selectedConsultant || !selectedDate) return true;
     
-    return bookedSlots[selectedConsultant.id][dateKey].includes(slotId);
+    // Convert selected date to "d/M/yyyy" format for lookup
+    const dateKey = format(selectedDate, "d/M/yyyy");
+    
+    // Check if the slot is in the consultant's bookedShifts for this date
+    const bookedShiftsForDay = selectedConsultant.bookedShifts[dateKey] || [];
+    
+    // Check if the slot is in newly booked slots during this session
+    const locallyBookedShifts = 
+      localBookedSlots[selectedConsultant.id]?.[dateKey] || [];
+    
+    // A slot is unavailable if it's in either bookedShifts or localBookedSlots
+    return bookedShiftsForDay.includes(slotId) || locallyBookedShifts.includes(slotId);
   };
 
   const handleConsultantSelect = (consultant) => {
     setSelectedConsultant(consultant);
-    setSelectedTimeSlot(null);
+    // Date and time slot will be set in useEffect
   };
 
   const handleDateSelect = (date) => {
@@ -133,12 +116,12 @@ const Booking = () => {
     
     setIsSubmitting(true);
     
-    // Giả lập API call
+    // Simulating API call
     setTimeout(() => {
-      // Cập nhật trạng thái đã đặt
-      const dateKey = format(selectedDate, "yyyy-MM-dd");
+      // Update locally booked slots
+      const dateKey = format(selectedDate, "d/M/yyyy");
       
-      setBookedSlots(prev => {
+      setLocalBookedSlots(prev => {
         const updatedSlots = { ...prev };
         
         if (!updatedSlots[selectedConsultant.id]) {
@@ -169,6 +152,7 @@ const Booking = () => {
     });
     setSelectedConsultant(null);
     setSelectedTimeSlot(null);
+    setSelectedDate(null);
   };
 
   return (
@@ -210,18 +194,20 @@ const Booking = () => {
                   <div>
                     {/* Lựa chọn ngày */}
                     <DateSelector
-                      dateOptions={dateOptions}
+                      dateOptions={availableDates}
                       selectedDate={selectedDate}
                       onDateSelect={handleDateSelect}
                     />
 
                     {/* Lựa chọn ca làm việc */}
-                    <TimeSlotSelector
-                      timeSlots={timeSlots}
-                      selectedTimeSlot={selectedTimeSlot}
-                      onTimeSlotSelect={handleTimeSlotSelect}
-                      checkIfBooked={isTimeSlotBooked}
-                    />
+                    {selectedDate && (
+                      <TimeSlotSelector
+                        timeSlots={timeSlots}
+                        selectedTimeSlot={selectedTimeSlot}
+                        onTimeSlotSelect={handleTimeSlotSelect}
+                        checkIfBooked={isTimeSlotBooked}
+                      />
+                    )}
                   </div>
                 ) : (
                   <div className="px-6 py-12 text-center">
