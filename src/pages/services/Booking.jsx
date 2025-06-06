@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from "react";
-import { format, parse, isValid, isSameDay } from "date-fns";
+import { format, parse, isValid, isSameDay, startOfToday, addDays, eachDayOfInterval } from "date-fns";
 import { vi } from "date-fns/locale";
 import consultants from "../../data/consultants";
 
@@ -34,26 +34,42 @@ const Booking = () => {
     { id: 3, label: "Ca 4", time: "15:00 - 17:00" },
   ];
 
+  // Generate dates for the next 2 weeks (14 days)
+  const generateTwoWeekDates = () => {
+    const today = startOfToday();
+    const twoWeeksLater = addDays(today, 13); // 14 days including today
+    
+    return eachDayOfInterval({ start: today, end: twoWeeksLater });
+  };
+
+  // Check if a date has at least one available time slot
+  const hasAvailableTimeSlots = (consultant, date) => {
+    if (!consultant) return false;
+    
+    const dateKey = format(date, "d/M/yyyy");
+    const allTimeSlots = [0, 1, 2, 3]; // All possible time slots
+    const bookedSlotsForDay = consultant.bookedShifts[dateKey] || [];
+    
+    // If all slots are booked, return false
+    return allTimeSlots.some(slotId => !bookedSlotsForDay.includes(slotId));
+  };
+
   // Cập nhật danh sách ngày có thể đặt khi chọn tư vấn viên
   useEffect(() => {
     if (selectedConsultant) {
-      // Get all dates that have booking information (whether booked or not)
-      const dates = Object.keys(selectedConsultant.bookedShifts)
-        .map(dateStr => {
-          // Parse date from "d/M/yyyy" format
-          const parsedDate = parse(dateStr, "d/M/yyyy", new Date());
-          return isValid(parsedDate) ? parsedDate : null;
-        })
-        .filter(date => date !== null);
+      // Generate all dates for the next 2 weeks
+      const allDates = generateTwoWeekDates();
       
-      // Sort dates in ascending order
-      dates.sort((a, b) => a.getTime() - b.getTime());
+      // Filter to only include dates with at least one available slot
+      const datesWithAvailableSlots = allDates.filter(date => 
+        hasAvailableTimeSlots(selectedConsultant, date)
+      );
       
-      setAvailableDates(dates);
+      setAvailableDates(datesWithAvailableSlots);
       
-      // Select the first date if available
-      if (dates.length > 0) {
-        setSelectedDate(dates[0]);
+      // Select the first date with available slots if any
+      if (datesWithAvailableSlots.length > 0) {
+        setSelectedDate(datesWithAvailableSlots[0]);
       } else {
         setSelectedDate(null);
       }
@@ -70,17 +86,22 @@ const Booking = () => {
   const isTimeSlotBooked = (slotId) => {
     if (!selectedConsultant || !selectedDate) return true;
     
-    // Convert selected date to "d/M/yyyy" format for lookup
+    // Convert selected date to format for lookup
     const dateKey = format(selectedDate, "d/M/yyyy");
+    
+    // If this date doesn't exist in bookedShifts, all slots are available
+    if (!selectedConsultant.bookedShifts[dateKey]) {
+      return false; // No slots booked for this date
+    }
     
     // Check if the slot is in the consultant's bookedShifts for this date
     const bookedShiftsForDay = selectedConsultant.bookedShifts[dateKey] || [];
     
-    // Check if the slot is in newly booked slots during this session
+    // Check locally booked slots in this session
     const locallyBookedShifts = 
       localBookedSlots[selectedConsultant.id]?.[dateKey] || [];
     
-    // A slot is unavailable if it's in either bookedShifts or localBookedSlots
+    // Slot is unavailable if it's in bookedShifts or localBookedSlots
     return bookedShiftsForDay.includes(slotId) || locallyBookedShifts.includes(slotId);
   };
 

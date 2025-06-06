@@ -7,7 +7,7 @@ const config = {
   // API URLs
   api: {
     baseURL: import.meta.env.VITE_API_URL || "https://localhost:7050",
-    timeout: 20000, // 10 seconds    // Auth endpoints
+    timeout: 20000, // 20 seconds    // Auth endpoints
     auth: {
       login: "/api/v1/login",
       register: "/api/v1/register",

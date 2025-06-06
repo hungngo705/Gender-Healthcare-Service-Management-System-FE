@@ -20,7 +20,7 @@ const TimeSlotSelector = ({
               key={slot.id}
               onClick={() => !isBooked && onTimeSlotSelect(slot)}
               disabled={isBooked}
-              className={`px-4 py-3 border rounded-md ${
+              className={`px-4 py-3 border rounded-md h-[100px] ${
                 isBooked
                   ? "bg-gray-100 text-gray-400 border-gray-200 cursor-not-allowed"
                   : selectedTimeSlot?.id === slot.id
@@ -28,10 +28,11 @@ const TimeSlotSelector = ({
                   : "border-gray-300 hover:border-indigo-300"
               }`}
             >
-              <div className="flex items-center justify-center">
-                {slot.time}
+              <div className="flex flex-col items-center">
+                <span>{slot.label}</span>
+                <span className="text-xs">{slot.time}</span>
                 {isBooked && (
-                  <span className="ml-2 text-xs bg-red-100 text-red-600 px-1.5 py-0.5 rounded-full">
+                  <span className="mt-1 text-xs bg-red-100 text-red-600 px-1.5 py-0.5 rounded-full">
                     Đã đặt
                   </span>
                 )}
