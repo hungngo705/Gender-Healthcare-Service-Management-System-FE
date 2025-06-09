@@ -54,13 +54,21 @@ function UserManagementTab() {
   const loadUsers = useCallback(async () => {
     try {
       setLoading(true);
+      console.log("Loading users from API...");
       const response = await userService.getAllUsers();
+      console.log("API response:", response);
 
       // Show all users (including customers)
       setUsers(response || []);
+      console.log("Users set in state:", response || []);
     } catch (error) {
       console.error("Error loading users:", error);
-      toastService.error("Không thể tải danh sách người dùng");
+      console.error("Error details:", error.response?.data || error.message);
+      toastService.error(
+        `Không thể tải danh sách người dùng: ${
+          error.response?.data?.message || error.message
+        }`
+      );
     } finally {
       setLoading(false);
     }
@@ -191,23 +199,42 @@ function UserManagementTab() {
       status: "active",
     });
     setFormErrors({});
-  };
-
-  // Handle add user
+  }; // Handle add user
   const handleAddUser = async (e) => {
     e.preventDefault();
+    console.log("handleAddUser called with form data:", userForm);
 
-    if (!validateForm()) return;
+    if (!validateForm()) {
+      console.log("Form validation failed");
+      return;
+    }
 
     try {
       setSubmitting(true);
-      await userService.createUser(userForm);
+
+      // Create API payload with only the required fields
+      const createUserData = {
+        name: userForm.name,
+        email: userForm.email,
+        phoneNumber: userForm.phoneNumber,
+        address: userForm.address,
+        password: userForm.password,
+        role: userForm.role,
+      };
+      const result = await userService.createUser(createUserData);
+      console.log("User created successfully:", result);
       setShowAddUserModal(false);
       resetForm();
       await loadUsers(); // Reload users list
+      toastService.success("Người dùng đã được tạo thành công!");
     } catch (error) {
       console.error("Error creating user:", error);
-      toastService.error("Không thể tạo người dùng mới");
+      console.error("Error details:", error.response?.data || error.message);
+      toastService.error(
+        `Không thể tạo người dùng mới: ${
+          error.response?.data?.message || error.message
+        }`
+      );
     } finally {
       setSubmitting(false);
     }
@@ -230,21 +257,40 @@ function UserManagementTab() {
   }; // Handle update user
   const handleUpdateUser = async (e) => {
     e.preventDefault();
+    console.log("handleUpdateUser called with form data:", userForm);
+    console.log("Selected user:", selectedUser);
 
-    if (!validateForm(true)) return;
+    if (!validateForm(true)) {
+      console.log("Form validation failed for update");
+      return;
+    }
 
     try {
       setSubmitting(true); // Exclude password from update data
       // eslint-disable-next-line no-unused-vars
       const { password, ...updateData } = userForm;
-      await userService.updateUser(selectedUser.id, updateData);
+      console.log(
+        "Calling userService.updateUser with:",
+        selectedUser.id,
+        updateData
+      );
+
+      const result = await userService.updateUser(selectedUser.id, updateData);
+      console.log("User updated successfully:", result);
+
       setShowEditUserModal(false);
       resetForm();
       setSelectedUser(null);
       await loadUsers(); // Reload users list
+      toastService.success("Thông tin người dùng đã được cập nhật!");
     } catch (error) {
       console.error("Error updating user:", error);
-      toastService.error("Không thể cập nhật thông tin người dùng");
+      console.error("Error details:", error.response?.data || error.message);
+      toastService.error(
+        `Không thể cập nhật thông tin người dùng: ${
+          error.response?.data?.message || error.message
+        }`
+      );
     } finally {
       setSubmitting(false);
     }
@@ -256,18 +302,29 @@ function UserManagementTab() {
     setShowDeleteModal(true);
     setShowActionMenu(null);
   };
-
   // Confirm delete user
   const confirmDeleteUser = async () => {
+    console.log("confirmDeleteUser called for user:", selectedUser);
+
     try {
       setSubmitting(true);
-      await userService.deleteUser(selectedUser.id);
+      console.log("Calling userService.deleteUser with ID:", selectedUser.id);
+
+      const result = await userService.deleteUser(selectedUser.id);
+      console.log("User deleted successfully:", result);
+
       setShowDeleteModal(false);
       setSelectedUser(null);
       await loadUsers(); // Reload users list
+      toastService.success("Người dùng đã được xóa thành công!");
     } catch (error) {
       console.error("Error deleting user:", error);
-      toastService.error("Không thể xóa người dùng");
+      console.error("Error details:", error.response?.data || error.message);
+      toastService.error(
+        `Không thể xóa người dùng: ${
+          error.response?.data?.message || error.message
+        }`
+      );
     } finally {
       setSubmitting(false);
     }
@@ -945,7 +1002,7 @@ function UserManagementTab() {
                         <p className="text-red-500 text-xs mt-1">
                           {formErrors.role}{" "}
                         </p>
-                      )}
+                      )}{" "}
                     </div>
                     <div>
                       <label
