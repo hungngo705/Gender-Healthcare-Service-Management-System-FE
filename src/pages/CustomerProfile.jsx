@@ -1,6 +1,7 @@
-import { useState, useEffect } from "react";
+import { useState, useEffect, useCallback } from "react";
 import { useAuth } from "../contexts/AuthContext";
 import { useNavigate } from "react-router-dom";
+import userService from "../services/userService";
 import {
   Bell,
   X,
@@ -13,7 +14,6 @@ import {
   Phone,
   MapPin,
   Edit,
-  Settings,
   Shield,
   CreditCard,
 } from "lucide-react";
@@ -80,29 +80,77 @@ function CustomerProfile() {
 
     setNotifications(mockNotifications);
     setUnreadCount(mockNotifications.filter((n) => !n.isRead).length);
-  }, []);
+  }, []); // Load user profile data from API
+  const loadUserProfile = useCallback(async () => {
+    try {
+      const userData = await userService.getCurrentUserProfile();
 
-  // Update profile data when user data is available
+      // Map API response to local state structure
+      setProfileData({
+        name: userData.name || "",
+        email: userData.email || "",
+        phone: userData.phoneNumber || "",
+        address: userData.address || "",
+        birthday: userData.birthday || userData.dateOfBirth || "",
+        gender: userData.gender || "",
+        emergencyContact: userData.emergencyContact || "",
+      });
+    } catch (error) {
+      console.error("Failed to load user profile:", error);
+      // Fallback to localStorage data if API fails
+      if (currentUser) {
+        setProfileData({
+          name: currentUser.name || "",
+          email: currentUser.email || "",
+          phone: currentUser.phoneNumber || currentUser.phone || "",
+          address: currentUser.address || "",
+          birthday: currentUser.birthday || currentUser.dateOfBirth || "",
+          gender: currentUser.gender || "",
+          emergencyContact: currentUser.emergencyContact || "",
+        });
+      }
+    }
+  }, [currentUser]); // Update profile data when user data is available
   useEffect(() => {
     if (currentUser) {
-      setProfileData({
-        name: currentUser.name || "",
-        email: currentUser.email || "",
-        phone: currentUser.phone || currentUser.phoneNumber || "",
-        address: currentUser.address || "",
-        birthday: currentUser.birthday || currentUser.dateOfBirth || "",
-        gender: currentUser.gender || "",
-        emergencyContact: currentUser.emergencyContact || "",
-      });
+      loadUserProfile();
     }
-  }, [currentUser]);
+  }, [currentUser, loadUserProfile]); // Handle saving profile information
+  const handleSaveProfile = async (updatedData) => {
+    try {
+      // Prepare data for API call - map to API expected format
+      const apiData = {
+        name: updatedData.name,
+        email: updatedData.email,
+        phoneNumber: updatedData.phone,
+        address: updatedData.address,
+        birthday: updatedData.birthday,
+        gender: updatedData.gender,
+        emergencyContact: updatedData.emergencyContact,
+      };
 
-  // Handle saving profile information
-  const handleSaveProfile = (updatedData) => {
-    console.log("Updating profile:", updatedData);
-    setProfileData(updatedData);
-    // Show success message
-    alert("Thông tin đã được cập nhật thành công!");
+      // Call API to update profile
+      const updatedProfile = await userService.updateCurrentUserProfile(
+        apiData
+      );
+
+      // Update local state with response data
+      setProfileData({
+        name: updatedProfile.name || updatedData.name,
+        email: updatedProfile.email || updatedData.email,
+        phone: updatedProfile.phoneNumber || updatedData.phone,
+        address: updatedProfile.address || updatedData.address,
+        birthday: updatedProfile.birthday || updatedData.birthday,
+        gender: updatedProfile.gender || updatedData.gender,
+        emergencyContact:
+          updatedProfile.emergencyContact || updatedData.emergencyContact,
+      }); // Reload profile data to ensure consistency
+      await loadUserProfile();
+    } catch (error) {
+      console.error("Failed to save profile:", error);
+      // If API fails, keep local data and show error
+      setProfileData(updatedData);
+    }
   };
 
   // Mark all notifications as read
@@ -155,19 +203,45 @@ function CustomerProfile() {
 
   // Navigation tabs with icons
   const tabs = [
-    { id: "profile", label: "Thông tin cá nhân", icon: <User size={16} className="mr-3" /> },
-    { id: "appointments", label: "Lịch hẹn", icon: <Calendar size={16} className="mr-3" /> },
-    { id: "medical-records", label: "Hồ sơ y tế", icon: <FileText size={16} className="mr-3" /> },
-    { id: "notifications", label: "Thông báo", icon: <Bell size={16} className="mr-3" /> },
-    { id: "security", label: "Bảo mật", icon: <Shield size={16} className="mr-3" /> },
-    { id: "payments", label: "Thanh toán", icon: <CreditCard size={16} className="mr-3" /> },
+    {
+      id: "profile",
+      label: "Thông tin cá nhân",
+      icon: <User size={16} className="mr-3" />,
+    },
+    {
+      id: "appointments",
+      label: "Lịch hẹn",
+      icon: <Calendar size={16} className="mr-3" />,
+    },
+    {
+      id: "medical-records",
+      label: "Hồ sơ y tế",
+      icon: <FileText size={16} className="mr-3" />,
+    },
+    {
+      id: "notifications",
+      label: "Thông báo",
+      icon: <Bell size={16} className="mr-3" />,
+    },
+    {
+      id: "security",
+      label: "Bảo mật",
+      icon: <Shield size={16} className="mr-3" />,
+    },
+    {
+      id: "payments",
+      label: "Thanh toán",
+      icon: <CreditCard size={16} className="mr-3" />,
+    },
   ];
 
   // Render active tab content
   const renderTabContent = () => {
     switch (activeTab) {
       case "profile":
-        return <ProfileTab profileData={profileData} onSave={handleSaveProfile} />;
+        return (
+          <ProfileTab profileData={profileData} onSave={handleSaveProfile} />
+        );
       case "appointments":
         return <AppointmentsTab navigate={navigate} />;
       case "medical-records":
@@ -195,7 +269,8 @@ function CustomerProfile() {
           <div className="flex w-full overflow-x-auto scrollbar-hide">
             {tabs.map((tab) => {
               const isActive = activeTab === tab.id;
-              const hasNotifications = tab.id === "notifications" && unreadCount > 0;
+              const hasNotifications =
+                tab.id === "notifications" && unreadCount > 0;
 
               return (
                 <button
@@ -245,11 +320,11 @@ function CustomerProfile() {
                 </svg>
                 Thông tin cá nhân
               </h2>
-              
+
               <div className="flex flex-col sm:flex-row sm:items-center gap-4">
                 <div className="flex-shrink-0 relative">
                   <UserAvatar size="lg" />
-                  <button 
+                  <button
                     className="absolute bottom-0 right-0 bg-white rounded-full p-1 shadow-sm border border-gray-200 hover:bg-gray-50"
                     aria-label="Change profile picture"
                     title="Thay đổi ảnh đại diện"
@@ -258,17 +333,19 @@ function CustomerProfile() {
                     <Edit className="h-3 w-3 text-gray-500" />
                   </button>
                 </div>
-                
+
                 <div className="flex-1">
                   <h3 className="text-lg font-semibold text-gray-800">
                     {currentUser?.name || profileData.name || ""}
                   </h3>
-                  
+
                   <span className="inline-block px-3 py-1 mt-1 bg-blue-100 text-blue-800 text-sm font-medium rounded-full">
-                    {currentUser ? userUtils.formatRole(userUtils.getUserRole(currentUser)) : "Khách hàng"}
+                    {currentUser
+                      ? userUtils.formatRole(userUtils.getUserRole(currentUser))
+                      : "Khách hàng"}
                   </span>
-                  
-                  <button 
+
+                  <button
                     onClick={() => setActiveTab("profile")}
                     className="mt-2 flex items-center text-sm text-indigo-600 hover:text-indigo-800 transition-colors"
                   >
@@ -277,7 +354,7 @@ function CustomerProfile() {
                   </button>
                 </div>
               </div>
-              
+
               {/* Contact Info */}
               <div className="w-full mt-5 space-y-3 border-t border-gray-100 pt-4">
                 {currentUser?.email && (
@@ -286,14 +363,14 @@ function CustomerProfile() {
                     <span>{currentUser.email}</span>
                   </div>
                 )}
-                
+
                 {(currentUser?.phone || currentUser?.phoneNumber) && (
                   <div className="flex items-center text-gray-600">
                     <Phone className="h-5 w-5 mr-3 text-gray-400" />
                     <span>{currentUser.phone || currentUser.phoneNumber}</span>
                   </div>
                 )}
-                
+
                 {currentUser?.address && (
                   <div className="flex items-center text-gray-600">
                     <MapPin className="h-5 w-5 mr-3 text-gray-400" />
@@ -302,7 +379,7 @@ function CustomerProfile() {
                 )}
               </div>
             </div>
-            
+
             {/* Navigation */}
             <nav className="sticky top-4 z-10">
               <ul className="divide-y divide-gray-100">
@@ -335,7 +412,7 @@ function CustomerProfile() {
               </ul>
             </nav>
           </div>
-          
+
           {/* Recent Notifications */}
           <div className="bg-white rounded-lg shadow-sm overflow-hidden">
             <div className="flex justify-between items-center p-5 border-b border-gray-200">
@@ -353,7 +430,11 @@ function CustomerProfile() {
                 <button
                   className="text-gray-500 hover:text-gray-700 cursor-pointer"
                   onClick={() => setNotificationsVisible(!notificationsVisible)}
-                  aria-label={notificationsVisible ? "Hide notifications" : "Show notifications"}
+                  aria-label={
+                    notificationsVisible
+                      ? "Hide notifications"
+                      : "Show notifications"
+                  }
                 >
                   {notificationsVisible ? (
                     <svg
@@ -387,7 +468,7 @@ function CustomerProfile() {
                 </button>
               </div>
             </div>
-            
+
             {notificationsVisible && (
               <div className="divide-y divide-gray-100">
                 {notifications.length === 0 ? (
@@ -403,7 +484,9 @@ function CustomerProfile() {
                       <div
                         key={notification.id}
                         className={`flex p-4 ${
-                          notification.isRead ? "" : "bg-blue-50 border-l-4 border-blue-500"
+                          notification.isRead
+                            ? ""
+                            : "bg-blue-50 border-l-4 border-blue-500"
                         }`}
                       >
                         <div className="mr-3 mt-0.5">
@@ -412,9 +495,13 @@ function CustomerProfile() {
 
                         <div className="flex-1">
                           <div className="flex justify-between items-start">
-                            <h4 className={`text-sm font-medium ${
-                              notification.isRead ? "text-gray-700" : "text-gray-900"
-                            }`}>
+                            <h4
+                              className={`text-sm font-medium ${
+                                notification.isRead
+                                  ? "text-gray-700"
+                                  : "text-gray-900"
+                              }`}
+                            >
                               {notification.title}
                             </h4>
 
@@ -456,7 +543,9 @@ function CustomerProfile() {
                       {notifications.length > 3 && (
                         <button
                           onClick={() => setActiveTab("notifications")}
-                          className={`text-sm font-medium text-indigo-600 hover:text-indigo-800 ${unreadCount > 0 ? 'ml-auto' : ''}`}
+                          className={`text-sm font-medium text-indigo-600 hover:text-indigo-800 ${
+                            unreadCount > 0 ? "ml-auto" : ""
+                          }`}
                         >
                           Xem tất cả thông báo
                         </button>

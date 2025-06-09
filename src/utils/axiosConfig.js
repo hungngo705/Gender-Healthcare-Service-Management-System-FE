@@ -54,6 +54,8 @@ apiClient.interceptors.response.use(
 
       // Handle 401 Unauthorized
       if (error.response.status === 401) {
+        console.log("401 Unauthorized - Token may be invalid or expired");
+
         // Try to refresh token if we have one
         const refreshToken = localStorage.getItem(
           config.auth.refreshStorageKey
@@ -85,17 +87,34 @@ apiClient.interceptors.response.use(
               return apiClient(originalRequest);
             }
           } catch (refreshError) {
-            // If refresh token fails, redirect to login
-            toastService.error("Your session has expired. Please login again.");
+            console.log("Token refresh failed, cleaning auth state");
+            // If refresh token fails, clean up and redirect to login
             localStorage.removeItem(config.auth.storageKey);
             localStorage.removeItem(config.auth.refreshStorageKey);
-            window.location.href = "/login";
+            localStorage.removeItem("user");
+            localStorage.removeItem("token_expiration");
+
+            toastService.error("Your session has expired. Please login again.");
+
+            // Only redirect if not already on login page
+            if (!window.location.pathname.includes("/login")) {
+              window.location.href = "/login";
+            }
             return Promise.reject(refreshError);
           }
         } else {
-          // No refresh token available
+          // No refresh token available - clean up auth state
+          console.log("No refresh token, cleaning auth state");
+          localStorage.removeItem(config.auth.storageKey);
+          localStorage.removeItem("user");
+          localStorage.removeItem("token_expiration");
+
           toastService.error("Please login to continue");
-          window.location.href = "/login";
+
+          // Only redirect if not already on login page
+          if (!window.location.pathname.includes("/login")) {
+            window.location.href = "/login";
+          }
         }
       }
 
@@ -134,20 +153,43 @@ apiClient.interceptors.response.use(
         if (error.response.data) {
           toastService.error(error.response.data);
         } else {
-          toastService.error("A server error occurred. Please try again later.");
+          toastService.error(
+            "A server error occurred. Please try again later."
+          );
         }
       }
     } else if (error.request) {
       // The request was made but no response was received
+      console.log("Network error - no response received from server");
+
       if (error.code === "ECONNABORTED") {
         errorMessage = "Request timed out. Please try again later.";
       } else if (error.message && error.message.includes("Network Error")) {
-        errorMessage = "Network error. Please check your internet connection.";
+        errorMessage =
+          "Network error. Please check your internet connection and server status.";
+
+        // Don't show error toast for network errors during token verification
+        // as this might be due to server being down temporarily
+        if (!error.config?.url?.includes("/profile")) {
+          toastService.error(errorMessage);
+        }
+
+        // If this is a network error and we have stored auth data,
+        // don't immediately clear it as server might be temporarily down
+        console.log(
+          "Server appears to be down, maintaining auth state temporarily"
+        );
+
+        return Promise.reject(error);
       } else {
         errorMessage =
           "No response received from server. Please check your connection.";
       }
-      toastService.error(errorMessage);
+
+      // Only show toast if it's not a token verification request
+      if (!error.config?.url?.includes("/profile")) {
+        toastService.error(errorMessage);
+      }
     } else {
       // Something happened in setting up the request that triggered an Error
       errorMessage = `Error: ${error.message}`;
@@ -242,15 +284,14 @@ const apiService = {
           }
         : undefined,
     });
-  }
+  },
   /**
    * Download a file with progress tracking
    * @param {string} url - The URL to make the request to
    * @param {Function} onProgress - Progress callback function
    * @param {Object} params - Query parameters
    * @returns {Promise} - The response promise
-   */,
-  download: (url, onProgress = null, params = {}) => {
+   */ download: (url, onProgress = null, params = {}) => {
     return apiClient.get(url, {
       params,
       responseType: "blob",

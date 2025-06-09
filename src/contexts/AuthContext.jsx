@@ -1,7 +1,9 @@
 import { createContext, useContext, useState, useEffect } from "react";
+import PropTypes from "prop-types";
 import authService from "../services/authService";
 import config from "../utils/config";
 import userUtils from "../utils/userUtils";
+import tokenManager from "../utils/tokenManager";
 
 // Hàm decode JWT token (không sử dụng thư viện để tránh phụ thuộc)
 const parseJwt = (token) => {
@@ -29,78 +31,124 @@ const AuthContext = createContext(null);
 export function AuthProvider({ children }) {
   const [currentUser, setCurrentUser] = useState(null);
   const [loading, setLoading] = useState(true);
-  // Kiểm tra trạng thái đăng nhập từ localStorage khi tải trang và kiểm tra hạn token
-  useEffect(() => {
-    const checkAuthStatus = () => {
-      const user = localStorage.getItem("user");
-      const token = localStorage.getItem(config.auth.storageKey);
+  // Helper function to clean up auth state
+  const cleanupAuthState = async () => {
+    setCurrentUser(null);
+    tokenManager.clearAuthData();
+  };
 
-      // Kiểm tra nếu có user và token
-      if (user && token) {
-        try {
-          const decodedToken = parseJwt(token);
+  // Helper function to validate token expiration
+  const isTokenExpired = (decodedToken) => {
+    if (decodedToken.exp) {
+      const expirationTime = decodedToken.exp * 1000;
+      const currentTime = Date.now();
+      return expirationTime <= currentTime;
+    }
 
-          if (decodedToken) {
-            // Kiểm tra nếu token có chứa thông tin hết hạn (exp)
-            if (decodedToken.exp) {
-              const expirationTime = decodedToken.exp * 1000; // Chuyển về milliseconds
-              const currentTime = Date.now();
+    const expiration = localStorage.getItem("token_expiration");
+    if (expiration) {
+      const expirationDate = new Date(expiration);
+      const now = new Date();
+      return expirationDate <= now;
+    }
 
-              if (expirationTime > currentTime) {
-                // Token còn hạn sử dụng
-                setCurrentUser(JSON.parse(user));
-              } else {
-                // Token đã hết hạn
-                console.log("Token đã hết hạn, đăng xuất người dùng");
-                authService.logout();
-              }
-            } else {
-              // Không có thông tin hết hạn trong token, kiểm tra expiration từ localStorage
-              const expiration = localStorage.getItem("token_expiration");
-              if (expiration) {
-                const expirationDate = new Date(expiration);
-                const now = new Date();
+    return false; // Assume not expired if no expiration info
+  };
 
-                if (expirationDate > now) {
-                  // Token còn hạn sử dụng
-                  setCurrentUser(JSON.parse(user));
-                } else {
-                  // Token đã hết hạn
-                  console.log("Token đã hết hạn, đăng xuất người dùng");
-                  authService.logout();
-                }
-              } else {
-                // Không có thông tin hết hạn, giả định token còn hạn
-                setCurrentUser(JSON.parse(user));
-              }
-            }
-          } else {
-            // Không thể giải mã token, đăng xuất để an toàn
-            authService.logout();
-          }
-        } catch (error) {
-          console.error("Error checking auth status:", error);
-          authService.logout();
+  // Helper function to set user from stored data
+  const setUserFromStorage = (user) => {
+    const userData = JSON.parse(user);
+    setCurrentUser(userData);
+    console.log("Auth status checked: User authenticated", userData);
+  }; // Verify token with server to ensure it's still valid
+  const verifyTokenWithServer = async (token) => {
+    try {
+      // Make a lightweight request to verify token validity
+      const response = await fetch(
+        `${config.api.baseURL}${config.api.users.profile}`,
+        {
+          method: "GET",
+          headers: {
+            Authorization: `Bearer ${token}`,
+            "Content-Type": "application/json",
+          },
+          // Set a shorter timeout for token verification
+          signal: AbortSignal.timeout(5000),
         }
+      );
+
+      if (response.ok) {
+        return true;
+      } else if (response.status === 401) {
+        console.log("Token is invalid or expired according to server");
+        return false;
+      } else {
+        // For other errors, assume token might still be valid
+        // to avoid logging out user due to temporary server issues
+        console.log(
+          "Server error during token verification, assuming token valid"
+        );
+        return true;
       }
-      setLoading(false);
+    } catch (error) {
+      // Network error or timeout - don't log out user immediately
+      // as server might be temporarily down
+      console.log("Network error during token verification:", error.message);
+      if (error.name === "TimeoutError" || error.message.includes("network")) {
+        console.log("Assuming token valid due to network issues");
+        return true;
+      }
+      // For other errors, consider token invalid
+      return false;
+    }
+  };
+  // Enhanced startup validation using tokenManager
+  useEffect(() => {
+    const checkAuthStatus = async () => {
+      try {
+        const shouldRemainAuthenticated = await tokenManager.handleAppStartup();
+
+        if (shouldRemainAuthenticated) {
+          const user = localStorage.getItem("user");
+          if (user) {
+            setUserFromStorage(user);
+          }
+        } else {
+          console.log("User authentication invalid on startup");
+        }
+      } catch (error) {
+        console.error("Error checking auth status:", error);
+        await cleanupAuthState();
+      } finally {
+        setLoading(false);
+      }
     };
 
     checkAuthStatus();
-  }, []);
-  // Hàm đăng nhập
+  }, []); // Hàm đăng nhập
   const login = (userData) => {
     if (!userData) {
       console.error("Không có dữ liệu người dùng");
       return false;
     }
 
-    // Đảm bảo không lưu trữ mật khẩu trong state
-    const { password: _, ...userWithoutPassword } = userData;
+    try {
+      // Đảm bảo không lưu trữ mật khẩu trong state
+      // eslint-disable-next-line no-unused-vars
+      const { password, ...userWithoutPassword } = userData;
 
-    setCurrentUser(userWithoutPassword);
-    localStorage.setItem("user", JSON.stringify(userWithoutPassword));
-    return true;
+      // Cập nhật state trước
+      setCurrentUser(userWithoutPassword);
+
+      // Đảm bảo dữ liệu được lưu vào localStorage
+      localStorage.setItem("user", JSON.stringify(userWithoutPassword));
+
+      console.log("Login successful, user data:", userWithoutPassword);
+      return true;
+    } catch (error) {
+      console.error("Error during login state update:", error);
+      return false;
+    }
   };
   // Hàm đăng xuất
   const logout = async () => {
@@ -134,9 +182,41 @@ export function AuthProvider({ children }) {
   // Kiểm tra vai trò cụ thể
   const hasRole = (role) => {
     return userUtils.hasRole(currentUser, role);
+  }; // Improved token validation that checks with server
+  const validateToken = async () => {
+    const token = localStorage.getItem(config.auth.storageKey);
+    if (!token) return false;
+
+    try {
+      const decodedToken = parseJwt(token);
+      if (!decodedToken) return false;
+
+      // First check local expiration
+      const isLocallyExpired = isTokenExpired(decodedToken);
+      if (isLocallyExpired) {
+        console.log("Token expired locally");
+        await cleanupAuthState();
+        return false;
+      }
+
+      // Then verify with server if token is still valid
+      const isValidOnServer = await verifyTokenWithServer(token);
+      if (!isValidOnServer) {
+        console.log("Token invalid on server, cleaning up");
+        await cleanupAuthState();
+        return false;
+      }
+
+      return true;
+    } catch (error) {
+      console.error("Error validating token:", error);
+      await cleanupAuthState();
+      return false;
+    }
   };
-  // Kiểm tra token JWT hiện tại có hợp lệ không
-  const validateToken = () => {
+
+  // Legacy sync token validation (for backwards compatibility)
+  const validateTokenSync = () => {
     const token = localStorage.getItem(config.auth.storageKey);
     if (!token) return false;
 
@@ -145,10 +225,26 @@ export function AuthProvider({ children }) {
       if (!decodedToken) return false;
 
       // Kiểm tra thời gian hết hạn (exp là Unix timestamp)
-      const expirationTime = decodedToken.exp * 1000; // Chuyển về milliseconds
-      const currentTime = Date.now();
+      if (decodedToken.exp) {
+        const expirationTime = decodedToken.exp * 1000; // Chuyển về milliseconds
+        const currentTime = Date.now();
+        const bufferTime = 30000; // 30 seconds buffer để tránh token hết hạn đột ngột
 
-      return expirationTime > currentTime;
+        return expirationTime > currentTime + bufferTime;
+      }
+
+      // Nếu không có exp trong token, kiểm tra expiration từ localStorage
+      const expiration = localStorage.getItem("token_expiration");
+      if (expiration) {
+        const expirationDate = new Date(expiration);
+        const now = new Date();
+        const bufferTime = 30000; // 30 seconds buffer
+
+        return expirationDate.getTime() > now.getTime() + bufferTime;
+      }
+
+      // Nếu không có thông tin hết hạn, coi như token còn hạn
+      return true;
     } catch (error) {
       console.error("Error validating token:", error);
       return false;
@@ -167,16 +263,16 @@ export function AuthProvider({ children }) {
       return null;
     }
   };
-
   const value = {
     currentUser,
     login,
     logout,
-    isAuthenticated: !!currentUser && validateToken(),
+    isAuthenticated: !!currentUser && validateTokenSync(),
     isStaffOrHigher,
     isCustomerOrGuest,
     hasRole,
     validateToken,
+    validateTokenSync,
     getTokenInfo,
   };
 
@@ -186,6 +282,10 @@ export function AuthProvider({ children }) {
     </AuthContext.Provider>
   );
 }
+
+AuthProvider.propTypes = {
+  children: PropTypes.node.isRequired,
+};
 
 // Hook sử dụng context
 export function useAuth() {

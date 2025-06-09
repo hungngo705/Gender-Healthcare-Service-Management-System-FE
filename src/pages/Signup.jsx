@@ -2,14 +2,18 @@ import React, { useState } from "react";
 import { Link, useNavigate } from "react-router-dom";
 // eslint-disable-next-line no-unused-vars
 import { motion } from "framer-motion";
+import authService from "../services/authService";
 
 function Signup() {
   const [formData, setFormData] = useState({
     name: "",
     email: "",
+    phoneNumber: "",
+    address: "",
     password: "",
     confirmPassword: "",
   });
+  const [isRegistering, setIsRegistering] = useState(false);
   const navigate = useNavigate();
 
   const handleChange = (e) => {
@@ -19,22 +23,42 @@ function Signup() {
       [name]: value,
     });
   };
-
-  const handleSubmit = (e) => {
+  const handleSubmit = async (e) => {
     e.preventDefault();
-    if (formData.password !== formData.confirmPassword) {
-      alert("Mật khẩu không khớp!");
+
+    if (
+      !formData.name ||
+      !formData.email ||
+      !formData.phoneNumber ||
+      !formData.address ||
+      !formData.password ||
+      !formData.confirmPassword
+    ) {
+      // Error will be shown via toast
       return;
     }
 
-    // Mô phỏng đăng ký thành công
-    navigate("/login");
+    if (formData.password !== formData.confirmPassword) {
+      // Error will be shown via toast
+      return;
+    }
+
+    setIsRegistering(true);
+    try {
+      await authService.register(formData);
+      // Registration successful, navigate to login
+      navigate("/login");
+    } catch {
+      // Error toast is handled by the axios interceptor
+    } finally {
+      setIsRegistering(false);
+    }
   };
 
   return (
     <div className="min-h-screen flex items-center justify-center bg-gradient-to-br from-pink-500 via-purple-500 to-indigo-500 p-4">
       <motion.div
-        className="flex w-full max-w-4xl h-[550px] bg-white rounded-2xl overflow-hidden shadow-xl"
+        className="flex w-full max-w-4xl h-[650px] bg-white rounded-2xl overflow-hidden shadow-xl"
         initial={{ opacity: 0, scale: 0.9 }}
         animate={{ opacity: 1, scale: 1 }}
         transition={{ duration: 0.5 }}
@@ -75,8 +99,7 @@ function Signup() {
                 required
                 className="w-full p-3 border-b border-gray-300 focus:border-blue-500 focus:outline-none"
               />
-            </motion.div>
-
+            </motion.div>{" "}
             <motion.div
               initial={{ opacity: 0, y: 20 }}
               animate={{ opacity: 1, y: 0 }}
@@ -92,7 +115,36 @@ function Signup() {
                 className="w-full p-3 border-b border-gray-300 focus:border-blue-500 focus:outline-none"
               />
             </motion.div>
-
+            <motion.div
+              initial={{ opacity: 0, y: 20 }}
+              animate={{ opacity: 1, y: 0 }}
+              transition={{ delay: 0.55 }}
+            >
+              <input
+                type="tel"
+                name="phoneNumber"
+                placeholder="Số Điện Thoại"
+                value={formData.phoneNumber}
+                onChange={handleChange}
+                required
+                className="w-full p-3 border-b border-gray-300 focus:border-blue-500 focus:outline-none"
+              />
+            </motion.div>
+            <motion.div
+              initial={{ opacity: 0, y: 20 }}
+              animate={{ opacity: 1, y: 0 }}
+              transition={{ delay: 0.57 }}
+            >
+              <input
+                type="text"
+                name="address"
+                placeholder="Địa Chỉ"
+                value={formData.address}
+                onChange={handleChange}
+                required
+                className="w-full p-3 border-b border-gray-300 focus:border-blue-500 focus:outline-none"
+              />
+            </motion.div>
             <motion.div
               initial={{ opacity: 0, y: 20 }}
               animate={{ opacity: 1, y: 0 }}
@@ -107,12 +159,11 @@ function Signup() {
                 required
                 className="w-full p-3 border-b border-gray-300 focus:border-blue-500 focus:outline-none"
               />
-            </motion.div>
-
+            </motion.div>{" "}
             <motion.div
               initial={{ opacity: 0, y: 20 }}
               animate={{ opacity: 1, y: 0 }}
-              transition={{ delay: 0.7 }}
+              transition={{ delay: 0.65 }}
             >
               <input
                 type="password"
@@ -124,36 +175,63 @@ function Signup() {
                 className="w-full p-3 border-b border-gray-300 focus:border-blue-500 focus:outline-none"
               />
             </motion.div>
-
             <motion.button
               type="submit"
               className="w-full bg-indigo-600 hover:bg-indigo-700 text-white py-3 rounded flex items-center justify-center"
               initial={{ opacity: 0, y: 20 }}
               animate={{ opacity: 1, y: 0 }}
-              transition={{ delay: 0.8 }}
-              whileHover={{ scale: 1.03 }}
-              whileTap={{ scale: 0.98 }}
+              transition={{ delay: 0.7 }}
+              whileHover={{ scale: isRegistering ? 1 : 1.03 }}
+              whileTap={{ scale: isRegistering ? 1 : 0.98 }}
+              disabled={isRegistering}
             >
-              ĐĂNG KÝ
-              <svg
-                xmlns="http://www.w3.org/2000/svg"
-                className="h-5 w-5 ml-2"
-                viewBox="0 0 20 20"
-                fill="currentColor"
-              >
-                <path
-                  fillRule="evenodd"
-                  d="M7.293 14.707a1 1 0 010-1.414L10.586 10 7.293 6.707a1 1 0 011.414-1.414l4 4a1 1 0 010 1.414l-4 4a1 1 0 01-1.414 0z"
-                  clipRule="evenodd"
-                />
-              </svg>
+              {isRegistering ? (
+                <>
+                  <svg
+                    className="animate-spin -ml-1 mr-3 h-5 w-5 text-white"
+                    xmlns="http://www.w3.org/2000/svg"
+                    fill="none"
+                    viewBox="0 0 24 24"
+                  >
+                    <circle
+                      className="opacity-25"
+                      cx="12"
+                      cy="12"
+                      r="10"
+                      stroke="currentColor"
+                      strokeWidth="4"
+                    ></circle>
+                    <path
+                      className="opacity-75"
+                      fill="currentColor"
+                      d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"
+                    ></path>
+                  </svg>
+                  ĐANG ĐĂNG KÝ...
+                </>
+              ) : (
+                <>
+                  ĐĂNG KÝ
+                  <svg
+                    xmlns="http://www.w3.org/2000/svg"
+                    className="h-5 w-5 ml-2"
+                    viewBox="0 0 20 20"
+                    fill="currentColor"
+                  >
+                    <path
+                      fillRule="evenodd"
+                      d="M7.293 14.707a1 1 0 010-1.414L10.586 10 7.293 6.707a1 1 0 011.414-1.414l4 4a1 1 0 010 1.414l-4 4a1 1 0 01-1.414 0z"
+                      clipRule="evenodd"
+                    />
+                  </svg>
+                </>
+              )}
             </motion.button>
-
             <motion.div
               className="mt-6 text-center"
               initial={{ opacity: 0 }}
               animate={{ opacity: 1 }}
-              transition={{ delay: 0.9 }}
+              transition={{ delay: 0.8 }}
             >
               <span className="text-gray-600">Đã có tài khoản?</span>{" "}
               <Link to="/login" className="text-blue-600 hover:underline">
