@@ -1,13 +1,42 @@
 // Environment configuration
 
-// In a real application, these would be loaded from environment variables
-// Using import.meta.env (Vite) or process.env (Create React App)
+// Environment detection and API URL configuration
+const getApiBaseURL = () => {
+  // First check environment variable
+  if (import.meta.env.VITE_API_URL) {
+    return import.meta.env.VITE_API_URL;
+  }
+
+  // Auto-detect based on current host
+  const currentHost = window.location.hostname;
+
+  if (currentHost === "localhost" || currentHost === "127.0.0.1") {
+    return "https://localhost:7050";
+  }
+
+  // For production, you need to set the correct API URL
+  // This should match your backend server URL
+  if (
+    currentHost.includes("github.io") ||
+    currentHost.includes("vercel.app") ||
+    currentHost.includes("netlify.app")
+  ) {
+    // Common hosting platforms - update with your actual production API URL
+    console.warn(
+      "Production API URL not configured! Please set VITE_API_URL environment variable."
+    );
+    return "https://your-production-api-domain.com"; // Replace with actual production URL
+  }
+
+  // Fallback for other hosts
+  return `https://${currentHost}:7050`;
+};
 
 const config = {
   // API URLs
   api: {
-    baseURL: import.meta.env.VITE_API_URL || "https://localhost:7050",
-    timeout: 20000, // 20 seconds    // Auth endpoints
+    baseURL: getApiBaseURL(),
+    timeout: 20000, // 20 seconds// Auth endpoints
     auth: {
       login: "/api/v1/login",
       register: "/api/v1/register",
@@ -69,15 +98,23 @@ const config = {
       delete: (id) => `/api/v1/blog/${id}`,
       getComments: (blogId) => `/api/v1/blog/${blogId}/comments`,
       addComment: (blogId) => `/api/v1/blog/${blogId}/comments`,
-    },
-
-    // Service endpoints
+    }, // Service endpoints
     services: {
       getAll: "/api/v1/service/getall",
       create: "/api/v1/service/create",
       getById: (id) => `/api/v1/service/${id}`,
       update: (id) => `/api/v1/service/${id}`,
       delete: (id) => `/api/v1/service/${id}`,
+    }, // Dashboard endpoints
+    dashboard: {
+      stats: "/api/v1/dashboard/stats",
+      data: "/api/v1/dashboard/data",
+      usersByRole: "/api/v1/dashboard/users-by-role",
+      appointmentsByStatus: "/api/v1/dashboard/appointments-by-status",
+      statsByRole: (role) => `/api/v1/dashboard/stats/role/${role}`,
+      activities: "/api/v1/dashboard/activities",
+      monthlyStats: (year, month) =>
+        `/api/v1/dashboard/stats/monthly/${year}/${month}`,
     },
   },
 
