@@ -1,10 +1,12 @@
-import React, { useState, useEffect } from "react";
+import React, { useState, useEffect, useCallback } from "react";
 import PropTypes from "prop-types";
 import { Calendar, Loader, AlertTriangle, RefreshCw } from "lucide-react";
 import dashboardService from "../../../services/dashboardService";
 import toastService from "../../../utils/toastService";
 
-const OverviewTab = ({ role }) => {
+const OverviewTab = React.memo(({ role }) => {
+  console.log("🔄 OverviewTab component re-rendering with role:", role);
+
   const [dashboardData, setDashboardData] = useState(null);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
@@ -22,40 +24,46 @@ const OverviewTab = ({ role }) => {
     if (status === 1) return "bg-green-100 text-green-800";
     return "bg-red-100 text-red-800";
   };
-
   // Helper function to get appointment status text
   const getAppointmentStatusText = (status) => {
     if (status === 0) return "Chờ xác nhận";
     if (status === 1) return "Đã xác nhận";
     return "Đã hủy";
   };
-  // Load dashboard data from API
-  useEffect(() => {
-    loadDashboardData();
-  }, []);
-  const loadDashboardData = async () => {
+
+  // Load dashboard data from API - useCallback to prevent recreation
+  const loadDashboardData = useCallback(async () => {
+    console.log("📡 API Call: Loading dashboard data...");
     try {
       setLoading(true);
       setError(null);
 
       // Get comprehensive dashboard data
       const response = await dashboardService.getDashboardData();
+      console.log("✅ API Response received:", response.data);
       // The API returns data in response.data.data structure
       if (response.data?.is_success) {
         setDashboardData(response.data.data);
+        console.log("💾 Dashboard data set successfully");
       } else {
         throw new Error(
           response.data?.message || "Failed to fetch dashboard data"
         );
       }
     } catch (err) {
-      console.error("Failed to load dashboard data:", err);
+      console.error("❌ Failed to load dashboard data:", err);
       setError("Không thể tải dữ liệu dashboard");
       toastService.error("Không thể tải dữ liệu dashboard");
     } finally {
       setLoading(false);
+      console.log("⏹️ Loading finished");
     }
-  };
+  }, []); // Empty dependency array to prevent recreation
+
+  // Load data when component mounts or role changes
+  useEffect(() => {
+    loadDashboardData();
+  }, [loadDashboardData]);
 
   // Handle manual refresh
   const handleRefresh = () => {
@@ -197,7 +205,6 @@ const OverviewTab = ({ role }) => {
           <span>Làm mới</span>
         </button>
       </div>
-
       {/* Loading State */}
       {loading ? (
         <div className="flex items-center justify-center h-64 bg-gray-50 rounded-lg">
@@ -359,10 +366,12 @@ const OverviewTab = ({ role }) => {
             </div>
           </div>
         </>
-      )}
+      )}{" "}
     </div>
   );
-};
+});
+
+OverviewTab.displayName = "OverviewTab";
 
 OverviewTab.propTypes = {
   role: PropTypes.string,
