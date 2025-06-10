@@ -15,7 +15,7 @@ function CallToAction() {
         <div className="flex flex-wrap justify-center gap-4">
           
           <Link
-            to="/services/consultation"
+            to="/services/booking"
             className="px-6 py-3 bg-transparent border border-white text-white rounded-md font-medium hover:bg-white hover:bg-opacity-10 transition-all"
           >
             Đặt Lịch Tư Vấn
