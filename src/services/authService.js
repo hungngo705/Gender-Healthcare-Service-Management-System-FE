@@ -231,7 +231,6 @@ export const authService = {
       return Promise.reject(error);
     }
   },
-
   /**
    * Request password reset email
    * @param {string} email - User email address
@@ -242,22 +241,19 @@ export const authService = {
       const response = await apiService.post(config.api.auth.forgotPassword, {
         email,
       });
-      toastService.success(
-        "Password reset instructions have been sent to your email"
-      );
+      toastService.success("Mã xác nhận đã được gửi đến email của bạn");
       return response.data;
     } catch (error) {
       // Error handling is done by the axios interceptors
       return Promise.reject(error);
     }
   },
-
   /**
-   * Reset password with token
+   * Reset password with verification code
    * @param {Object} resetData - Reset password data
-   * @param {string} resetData.token - Password reset token
+   * @param {string} resetData.email - User email address
+   * @param {string} resetData.code - Password reset verification code
    * @param {string} resetData.newPassword - New password
-   * @param {string} resetData.confirmPassword - Confirm new password
    * @returns {Promise} - The reset password response promise
    */
   resetPassword: async (resetData) => {
@@ -266,19 +262,18 @@ export const authService = {
         config.api.auth.resetPassword,
         resetData
       );
-      toastService.success("Password has been reset successfully");
+      toastService.success("Mật khẩu đã được đặt lại thành công");
       return response.data;
     } catch (error) {
       // Error handling is done by the axios interceptors
       return Promise.reject(error);
     }
-  }
+  },
   /**
    * Get redirect path based on user role
    * @param {string} role - User role
    * @returns {string} Redirect path
-   */,
-  getRedirectPath: (role) => {
+   */ getRedirectPath: (role) => {
     if (!role) {
       console.log("No role provided, defaulting to home");
       return "/";
@@ -290,13 +285,10 @@ export const authService = {
     // Define role-based redirects
     const roleRedirects = {
       admin: "/dashboard",
-      administrator: "/dashboard",
       staff: "/dashboard",
-      doctor: "/dashboard",
       consultant: "/dashboard",
       manager: "/dashboard",
       customer: "/",
-      user: "/",
       guest: "/",
     };
 

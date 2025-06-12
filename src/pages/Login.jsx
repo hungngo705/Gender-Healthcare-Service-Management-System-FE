@@ -248,12 +248,12 @@ function Login() {
               animate={{ opacity: 1 }}
               transition={{ delay: 0.5 }}
             >
-              <button
-                type="button"
+              <Link
+                to="/forgot-password"
                 className="text-sm text-blue-600 hover:underline bg-transparent border-none cursor-pointer"
               >
                 Quên Mật Khẩu?
-              </button>
+              </Link>
             </motion.div>{" "}
             <motion.button
               type="submit"
