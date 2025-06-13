@@ -89,6 +89,7 @@ const Booking = () => {
     email: "",
     phone: "",
     reason: "",
+    customerId: null
   });
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [bookingSuccess, setBookingSuccess] = useState(false);
@@ -197,7 +198,7 @@ const Booking = () => {
   };
 
   // Update handleSubmit to use the toast service
-  const handleSubmit = async (e) => {
+  const handleSubmit = async (e, appointmentData) => {
     e.preventDefault();
     
     if (!selectedConsultant || !selectedTimeSlot) {
@@ -207,28 +208,26 @@ const Booking = () => {
     
     setIsSubmitting(true);
     
-    // Format date for API
-    const dateKey = format(selectedDate, "yyyy-MM-dd");
-    
     try {
-      // Prepare appointment data for API
-      const appointmentData = {
+      // If appointmentData is provided by BookingForm, use it directly
+      const dataToSubmit = appointmentData || {
+        customerId: formData.customerId, // Use customer ID from form data
         consultantId: selectedConsultant.id,
-        appointmentDate: dateKey,
+        serviceId: "c8d9e0f1-2a3b-4c5d-6e7f-8a9b0c1d2e3f", // Default service ID
+        appointmentDate: format(selectedDate, "yyyy-MM-dd"),
         slot: selectedTimeSlot.id,
-        patientName: formData.name,
-        patientEmail: formData.email,
-        patientPhone: formData.phone,
-        reason: formData.reason,
-        // Add other fields as required by your API
+        notes: formData.reason
       };
       
+      console.log("Submitting appointment data:", dataToSubmit);
+      
       // Call API to create appointment
-      await appointmentService.create(appointmentData);
+      await appointmentService.create(dataToSubmit);
       
       // Update local state to reflect the booking
       setLocalBookedSlots(prev => {
         const updatedSlots = { ...prev };
+        const dateKey = dataToSubmit.appointmentDate;
         
         if (!updatedSlots[selectedConsultant.id]) {
           updatedSlots[selectedConsultant.id] = {};
@@ -238,7 +237,7 @@ const Booking = () => {
           updatedSlots[selectedConsultant.id][dateKey] = [];
         }
         
-        updatedSlots[selectedConsultant.id][dateKey].push(selectedTimeSlot.id);
+        updatedSlots[selectedConsultant.id][dateKey].push(dataToSubmit.slot);
         
         return updatedSlots;
       });
@@ -391,6 +390,8 @@ const Booking = () => {
                       onInputChange={handleInputChange}
                       onSubmit={handleSubmit}
                       isSubmitting={isSubmitting}
+                      setFormData={setFormData} // Add this line
+                      onBookingSuccess={() => setBookingSuccess(true)} // Add this line
                     />
                   ) : (
                     <div className="px-6 py-12 text-center">

@@ -21,7 +21,7 @@ export const consultants = [
       phoneNumber: "5553456789",
       address: "123 Pine Rd, Villageton",
       role: "Consultant",
-      avatarUrl: "https://example.com/avatars/emma.jpg",
+      avatarUrl: "https://media.istockphoto.com/id/1466995518/photo/business-woman-and-worker-portrait-at-office-desk-as-administration-executive-company-manager.jpg?s=612x612&w=0&k=20&c=NvKeG6Fh0_VVfH_N0Ka-5j8284XJhL2VTJfe6IwDkWQ=",
       isActive: true,
     },
     serviceId: "c8d9e0f1-2a3b-4c5d-6e7f-8a9b0c1d2e3f",
