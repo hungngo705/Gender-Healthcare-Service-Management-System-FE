@@ -1,4 +1,4 @@
-[
+export const appoinments = [
   {
     "id": "a3b4c5d6-7e8f-9a0b-1c2d-3e4f5a6b7c8d",
     "customerId": "d8a3ed45-1a5e-4c58-bd6f-f5161b82bd7d",
@@ -24,7 +24,7 @@
       "isActive": true
     },
     "serviceId": "c8d9e0f1-2a3b-4c5d-6e7f-8a9b0c1d2e3f",
-    "appointmentDate": "2023-07-15",
+    "appointmentDate": "2025-06-10",
     "slot": 0,
     "status": 1,
     "notes": "Patient requested STI testing for all common infections",
@@ -55,7 +55,7 @@
       "isActive": true
     },
     "serviceId": "d9e0f1a2-3b4c-5d6e-7f8a-9b0c1d2e3f4a",
-    "appointmentDate": "2023-07-16",
+    "appointmentDate": "2025-06-11",
     "slot": 0,
     "status": 0,
     "notes": "First-time consultation",
@@ -86,7 +86,7 @@
       "isActive": true
     },
     "serviceId": "e0f1a2b3-4c5d-6e7f-8a9b-0c1d2e3f4a5b",
-    "appointmentDate": "2023-07-17",
+    "appointmentDate": "2025-06-12",
     "slot": 0,
     "status": 0,
     "notes": "Follow-up for previous issues",
@@ -148,10 +148,12 @@
       "isActive": true
     },
     "serviceId": "a2b3c4d5-6e7f-8a9b-0c1d-2e3f4a5b6c7d",
-    "appointmentDate": "2023-07-19",
+    "appointmentDate": "2025-06-13",
     "slot": 0,
     "status": 2,
     "notes": "Cancelled due to scheduling conflict",
     "createdAt": "2023-07-05T13:45:00Z"
   }
 ]
+
+export default appoinments;
