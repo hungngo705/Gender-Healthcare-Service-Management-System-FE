@@ -150,7 +150,7 @@ function Header() {
                             Hồ Sơ
                           </NavLink>{" "}
                           <NavLink
-                            to="/profile/appointments"
+                            to="/profile?tab=appointments"
                             className="block px-4 py-2 text-sm text-gray-700 hover:bg-gray-100"
                             onClick={() => setIsProfileMenuOpen(false)}
                           >
@@ -326,7 +326,7 @@ function Header() {
                       </li>{" "}
                       <li>
                         <NavLink
-                          to="/profile/appointments"
+                          to="/profile?tab=appointments"
                           className={({ isActive }) =>
                             isActive
                               ? "block text-blue-600 font-medium"

@@ -139,7 +139,7 @@ const DateSelector = ({ dateOptions, selectedDate, onDateSelect }) => {
         // List view - shows only next 2 weeks
         <div>
           <div className="mb-2 text-xs text-gray-500">
-            Chọn ngày trong 2 tuần tới ({format(today, "dd/MM/yyyy")} - {format(twoWeeksLater, "dd/MM/yyyy")})
+            Chọn ngày trong 2 tuần tới ({format(today, "yyyy-MM-dd")} - {format(twoWeeksLater, "yyyy-MM-dd")})
           </div>
           
           <div className="flex flex-wrap gap-2 pb-2">
@@ -163,7 +163,7 @@ const DateSelector = ({ dateOptions, selectedDate, onDateSelect }) => {
                     {format(date, "EEEE", { locale: vi })}
                   </div>
                   <div className="text-xs">
-                    {format(date, "dd/MM/yyyy")}
+                    {format(date, "yyyy-MM-dd")}
                   </div>
                   
                 </button>

@@ -7,7 +7,7 @@ import { motion, AnimatePresence } from "framer-motion";
 // Import data từ các file riêng biệt
 import {
   services,
-  consultants,
+  appoinments,
   testimonials,
   blogData,
   bannerSlides,
@@ -293,7 +293,7 @@ function Home() {
           </div>
 
           <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-8">
-            {consultants.map((consultant) => (
+            {appoinments.map((consultant) => (
               <motion.div
                 key={consultant.id}
                 className="bg-white rounded-xl shadow-md overflow-hidden"
@@ -393,7 +393,7 @@ function Home() {
                 to="/services/tracking"
                 className="inline-flex items-center text-purple-700 font-medium hover:text-purple-900"
               >
-                Thử công cụ theo dõi
+                Công cụ theo dõi
                 <svg
                   xmlns="http://www.w3.org/2000/svg"
                   className="h-5 w-5 ml-1"
@@ -433,7 +433,7 @@ function Home() {
                 </svg>
               </div>
 
-              <h3 className="text-2xl font-semibold text-gray-900 mb-3">
+              <h3 className="text-2xl font-semibold text-gray-900 mb-3 ">
                 Tư Vấn Trực Tuyến
               </h3>
               <p className="text-gray-600 mb-6">
@@ -672,8 +672,8 @@ function Home() {
               to="/services/tracking"
               className="inline-flex items-center bg-white border-2 border-indigo-600 text-indigo-600 font-medium px-6 py-3 rounded-lg hover:bg-indigo-50 transition duration-300"
             >
-              Thử Công Cụ Theo Dõi
-              <svg
+              Công Cụ Theo Dõi
+                <svg
                 xmlns="http://www.w3.org/2000/svg"
                 className="h-5 w-5 ml-2"
                 viewBox="0 0 20 20"

@@ -1,5 +1,5 @@
 import services from "./services";
-import consultants from "./consultants";
+import appoinments from "./consultants";
 import testimonials from "./testimonials";
 import blogData from "./blogData";
 import bannerSlides from "./bannerSlides";
@@ -9,7 +9,7 @@ import serviceCategories from "./serviceCategories";
 
 export {
   services,
-  consultants,
+  appoinments,
   testimonials,
   blogData,
   bannerSlides,
