@@ -14,8 +14,6 @@ export function getDashboardConfig(userRole) {
           label: "Lịch hẹn tư vấn",
           icon: "calendar",
         },
-        { id: "testProcessing", label: "Xử lý xét nghiệm", icon: "clipboard" },
-        { id: "customers", label: "Bệnh nhân", icon: "users" },
         { id: "messages", label: "Tin nhắn", icon: "chat" },
       ],
       description: "Quản lý lịch tư vấn và xử lý xét nghiệm",

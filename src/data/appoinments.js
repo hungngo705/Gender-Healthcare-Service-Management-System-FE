@@ -1,4 +1,4 @@
-export const consultants = [
+export const appoinments = [
   {
     id: "a3b4c5d6-7e8f-9a0b-1c2d-3e4f5a6b7c8d",
     customerId: "d8a3ed45-1a5e-4c58-bd6f-f5161b82bd7d",
@@ -161,4 +161,4 @@ export const consultants = [
   },
 ];
 
-export default consultants;
+export default appoinments;
