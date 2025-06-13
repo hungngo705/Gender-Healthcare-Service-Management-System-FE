@@ -1,4 +1,4 @@
-import React, { useRef } from "react";
+import React from "react";
 import {
   MoreVertical,
   Edit,
@@ -25,8 +25,6 @@ const UserTable = ({
   getUserDisplayInfo,
   formatDate,
 }) => {
-  const actionMenuRef = useRef(null);
-
   return (
     <div className="overflow-x-auto">
       <table className="min-w-full divide-y divide-gray-200">
@@ -127,18 +125,16 @@ const UserTable = ({
               <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-500">
                 <div>Hoạt động gần nhất: {formatDate(user.lastActive)}</div>
                 <div>Ngày tạo: {formatDate(user.createdAt)}</div>
-              </td>
+              </td>{" "}
               <td className="px-6 py-4 whitespace-nowrap text-right text-sm font-medium">
-                <div
-                  className="relative"
-                  ref={showActionMenu === user.id ? actionMenuRef : null}
-                >
+                <div className="relative" data-action-menu="true">
                   <button
-                    onClick={() =>
+                    type="button"
+                    onClick={() => {
                       setShowActionMenu(
                         showActionMenu === user.id ? null : user.id
-                      )
-                    }
+                      );
+                    }}
                     className="text-gray-400 hover:text-gray-600 transition-colors p-2 rounded-lg hover:bg-gray-100"
                   >
                     <MoreVertical className="h-5 w-5" />
@@ -148,15 +144,23 @@ const UserTable = ({
                     <div className="absolute right-0 z-10 mt-2 w-48 rounded-md shadow-lg bg-white ring-1 ring-black ring-opacity-5">
                       <div className="py-1" role="menu">
                         <button
+                          type="button"
                           className="flex items-center w-full px-4 py-2 text-sm text-gray-700 hover:bg-gray-100 transition-colors"
-                          onClick={() => onViewUser(user)}
+                          onClick={() => {
+                            // Direct invocation without event objects
+                            onViewUser(user);
+                          }}
                         >
                           <Eye className="h-4 w-4 mr-3" />
                           Xem chi tiết
                         </button>
                         <button
+                          type="button"
                           className="flex items-center w-full px-4 py-2 text-sm text-gray-700 hover:bg-gray-100 transition-colors"
-                          onClick={() => onEditUser(user)}
+                          onClick={() => {
+                            // Direct invocation without event objects
+                            onEditUser(user);
+                          }}
                         >
                           <Edit className="h-4 w-4 mr-3" />
                           Chỉnh sửa

@@ -97,7 +97,6 @@ function UserManagementTab() {
         filter={filter}
         onAddUser={() => setShowAddUserModal(true)}
       />
-
       {/* Search and Filters */}
       <SearchAndFilters
         searchTerm={searchTerm}
@@ -105,7 +104,6 @@ function UserManagementTab() {
         filter={filter}
         onFilterChange={handleFilterChange}
       />
-
       {/* Stats Cards */}
       {!loading && filteredUsers.length > 0 && (
         <UserStatsCards
@@ -114,7 +112,6 @@ function UserManagementTab() {
           totalPages={totalPages}
         />
       )}
-
       {/* Main Content Area */}
       <div className="bg-white rounded-xl shadow-sm border border-gray-200 p-6 mb-6 z-10">
         {/* Empty States (Loading, No Data, etc.) */}
@@ -134,8 +131,14 @@ function UserManagementTab() {
             paginatedUsers={paginatedUsers}
             showActionMenu={showActionMenu}
             setShowActionMenu={setShowActionMenu}
-            onViewUser={handleViewUser}
-            onEditUser={handleEditUser}
+            onViewUser={(user) => {
+              // Always use the handle functions from the hook
+              handleViewUser(user);
+            }}
+            onEditUser={(user) => {
+              // Always use the handle functions from the hook
+              handleEditUser(user);
+            }}
             onToggleUserStatus={handleToggleUserStatus}
             onDeleteUser={handleDeleteUser}
             getRoleBadgeClass={getRoleBadgeClass}
@@ -147,7 +150,6 @@ function UserManagementTab() {
           />
         )}
       </div>
-
       {/* Pagination */}
       <PaginationControls
         currentPage={currentPage}
@@ -159,7 +161,6 @@ function UserManagementTab() {
         onPageChange={handlePageChange}
         onItemsPerPageChange={handleItemsPerPageChange}
       />
-
       {/* Modals */}
       <AddUserModal
         isOpen={showAddUserModal}
@@ -170,7 +171,6 @@ function UserManagementTab() {
         submitting={submitting}
         onFormChange={handleFormChange}
       />
-
       <EditUserModal
         isOpen={showEditUserModal}
         onClose={closeEditUserModal}
@@ -180,7 +180,6 @@ function UserManagementTab() {
         submitting={submitting}
         onFormChange={handleFormChange}
       />
-
       <DeleteUserModal
         isOpen={showDeleteModal}
         onClose={closeDeleteModal}
@@ -188,8 +187,10 @@ function UserManagementTab() {
         user={selectedUser}
         submitting={submitting}
       />
-
+      {/* User Details Modal */}
+      {/* Adding key={selectedUser?.id} forces re-render when user changes */}
       <UserDetailsModal
+        key={selectedUser?.id || "details-modal"}
         isOpen={showDetailsModal}
         onClose={closeDetailsModal}
         user={selectedUser}

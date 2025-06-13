@@ -17,17 +17,19 @@ const EditUserModal = ({
   };
 
   return (
-    <div className="fixed inset-0 bg-black/20 backdrop-blur-sm overflow-y-auto h-full w-full z-50 flex items-center justify-center">
-      <div className="relative bg-white rounded-xl shadow-2xl max-w-md w-full mx-4">
-        <div className="bg-gradient-to-r from-blue-600 to-indigo-600 rounded-t-xl p-6 text-white">
+    <div className="fixed inset-0 bg-black/30 backdrop-blur-sm overflow-y-auto h-full w-full z-50 flex items-center justify-center">
+      <div className="relative bg-white rounded-xl shadow-2xl max-w-md w-full mx-4 transform transition-all animate-fade-in-up">
+        <div className="bg-gradient-to-r from-violet-600 to-indigo-600 rounded-t-xl p-6 text-white">
           <div className="flex items-center justify-between">
             <div className="flex items-center space-x-3">
               <Edit className="h-6 w-6" />
-              <h3 className="text-lg font-semibold">Chỉnh sửa người dùng</h3>
+              <h3 className="text-lg font-semibold">
+                Chỉnh sửa thông tin người dùng
+              </h3>
             </div>
             <button
               onClick={onClose}
-              className="text-white hover:text-gray-200 transition-colors"
+              className="text-white hover:text-gray-200 transition-colors focus:outline-none focus:ring-2 focus:ring-white focus:ring-offset-2 focus:ring-offset-indigo-600 rounded-full p-1"
             >
               <X className="h-6 w-6" />
             </button>
@@ -58,7 +60,6 @@ const EditUserModal = ({
               <p className="text-red-500 text-xs mt-1">{formErrors.name}</p>
             )}
           </div>
-
           <div>
             <label
               htmlFor="edit-user-email"
@@ -82,7 +83,6 @@ const EditUserModal = ({
               <p className="text-red-500 text-xs mt-1">{formErrors.email}</p>
             )}
           </div>
-
           <div>
             <label
               htmlFor="edit-user-phone"
@@ -107,7 +107,6 @@ const EditUserModal = ({
               </p>
             )}
           </div>
-
           <div>
             <label
               htmlFor="edit-user-address"
@@ -125,7 +124,6 @@ const EditUserModal = ({
               disabled={submitting}
             />
           </div>
-
           <div>
             <label
               htmlFor="edit-user-role"
@@ -153,26 +151,8 @@ const EditUserModal = ({
             {formErrors.role && (
               <p className="text-red-500 text-xs mt-1">{formErrors.role}</p>
             )}
-          </div>
-
-          <div>
-            <label
-              htmlFor="edit-user-specialty"
-              className="block text-sm font-medium text-gray-700 mb-2"
-            >
-              Chuyên môn (dành cho tư vấn viên)
-            </label>
-            <input
-              id="edit-user-specialty"
-              type="text"
-              value={userForm.specialty}
-              onChange={(e) => handleFormChange("specialty", e.target.value)}
-              className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500 transition-all"
-              placeholder="Nhập chuyên môn"
-              disabled={submitting}
-            />
-          </div>
-
+          </div>{" "}
+          {/* Specialty field removed as requested */}
           <div>
             <label
               htmlFor="edit-user-status"
@@ -184,19 +164,18 @@ const EditUserModal = ({
               id="edit-user-status"
               value={userForm.status}
               onChange={(e) => handleFormChange("status", e.target.value)}
-              className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500 transition-all"
+              className="w-full px-3 py-2.5 border border-gray-300 rounded-lg focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500 transition-all"
               disabled={submitting}
             >
               <option value="active">Hoạt động</option>
               <option value="inactive">Ngừng hoạt động</option>
             </select>
-          </div>
-
-          <div className="flex items-center justify-end space-x-3 pt-6 border-t border-gray-200">
+          </div>{" "}
+          <div className="flex flex-col-reverse sm:flex-row sm:justify-end sm:space-x-3 gap-2 sm:gap-0 pt-6 border-t border-gray-200">
             <button
               type="button"
               onClick={onClose}
-              className="px-4 py-2 text-sm font-medium text-gray-700 bg-gray-100 hover:bg-gray-200 rounded-lg transition-colors"
+              className="px-4 py-3 text-sm font-medium text-gray-700 bg-gray-100 hover:bg-gray-200 rounded-lg transition-colors focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-gray-300"
               disabled={submitting}
             >
               Hủy
@@ -204,9 +183,9 @@ const EditUserModal = ({
             <button
               type="submit"
               disabled={submitting}
-              className="px-4 py-2 text-sm font-medium text-white bg-gradient-to-r from-blue-600 to-indigo-600 hover:from-blue-700 hover:to-indigo-700 rounded-lg transition-all disabled:opacity-50 disabled:cursor-not-allowed flex items-center space-x-2"
+              className="px-6 py-3 text-sm font-medium text-white bg-gradient-to-r from-violet-600 to-indigo-600 hover:from-violet-700 hover:to-indigo-700 rounded-lg transition-all disabled:opacity-50 disabled:cursor-not-allowed flex items-center justify-center space-x-2 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-indigo-500"
             >
-              {submitting && <Loader className="h-4 w-4 animate-spin" />}
+              {submitting && <Loader className="h-4 w-4 animate-spin mr-2" />}
               <span>{submitting ? "Đang cập nhật..." : "Cập nhật"}</span>
             </button>
           </div>

@@ -38,11 +38,8 @@ export const useUserManagement = () => {
   const loadUsers = useCallback(async () => {
     try {
       setLoading(true);
-      console.log("Loading users from API...");
       const response = await userService.getAllUsers();
-      console.log("API response:", response);
       setUsers(response || []);
-      console.log("Users set in state:", response || []);
     } catch (error) {
       console.error("Error loading users:", error);
       console.error("Error details:", error.response?.data || error.message);
@@ -107,12 +104,9 @@ export const useUserManagement = () => {
   // User CRUD operations
   const handleAddUser = async (e) => {
     e.preventDefault();
-    console.log("handleAddUser called with form data:", userForm);
-
     const errors = validateUserForm(userForm);
     if (Object.keys(errors).length > 0) {
       setFormErrors(errors);
-      console.log("Form validation failed");
       return;
     }
 
@@ -127,8 +121,7 @@ export const useUserManagement = () => {
         role: userForm.role,
       };
 
-      const result = await userService.createUser(createUserData);
-      console.log("User created successfully:", result);
+      await userService.createUser(createUserData);
       setShowAddUserModal(false);
       resetForm();
       await loadUsers();
@@ -145,9 +138,14 @@ export const useUserManagement = () => {
       setSubmitting(false);
     }
   };
-
   const handleEditUser = (user) => {
+    // First close the action menu
+    setShowActionMenu(null);
+
+    // Then set the user data
     setSelectedUser(user);
+
+    // Set up the form data
     setUserForm({
       name: user.name || "",
       email: user.email || "",
@@ -158,33 +156,23 @@ export const useUserManagement = () => {
       specialty: user.specialty || "",
       status: user.status || "active",
     });
-    setShowEditUserModal(true);
-    setShowActionMenu(null);
-  };
 
+    // Finally open the modal - directly without timeout
+    setShowEditUserModal(true);
+  };
   const handleUpdateUser = async (e) => {
     e.preventDefault();
-    console.log("handleUpdateUser called with form data:", userForm);
-    console.log("Selected user:", selectedUser);
 
     const errors = validateUserForm(userForm, true);
     if (Object.keys(errors).length > 0) {
       setFormErrors(errors);
-      console.log("Form validation failed for update");
       return;
     }
 
     try {
       setSubmitting(true);
-      const { password, ...updateData } = userForm;
-      console.log(
-        "Calling userService.updateUser with:",
-        selectedUser.id,
-        updateData
-      );
-
-      const result = await userService.updateUser(selectedUser.id, updateData);
-      console.log("User updated successfully:", result);
+      const { password: _password, ...updateData } = userForm;
+      await userService.updateUser(selectedUser.id, updateData);
 
       setShowEditUserModal(false);
       resetForm();
@@ -209,16 +197,10 @@ export const useUserManagement = () => {
     setShowDeleteModal(true);
     setShowActionMenu(null);
   };
-
   const confirmDeleteUser = async () => {
-    console.log("confirmDeleteUser called for user:", selectedUser);
-
     try {
       setSubmitting(true);
-      console.log("Calling userService.deleteUser with ID:", selectedUser.id);
-
-      const result = await userService.deleteUser(selectedUser.id);
-      console.log("User deleted successfully:", result);
+      await userService.deleteUser(selectedUser.id);
 
       setShowDeleteModal(false);
       setSelectedUser(null);
@@ -236,11 +218,15 @@ export const useUserManagement = () => {
       setSubmitting(false);
     }
   };
-
   const handleViewUser = (user) => {
-    setSelectedUser(user);
-    setShowDetailsModal(true);
+    // First close the action menu
     setShowActionMenu(null);
+
+    // Then set the user data
+    setSelectedUser(user);
+
+    // Finally open the modal - directly without timeout
+    setShowDetailsModal(true);
   };
 
   const handleToggleUserStatus = async (user) => {
@@ -292,13 +278,11 @@ export const useUserManagement = () => {
   const handleFilterChange = (newFilter) => {
     setFilter(newFilter);
   };
-
   // Modal close handlers
   const closeAddUserModal = () => {
     setShowAddUserModal(false);
     resetForm();
   };
-
   const closeEditUserModal = () => {
     setShowEditUserModal(false);
     resetForm();
