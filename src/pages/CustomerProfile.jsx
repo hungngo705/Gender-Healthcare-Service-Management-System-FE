@@ -1,4 +1,4 @@
-import { useState, useEffect, useCallback } from "react";
+import { useState, useEffect } from "react";
 import { useAuth } from "../contexts/AuthContext";
 import { useNavigate, useSearchParams } from "react-router-dom";
 import userService from "../services/userService";
@@ -14,6 +14,7 @@ import {
   Phone,
   MapPin,
   Edit,
+  Settings,
   Shield,
   CreditCard,
 } from "lucide-react";
@@ -41,6 +42,21 @@ function CustomerProfile() {
   const [notifications, setNotifications] = useState([]);
   const [unreadCount, setUnreadCount] = useState(0);
   const [notificationsVisible, setNotificationsVisible] = useState(true);
+  // Custom function to handle tab changes and update URL
+  const setActiveTab = (tabId) => {
+    // Update the local state immediately
+    setActiveTabState(tabId);
+    // Update the URL (which will trigger the useEffect to update the tab again)
+    navigate(`/profile/${tabId}`, { replace: true });
+
+    // Force a re-render if needed (helps with immediate visibility changes)
+    setTimeout(() => {
+      setActiveTabState((prevState) => {
+        if (prevState === tabId) return prevState; // No change needed
+        return tabId; // Force update if somehow it didn't update
+      });
+    }, 0);
+  };
   const [profileData, setProfileData] = useState({
     name: "",
     email: "",
@@ -82,77 +98,67 @@ function CustomerProfile() {
 
     setNotifications(mockNotifications);
     setUnreadCount(mockNotifications.filter((n) => !n.isRead).length);
-  }, []); // Load user profile data from API
-  const loadUserProfile = useCallback(async () => {
-    try {
-      const userData = await userService.getCurrentUserProfile();
-
-      // Map API response to local state structure
-      setProfileData({
-        name: userData.name || "",
-        email: userData.email || "",
-        phone: userData.phoneNumber || "",
-        address: userData.address || "",
-        birthday: userData.birthday || userData.dateOfBirth || "",
-        gender: userData.gender || "",
-        emergencyContact: userData.emergencyContact || "",
-      });
-    } catch (error) {
-      console.error("Failed to load user profile:", error);
-      // Fallback to localStorage data if API fails
-      if (currentUser) {
-        setProfileData({
-          name: currentUser.name || "",
-          email: currentUser.email || "",
-          phone: currentUser.phoneNumber || currentUser.phone || "",
-          address: currentUser.address || "",
-          birthday: currentUser.birthday || currentUser.dateOfBirth || "",
-          gender: currentUser.gender || "",
-          emergencyContact: currentUser.emergencyContact || "",
-        });
-      }
-    }
-  }, [currentUser]); // Update profile data when user data is available
+  }, []);
+  // Update profile data when user data is available
   useEffect(() => {
     if (currentUser) {
-      loadUserProfile();
-    }
-  }, [currentUser, loadUserProfile]); // Handle saving profile information
-  const handleSaveProfile = async (updatedData) => {
-    try {
-      // Prepare data for API call - map to API expected format
-      const apiData = {
-        name: updatedData.name,
-        email: updatedData.email,
-        phoneNumber: updatedData.phone,
-        address: updatedData.address,
-        birthday: updatedData.birthday,
-        gender: updatedData.gender,
-        emergencyContact: updatedData.emergencyContact,
-      };
-
-      // Call API to update profile
-      const updatedProfile = await userService.updateCurrentUserProfile(
-        apiData
-      );
-
-      // Update local state with response data
       setProfileData({
-        name: updatedProfile.name || updatedData.name,
-        email: updatedProfile.email || updatedData.email,
-        phone: updatedProfile.phoneNumber || updatedData.phone,
-        address: updatedProfile.address || updatedData.address,
-        birthday: updatedProfile.birthday || updatedData.birthday,
-        gender: updatedProfile.gender || updatedData.gender,
-        emergencyContact:
-          updatedProfile.emergencyContact || updatedData.emergencyContact,
-      }); // Reload profile data to ensure consistency
-      await loadUserProfile();
-    } catch (error) {
-      console.error("Failed to save profile:", error);
-      // If API fails, keep local data and show error
-      setProfileData(updatedData);
+        name: currentUser.name || "",
+        email: currentUser.email || "",
+        phone: currentUser.phone || currentUser.phoneNumber || "",
+        address: currentUser.address || "",
+        birthday: currentUser.birthday || currentUser.dateOfBirth || "",
+        gender: currentUser.gender || "",
+        emergencyContact: currentUser.emergencyContact || "",
+      });
     }
+  }, [currentUser]); // Handle tab changes from URL
+  useEffect(() => {
+    // Map URL parameter to the actual tab ID if needed
+    const validTabs = [
+      "profile",
+      "appointments",
+      "medical-records",
+      "notifications",
+      "security",
+      "payments",
+    ];
+
+    // If we have a tab parameter in the URL
+    if (tab) {
+      let normalizedTab = tab.toLowerCase();
+
+      // Special mapping for common URL formats
+      if (
+        normalizedTab === "appointment" ||
+        normalizedTab === "booking" ||
+        normalizedTab === "schedule"
+      ) {
+        normalizedTab = "appointments";
+      } else if (normalizedTab === "medical" || normalizedTab === "records") {
+        normalizedTab = "medical-records";
+      }
+
+      if (validTabs.includes(normalizedTab)) {
+        // Update the active tab state
+        setActiveTabState(normalizedTab);
+      } else {
+        // If invalid tab parameter, redirect to default profile tab
+        navigate("/profile", { replace: true });
+        setActiveTabState("profile");
+      }
+    } else {
+      // If no tab parameter, ensure we're showing the default tab
+      setActiveTabState("profile");
+    }
+  }, [tab, navigate, setActiveTabState]);
+
+  // Handle saving profile information
+  const handleSaveProfile = (updatedData) => {
+    console.log("Updating profile:", updatedData);
+    setProfileData(updatedData);
+    // Show success message
+    alert("Thông tin đã được cập nhật thành công!");
   };
 
   // Mark all notifications as read
@@ -236,10 +242,15 @@ function CustomerProfile() {
       icon: <CreditCard size={16} className="mr-3" />,
     },
   ];
-
   // Render active tab content
   const renderTabContent = () => {
-    switch (activeTab) {
+    // Get the current active tab state for rendering
+    // This ensures we're always using the latest state
+    const currentActiveTab = activeTab;
+
+    console.log("Rendering tab content for:", currentActiveTab);
+
+    switch (currentActiveTab) {
       case "profile":
         return (
           <ProfileTab profileData={profileData} onSave={handleSaveProfile} />
@@ -255,6 +266,7 @@ function CustomerProfile() {
       case "payments":
         return <PaymentsTab />;
       default:
+        console.log("No matching tab found, showing default content");
         return (
           <div className="text-center py-6 bg-gray-50 rounded-lg">
             <p className="text-gray-500">Tab đang được phát triển</p>
@@ -262,6 +274,10 @@ function CustomerProfile() {
         );
     }
   };
+  // Add an effect to log when tab changes occur
+  useEffect(() => {
+    console.log("Active tab changed to:", activeTab);
+  }, [activeTab]);
 
   return (
     <div className="container mx-auto max-w-7xl px-4 py-8">
@@ -303,25 +319,28 @@ function CustomerProfile() {
         <div className="lg:w-1/3 space-y-6">
           {/* Combined User Profile Card and Navigation */}
           <div className="bg-white rounded-lg shadow-sm overflow-hidden">
+            {" "}
             {/* User Info Section */}
             <div className="p-6 border-b border-gray-100">
-              <h2 className="text-xl font-semibold text-gray-800 mb-5 flex items-center">
-                <svg
-                  xmlns="http://www.w3.org/2000/svg"
-                  className="h-6 w-6 mr-2 text-indigo-600"
-                  fill="none"
-                  viewBox="0 0 24 24"
-                  stroke="currentColor"
-                >
-                  <path
-                    strokeLinecap="round"
-                    strokeLinejoin="round"
-                    strokeWidth={2}
-                    d="M16 7a4 4 0 11-8 0 4 4 0 018 0zM12 14a7 7 0 00-7 7h14a7 7 0 00-7-7z"
-                  />
-                </svg>
-                Thông tin cá nhân
-              </h2>
+              <div className="flex justify-between items-center mb-5">
+                <h2 className="text-xl font-semibold text-gray-800 flex items-center">
+                  <svg
+                    xmlns="http://www.w3.org/2000/svg"
+                    className="h-6 w-6 mr-2 text-indigo-600"
+                    fill="none"
+                    viewBox="0 0 24 24"
+                    stroke="currentColor"
+                  >
+                    <path
+                      strokeLinecap="round"
+                      strokeLinejoin="round"
+                      strokeWidth={2}
+                      d="M16 7a4 4 0 11-8 0 4 4 0 018 0zM12 14a7 7 0 00-7 7h14a7 7 0 00-7-7z"
+                    />
+                  </svg>
+                  Thông tin cá nhân
+                </h2>
+              </div>
 
               <div className="flex flex-col sm:flex-row sm:items-center gap-4">
                 <div className="flex-shrink-0 relative">
@@ -381,7 +400,6 @@ function CustomerProfile() {
                 )}
               </div>
             </div>
-
             {/* Navigation */}
             <nav className="sticky top-4 z-10">
               <ul className="divide-y divide-gray-100">

@@ -49,6 +49,12 @@ const Dashboard = lazy(() =>
 const Unauthorized = lazy(() =>
   import(/* webpackChunkName: "unauthorized" */ "./pages/Unauthorized")
 );
+const ForgotPasswordPage = lazy(() =>
+  import(/* webpackChunkName: "forgot-password" */ "./pages/ForgotPasswordPage")
+);
+const ResetPasswordPage = lazy(() =>
+  import(/* webpackChunkName: "reset-password" */ "./pages/ResetPasswordPage")
+);
 
 function App() {
   return (
@@ -65,10 +71,13 @@ function App() {
         pauseOnHover
       />
       <Suspense fallback={<LoadingSpinner />}>
+        {" "}
         <Routes>
           <Route path="/login" element={<Login />} />
           <Route path="/signup" element={<Signup />} />
           <Route path="/unauthorized" element={<Unauthorized />} />
+          <Route path="/forgot-password" element={<ForgotPasswordPage />} />
+          <Route path="/reset-password" element={<ResetPasswordPage />} />
 
           {/* Dashboard routes for staff and higher */}
           <Route
@@ -90,7 +99,6 @@ function App() {
             <Route path="blog" element={<Blog />} />
             <Route path="blog/:id" element={<BlogDetail />} />
             <Route path="consultants/:id" element={<ConsultantDetail />} />
-
             {/* Các trang STI Testing và Tracking */}
             <Route
               path="services/sti-testing"
@@ -126,10 +134,17 @@ function App() {
                 </ProtectedRoute>
               }
             />
-
-            {/* Trang hồ sơ khách hàng */}
+            {/* Trang hồ sơ khách hàng */}{" "}
             <Route
               path="profile"
+              element={
+                <ProtectedRoute roleRequired="customer">
+                  <CustomerProfile />
+                </ProtectedRoute>
+              }
+            />
+            <Route
+              path="profile/:tab"
               element={
                 <ProtectedRoute roleRequired="customer">
                   <CustomerProfile />

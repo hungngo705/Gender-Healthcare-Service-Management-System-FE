@@ -148,7 +148,7 @@ function Header() {
                             onClick={() => setIsProfileMenuOpen(false)}
                           >
                             Hồ Sơ
-                          </NavLink>
+                          </NavLink>{" "}
                           <NavLink
                             to="/profile?tab=appointments"
                             className="block px-4 py-2 text-sm text-gray-700 hover:bg-gray-100"
@@ -323,7 +323,7 @@ function Header() {
                         >
                           Hồ Sơ
                         </NavLink>
-                      </li>
+                      </li>{" "}
                       <li>
                         <NavLink
                           to="/profile?tab=appointments"

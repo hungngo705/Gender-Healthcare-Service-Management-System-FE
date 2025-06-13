@@ -60,13 +60,17 @@ function ProfileSidebar({ activeTab, setActiveTab }) {
           <ul className="space-y-1">
             {tabs.map((tab) => (
               <li key={tab.id}>
+                {" "}
                 <button
                   className={`w-full flex items-center px-4 py-2 text-sm rounded-md ${
                     activeTab === tab.id
                       ? "bg-indigo-50 text-indigo-700 font-medium"
                       : "text-gray-700 hover:bg-gray-50"
                   }`}
-                  onClick={() => setActiveTab(tab.id)}
+                  onClick={() => {
+                    setActiveTab(tab.id);
+                    // No need to update URL here as the parent component handles it
+                  }}
                 >
                   {tab.icon}
                   {tab.label}
