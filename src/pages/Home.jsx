@@ -5,13 +5,8 @@ import { ChevronLeft, ChevronRight } from "lucide-react";
 import { motion, AnimatePresence } from "framer-motion";
 
 // Import data từ các file riêng biệt
-import {
-  services,
-  appoinments,
-  testimonials,
-  blogData,
-  bannerSlides,
-} from "../data";
+import { services, testimonials, blogData, bannerSlides } from "../data";
+import { consultants } from "../data/consultants";
 
 function Home() {
   const [currentSlide, setCurrentSlide] = useState(0);
@@ -194,7 +189,7 @@ function Home() {
                 Dịch Vụ Chuyên Biệt Của Chúng Tôi
               </h2>
               <p className="text-xl text-gray-600 max-w-3xl mx-auto">
-                Chăm sóc sức khỏe toàn diện được điều chỉnh phù hợp với nhu cầu 
+                Chăm sóc sức khỏe toàn diện được điều chỉnh phù hợp với nhu cầu
                 sức khỏe sinh sản và tình dục của bạn
               </p>
             </motion.div>
@@ -287,45 +282,48 @@ function Home() {
               Gặp Gỡ Đội Ngũ Tư Vấn
             </h2>
             <p className="text-xl text-gray-600 max-w-3xl mx-auto">
-              Các chuyên gia y tế giàu kinh nghiệm cam kết cung cấp dịch vụ 
-              chăm sóc chất lượng
+              Các chuyên gia y tế giàu kinh nghiệm cam kết cung cấp dịch vụ chăm
+              sóc chất lượng
             </p>
-          </div>
-
+          </div>{" "}
           <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-8">
-            {appoinments.map((consultant) => (
+            {consultants.slice(0, 4).map((appointment) => (
               <motion.div
-                key={consultant.id}
+                key={appointment.consultantId}
                 className="bg-white rounded-xl shadow-md overflow-hidden"
                 whileHover={{ y: -8 }}
                 transition={{ duration: 0.3 }}
               >
                 <img
-                  src={consultant.image}
-                  alt={consultant.name}
+                  src={
+                    appointment.consultant.avatarUrl ||
+                    "https://via.placeholder.com/300x200?text=Consultant"
+                  }
+                  alt={appointment.consultant.name}
                   className="w-full h-56 object-cover"
                 />
                 <div className="p-6">
                   <h3 className="text-xl font-semibold text-gray-900 mb-1">
-                    {consultant.name}
+                    {appointment.consultant.name}
                   </h3>
                   <p className="text-indigo-600 font-medium mb-2">
-                    {consultant.specialty}
+                    {appointment.consultant.role === "Consultant"
+                      ? "Chuyên viên tư vấn"
+                      : appointment.consultant.role}
                   </p>
                   <div className="flex items-center mb-3">
                     <div className="text-yellow-400 mr-1">
-                      {"★".repeat(Math.floor(consultant.rating))}
-                      {"☆".repeat(5 - Math.floor(consultant.rating))}
+                      {"★".repeat(4)}
+                      {"☆".repeat(1)}
                     </div>
-                    <span className="text-gray-500 text-sm">
-                      ({consultant.reviewCount} đánh giá)
-                    </span>
+                    <span className="text-gray-500 text-sm">(16 đánh giá)</span>
                   </div>
                   <p className="text-gray-600 text-sm mb-4 line-clamp-4 h-20 overflow-hidden">
-                    {consultant.bio}
+                    Chuyên gia tư vấn với nhiều năm kinh nghiệm trong lĩnh vực
+                    chăm sóc sức khỏe sinh sản và giới tính.
                   </p>
                   <Link
-                    to={`/consultants/${consultant.id}`}
+                    to={`/consultants/${appointment.consultantId}`}
                     className="inline-block w-full text-center py-2 border border-indigo-600 text-indigo-600 rounded-md hover:bg-indigo-600 hover:text-white transition duration-300"
                   >
                     Xem Hồ Sơ
@@ -334,7 +332,6 @@ function Home() {
               </motion.div>
             ))}
           </div>
-
           <div className="text-center mt-12">
             <Link
               to="/consultants"
@@ -354,7 +351,8 @@ function Home() {
               Tính Năng Nổi Bật
             </h2>
             <p className="text-xl text-gray-600 max-w-3xl mx-auto">
-              Các công cụ sáng tạo hỗ trợ hành trình sức khỏe sinh sản và tình dục của bạn
+              Các công cụ sáng tạo hỗ trợ hành trình sức khỏe sinh sản và tình
+              dục của bạn
             </p>
           </div>
 
@@ -387,7 +385,8 @@ function Home() {
               <p className="text-gray-600 mb-6">
                 Theo dõi chu kỳ kinh nguyệt, nhận dự đoán về thời kỳ rụng trứng,
                 cửa sổ sinh sản và thiết lập nhắc nhở về biện pháp tránh thai.
-                Thuật toán thông minh của chúng tôi thích ứng với chu kỳ độc đáo của bạn.
+                Thuật toán thông minh của chúng tôi thích ứng với chu kỳ độc đáo
+                của bạn.
               </p>
               <Link
                 to="/services/tracking"
@@ -437,9 +436,9 @@ function Home() {
                 Tư Vấn Trực Tuyến
               </h3>
               <p className="text-gray-600 mb-6">
-                Lên lịch tư vấn video riêng tư với các chuyên gia y tế của chúng tôi
-                để được tư vấn cá nhân hóa về sức khỏe sinh sản, giáo dục giới tính,
-                và bất kỳ mối quan tâm nào bạn có thể có.
+                Lên lịch tư vấn video riêng tư với các chuyên gia y tế của chúng
+                tôi để được tư vấn cá nhân hóa về sức khỏe sinh sản, giáo dục
+                giới tính, và bất kỳ mối quan tâm nào bạn có thể có.
               </p>
               <Link
                 to="/services/booking"
@@ -489,9 +488,9 @@ function Home() {
                 Dịch Vụ Xét Nghiệm STI
               </h3>
               <p className="text-gray-600 mb-6">
-                Đặt các xét nghiệm STI bảo mật, đặt lịch hẹn tại các phòng khám gần đó,
-                và nhận kết quả của bạn một cách an toàn thông qua nền tảng của chúng tôi,
-                với các tùy chọn chăm sóc tiếp theo nếu cần.
+                Đặt các xét nghiệm STI bảo mật, đặt lịch hẹn tại các phòng khám
+                gần đó, và nhận kết quả của bạn một cách an toàn thông qua nền
+                tảng của chúng tôi, với các tùy chọn chăm sóc tiếp theo nếu cần.
               </p>
               <Link
                 to="/services/sti-testing"
@@ -522,9 +521,12 @@ function Home() {
       <section className="py-16 bg-gradient-to-br from-indigo-900 to-blue-700 text-white">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
           <div className="text-center mb-12">
-            <h2 className="text-3xl font-bold mb-4">Khách Hàng Nói Gì Về Chúng Tôi</h2>
+            <h2 className="text-3xl font-bold mb-4">
+              Khách Hàng Nói Gì Về Chúng Tôi
+            </h2>
             <p className="text-xl opacity-90 max-w-3xl mx-auto">
-              Đọc về trải nghiệm của những người đã sử dụng dịch vụ của chúng tôi
+              Đọc về trải nghiệm của những người đã sử dụng dịch vụ của chúng
+              tôi
             </p>
           </div>
 
@@ -566,66 +568,65 @@ function Home() {
               Bài Viết Mới Nhất
             </h2>
             <p className="text-xl text-gray-600 max-w-3xl mx-auto">
-              Các bài viết giáo dục về sức khỏe sinh sản và tình dục
-              với các chủ đề quan trọng đối với bạn
+              Các bài viết giáo dục về sức khỏe sinh sản và tình dục với các chủ
+              đề quan trọng đối với bạn
             </p>
           </div>
 
           <div className="grid grid-cols-1 md:grid-cols-3 gap-8">
-            {blogData.sort((a, b) => new Date(b.date) - new Date(a.date)) //sort for newsest
-            .slice(0,3)
-            .map((post) => (
-              <motion.div
-                key={post.id}
-                className="bg-white rounded-xl shadow-md overflow-hidden"
-                whileHover={{ y: -8 }}
-              >
-                <div className="h-48 overflow-hidden">
-                  <img
-                    src={post.img}
-                    alt={post.title}
-                    className="w-full h-full object-cover transform hover:scale-105 transition duration-500"
-                  />
-                </div>
-                <div className="p-6">
-                  <div className="flex justify-between items-center mb-3 text-sm text-gray-500">
-                    <span>{post.date}</span>
-                    <span>Bởi {post.author}</span>
+            {blogData
+              .sort((a, b) => new Date(b.date) - new Date(a.date)) //sort for newsest
+              .slice(0, 3)
+              .map((post) => (
+                <motion.div
+                  key={post.id}
+                  className="bg-white rounded-xl shadow-md overflow-hidden"
+                  whileHover={{ y: -8 }}
+                >
+                  <div className="h-48 overflow-hidden">
+                    <img
+                      src={post.img}
+                      alt={post.title}
+                      className="w-full h-full object-cover transform hover:scale-105 transition duration-500"
+                    />
                   </div>
-                  <h3 className="text-xl font-bold text-gray-900 mb-3">
-                    {post.title}
-                  </h3>
-                  <p className="text-gray-600 mb-4">{post.excerpt}</p>
-                  <div className="mb-4 flex flex-wrap gap-2">
-                    <span
-                      className="inline-block bg-indigo-100 text-indigo-800 text-xs px-2 py-1 rounded-md"
+                  <div className="p-6">
+                    <div className="flex justify-between items-center mb-3 text-sm text-gray-500">
+                      <span>{post.date}</span>
+                      <span>Bởi {post.author}</span>
+                    </div>
+                    <h3 className="text-xl font-bold text-gray-900 mb-3">
+                      {post.title}
+                    </h3>
+                    <p className="text-gray-600 mb-4">{post.excerpt}</p>
+                    <div className="mb-4 flex flex-wrap gap-2">
+                      <span className="inline-block bg-indigo-100 text-indigo-800 text-xs px-2 py-1 rounded-md">
+                        {post.categoryName}
+                      </span>
+                    </div>
+                    <Link
+                      to={`/blog/${post.id}`}
+                      className="inline-flex items-center text-indigo-600 font-medium hover:text-indigo-800"
                     >
-                      {post.categoryName}
-                    </span>
+                      Đọc Thêm
+                      <svg
+                        xmlns="http://www.w3.org/2000/svg"
+                        className="h-4 w-4 ml-1"
+                        fill="none"
+                        viewBox="0 0 24 24"
+                        stroke="currentColor"
+                      >
+                        <path
+                          strokeLinecap="round"
+                          strokeLinejoin="round"
+                          strokeWidth={2}
+                          d="M14 5l7 7m0 0l-7 7m7-7H3"
+                        />
+                      </svg>
+                    </Link>
                   </div>
-                  <Link
-                    to={`/blog/${post.id}`}
-                    className="inline-flex items-center text-indigo-600 font-medium hover:text-indigo-800"
-                  >
-                    Đọc Thêm
-                    <svg
-                      xmlns="http://www.w3.org/2000/svg"
-                      className="h-4 w-4 ml-1"
-                      fill="none"
-                      viewBox="0 0 24 24"
-                      stroke="currentColor"
-                    >
-                      <path
-                        strokeLinecap="round"
-                        strokeLinejoin="round"
-                        strokeWidth={2}
-                        d="M14 5l7 7m0 0l-7 7m7-7H3"
-                      />
-                    </svg>
-                  </Link>
-                </div>
-              </motion.div>
-            ))}
+                </motion.div>
+              ))}
           </div>
 
           <div className="text-center mt-12">
@@ -646,8 +647,9 @@ function Home() {
             Kiểm Soát Sức Khỏe Sinh Sản Của Bạn Ngay Hôm Nay
           </h2>
           <p className="text-xl text-gray-600 mb-10 max-w-3xl mx-auto">
-            Bắt đầu theo dõi chu kỳ của bạn, đặt lịch tư vấn với các chuyên gia y tế,
-            hoặc lên lịch xét nghiệm STI để chăm sóc sức khỏe sinh sản toàn diện.
+            Bắt đầu theo dõi chu kỳ của bạn, đặt lịch tư vấn với các chuyên gia
+            y tế, hoặc lên lịch xét nghiệm STI để chăm sóc sức khỏe sinh sản
+            toàn diện.
           </p>
           <div className="flex flex-col sm:flex-row justify-center space-y-4 sm:space-y-0 sm:space-x-4">
             <Link
@@ -673,7 +675,7 @@ function Home() {
               className="inline-flex items-center bg-white border-2 border-indigo-600 text-indigo-600 font-medium px-6 py-3 rounded-lg hover:bg-indigo-50 transition duration-300"
             >
               Công Cụ Theo Dõi
-                <svg
+              <svg
                 xmlns="http://www.w3.org/2000/svg"
                 className="h-5 w-5 ml-2"
                 viewBox="0 0 20 20"

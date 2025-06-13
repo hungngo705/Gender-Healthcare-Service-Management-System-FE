@@ -1,6 +1,6 @@
 import React, { useState, useEffect } from "react";
 import PropTypes from "prop-types";
-import { appoinments } from "../../../data/consultants";
+import { appoinments } from "../../../data/appoinments";
 import authService from "../../../services/authService";
 
 function ConsultantAppointmentsTab({ role }) {
@@ -181,7 +181,9 @@ function ConsultantAppointmentsTab({ role }) {
           <p className="text-gray-500">
             {filter === "all"
               ? "Bạn chưa có lịch hẹn nào."
-              : `Không có lịch hẹn nào ở trạng thái "${getStatusText(filter)}".`}
+              : `Không có lịch hẹn nào ở trạng thái "${getStatusText(
+                  filter
+                )}".`}
           </p>
         </div>
       )}
