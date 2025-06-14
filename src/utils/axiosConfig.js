@@ -2,7 +2,7 @@ import axios from "axios";
 import config from "./config";
 import toastService from "./toastService";
 
-// Create axios instance with default config
+// Tạo instance axios với cấu hình mặc định
 const apiClient = axios.create({
   baseURL: config.api.baseURL,
   headers: {
@@ -11,11 +11,11 @@ const apiClient = axios.create({
   timeout: config.api.timeout,
 });
 
-// Request interceptor
+// Bộ chặn yêu cầu
 apiClient.interceptors.request.use(
   (reqConfig) => {
-    // You can modify the request config here
-    // For example, adding authentication token
+    // Bạn có thể sửa đổi cấu hình yêu cầu tại đây
+    // Ví dụ, thêm token xác thực
 
     const token = localStorage.getItem(config.auth.storageKey);
     if (token) {
@@ -25,44 +25,46 @@ apiClient.interceptors.request.use(
     return reqConfig;
   },
   (error) => {
-    toastService.error("Request failed to send. Please check your connection.");
+    toastService.error("Yêu cầu không thể gửi đi. Vui lòng kiểm tra kết nối của bạn.");
     return Promise.reject(error);
   }
 );
 
-// Response interceptor
+// Bộ chặn phản hồi
 apiClient.interceptors.response.use(
   (response) => {
-    // Any status code that lies within the range of 2xx
-    // You can show success messages here if your API returns specific success messages
-    if (response.data?.message) {
-      toastService.success(response.data.message);
-    }
+    // Bất kỳ mã trạng thái nào nằm trong phạm vi 2xx
+    // Bạn có thể hiển thị thông báo thành công tại đây nếu API trả về thông báo thành công cụ thể
+
+    // if (response.data?.message) {
+    //   toastService.success(response.data.message);
+    // }
+    
     return response;
   },
   async (error) => {
-    // Any status codes that falls outside the range of 2xx
-    let errorMessage = "An unexpected error occurred";
+    // Bất kỳ mã trạng thái nào nằm ngoài phạm vi 2xx
+    let errorMessage = "Đã xảy ra lỗi không mong muốn";
 
-    // Handle common errors
+    // Xử lý các lỗi phổ biến
     if (error.response) {
-      // The request was made and the server responded with a status code
-      // that falls out of the range of 2xx
+      // Yêu cầu đã được thực hiện và máy chủ đã phản hồi với mã trạng thái
+      // nằm ngoài phạm vi 2xx
 
-      // Get the error message from the response if available
+      // Lấy thông báo lỗi từ phản hồi nếu có
       errorMessage = error.response.data?.message || errorMessage;
 
-      // Handle 401 Unauthorized
+      // Xử lý lỗi 401 Không được phép
       if (error.response.status === 401) {
-        console.log("401 Unauthorized - Token may be invalid or expired");
+        console.log("401 Không được phép - Token có thể không hợp lệ hoặc đã hết hạn");
 
-        // Try to refresh token if we have one
+        // Thử làm mới token nếu chúng ta có
         const refreshToken = localStorage.getItem(
           config.auth.refreshStorageKey
         );
         if (refreshToken) {
           try {
-            // Implement refreshing token logic here
+            // Triển khai logic làm mới token tại đây
             const refreshResponse = await axios.post(
               `${config.api.baseURL}${config.api.auth.refreshToken}`,
               {
@@ -71,7 +73,7 @@ apiClient.interceptors.response.use(
             );
 
             if (refreshResponse.data && refreshResponse.data.token) {
-              // Update tokens
+              // Cập nhật token
               localStorage.setItem(
                 config.auth.storageKey,
                 refreshResponse.data.token
@@ -81,122 +83,122 @@ apiClient.interceptors.response.use(
                 refreshResponse.data.refreshToken
               );
 
-              // Retry the original request
+              // Thử lại yêu cầu ban đầu
               const originalRequest = error.config;
               originalRequest.headers.Authorization = `Bearer ${refreshResponse.data.token}`;
               return apiClient(originalRequest);
             }
           } catch (refreshError) {
-            console.log("Token refresh failed, cleaning auth state");
-            // If refresh token fails, clean up and redirect to login
+            console.log("Làm mới token thất bại, xóa trạng thái xác thực");
+            // Nếu làm mới token thất bại, dọn dẹp và chuyển hướng đến đăng nhập
             localStorage.removeItem(config.auth.storageKey);
             localStorage.removeItem(config.auth.refreshStorageKey);
             localStorage.removeItem("user");
             localStorage.removeItem("token_expiration");
 
-            toastService.error("Your session has expired. Please login again.");
+            toastService.error("Phiên của bạn đã hết hạn. Vui lòng đăng nhập lại.");
 
-            // Only redirect if not already on login page
+            // Chỉ chuyển hướng nếu chưa ở trang đăng nhập
             if (!window.location.pathname.includes("/login")) {
               window.location.href = "/login";
             }
             return Promise.reject(refreshError);
           }
         } else {
-          // No refresh token available - clean up auth state
-          console.log("No refresh token, cleaning auth state");
+          // Không có refresh token - dọn dẹp trạng thái xác thực
+          console.log("Không có refresh token, xóa trạng thái xác thực");
           localStorage.removeItem(config.auth.storageKey);
           localStorage.removeItem("user");
           localStorage.removeItem("token_expiration");
 
-          toastService.error("Please login to continue");
+          toastService.error("Vui lòng đăng nhập để tiếp tục");
 
-          // Only redirect if not already on login page
+          // Chỉ chuyển hướng nếu chưa ở trang đăng nhập
           if (!window.location.pathname.includes("/login")) {
             window.location.href = "/login";
           }
         }
       }
 
-      // Handle 403 Forbidden
+      // Xử lý lỗi 403 Cấm truy cập
       if (error.response.status === 403) {
-        toastService.error("You don't have permission to access this resource");
-      } // Handle 404 Not Found
+        toastService.error("Bạn không có quyền truy cập tài nguyên này");
+      } // Xử lý lỗi 404 Không tìm thấy
       if (error.response.status === 404) {
-        toastService.error("The requested resource was not found");
-        // You can also navigate to a 404 page for critical resources
+        toastService.error("Không tìm thấy tài nguyên yêu cầu");
+        // Bạn cũng có thể điều hướng đến trang 404 cho các tài nguyên quan trọng
         // if (error.config.url.includes('critical-endpoint')) {
         //   window.location.href = '/not-found';
         // }
       }
 
-      // Handle 422 Validation error
+      // Xử lý lỗi 422 Lỗi xác thực
       if (error.response.status === 422) {
-        // Handle validation errors
+        // Xử lý lỗi xác thực
         if (error.response.data?.errors) {
           const validationErrors = error.response.data.errors;
-          // Extract first validation error message to display
+          // Trích xuất thông báo lỗi xác thực đầu tiên để hiển thị
           const firstErrorKey = Object.keys(validationErrors)[0];
           if (firstErrorKey) {
             errorMessage =
-              validationErrors[firstErrorKey][0] || "Validation failed";
+              validationErrors[firstErrorKey][0] || "Xác thực thất bại";
           }
         }
         toastService.warning(errorMessage);
         return Promise.reject(error);
       }
 
-      // Handle 500 Internal Server Error
+      // Xử lý lỗi 500 Lỗi máy chủ nội bộ
       if (error.response.status >= 500) {
-        // Print out the response message if  available
+        // In ra thông báo phản hồi nếu có
         console.log("Alo:" + error.response.data);
         if (error.response.data) {
           toastService.error(error.response.data);
         } else {
           toastService.error(
-            "A server error occurred. Please try again later."
+            "Đã xảy ra lỗi máy chủ. Vui lòng thử lại sau."
           );
         }
       }
     } else if (error.request) {
-      // The request was made but no response was received
-      console.log("Network error - no response received from server");
+      // Yêu cầu đã được gửi nhưng không nhận được phản hồi
+      console.log("Lỗi mạng - không nhận được phản hồi từ máy chủ");
 
       if (error.code === "ECONNABORTED") {
-        errorMessage = "Request timed out. Please try again later.";
+        errorMessage = "Yêu cầu đã hết thời gian. Vui lòng thử lại sau.";
       } else if (error.message && error.message.includes("Network Error")) {
         errorMessage =
-          "Network error. Please check your internet connection and server status.";
+          "Lỗi mạng. Vui lòng kiểm tra kết nối internet và trạng thái máy chủ của bạn.";
 
-        // Don't show error toast for network errors during token verification
-        // as this might be due to server being down temporarily
+        // Không hiển thị thông báo lỗi cho lỗi mạng trong quá trình xác minh token
+        // vì điều này có thể do máy chủ tạm thời ngừng hoạt động
         if (!error.config?.url?.includes("/profile")) {
           toastService.error(errorMessage);
         }
 
-        // If this is a network error and we have stored auth data,
-        // don't immediately clear it as server might be temporarily down
+        // Nếu đây là lỗi mạng và chúng ta có dữ liệu xác thực đã lưu,
+        // đừng xóa nó ngay lập tức vì máy chủ có thể tạm thời ngừng hoạt động
         console.log(
-          "Server appears to be down, maintaining auth state temporarily"
+          "Máy chủ dường như đã ngừng hoạt động, tạm thời duy trì trạng thái xác thực"
         );
 
         return Promise.reject(error);
       } else {
         errorMessage =
-          "No response received from server. Please check your connection.";
+          "Không nhận được phản hồi từ máy chủ. Vui lòng kiểm tra kết nối của bạn.";
       }
 
-      // Only show toast if it's not a token verification request
+      // Chỉ hiển thị thông báo nếu không phải là yêu cầu xác minh token
       if (!error.config?.url?.includes("/profile")) {
         toastService.error(errorMessage);
       }
     } else {
-      // Something happened in setting up the request that triggered an Error
-      errorMessage = `Error: ${error.message}`;
+      // Đã xảy ra sự cố trong quá trình thiết lập yêu cầu gây ra Lỗi
+      errorMessage = `Lỗi: ${error.message}`;
       toastService.error(errorMessage);
     }
 
-    // Show error notification for any unhandled errors
+    // Hiển thị thông báo lỗi cho bất kỳ lỗi nào chưa được xử lý
     if (
       !error.response ||
       ![401, 403, 404, 422, 500].includes(error.response.status)
@@ -208,67 +210,67 @@ apiClient.interceptors.response.use(
   }
 );
 
-// API helper methods for common operations
+// Các phương thức API hỗ trợ cho các thao tác thông dụng
 const apiService = {
   /**
-   * Make GET request
-   * @param {string} url - The URL to make the request to
-   * @param {Object} params - Query parameters
-   * @param {Object} config - Additional axios config
-   * @returns {Promise} - The response promise
+   * Thực hiện yêu cầu GET
+   * @param {string} url - URL để gửi yêu cầu đến
+   * @param {Object} params - Các tham số truy vấn
+   * @param {Object} config - Cấu hình axios bổ sung
+   * @returns {Promise} - Promise phản hồi
    */
   get: (url, params = {}, config = {}) => {
     return apiClient.get(url, { params, ...config });
   },
 
   /**
-   * Make POST request
-   * @param {string} url - The URL to make the request to
-   * @param {Object} data - The data to send
-   * @param {Object} config - Additional axios config
-   * @returns {Promise} - The response promise
+   * Thực hiện yêu cầu POST
+   * @param {string} url - URL để gửi yêu cầu đến
+   * @param {Object} data - Dữ liệu để gửi
+   * @param {Object} config - Cấu hình axios bổ sung
+   * @returns {Promise} - Promise phản hồi
    */
   post: (url, data = {}, config = {}) => {
     return apiClient.post(url, data, config);
   },
 
   /**
-   * Make PUT request
-   * @param {string} url - The URL to make the request to
-   * @param {Object} data - The data to send
-   * @param {Object} config - Additional axios config
-   * @returns {Promise} - The response promise
+   * Thực hiện yêu cầu PUT
+   * @param {string} url - URL để gửi yêu cầu đến
+   * @param {Object} data - Dữ liệu để gửi
+   * @param {Object} config - Cấu hình axios bổ sung
+   * @returns {Promise} - Promise phản hồi
    */
   put: (url, data = {}, config = {}) => {
     return apiClient.put(url, data, config);
   },
 
   /**
-   * Make PATCH request
-   * @param {string} url - The URL to make the request to
-   * @param {Object} data - The data to send
-   * @param {Object} config - Additional axios config
-   * @returns {Promise} - The response promise
+   * Thực hiện yêu cầu PATCH
+   * @param {string} url - URL để gửi yêu cầu đến
+   * @param {Object} data - Dữ liệu để gửi
+   * @param {Object} config - Cấu hình axios bổ sung
+   * @returns {Promise} - Promise phản hồi
    */
   patch: (url, data = {}, config = {}) => {
     return apiClient.patch(url, data, config);
   },
 
   /**
-   * Make DELETE request
-   * @param {string} url - The URL to make the request to
-   * @param {Object} config - Additional axios config
-   * @returns {Promise} - The response promise
+   * Thực hiện yêu cầu DELETE
+   * @param {string} url - URL để gửi yêu cầu đến
+   * @param {Object} config - Cấu hình axios bổ sung
+   * @returns {Promise} - Promise phản hồi
    */
   delete: (url, config = {}) => {
     return apiClient.delete(url, config);
   },
   /**
-   * Upload a file with progress tracking
-   * @param {string} url - The URL to make the request to
-   * @param {FormData} formData - The form data containing files to upload
-   * @param {Function} onProgress - Progress callback function
-   * @returns {Promise} - The response promise
+   * Tải lên tệp với theo dõi tiến trình
+   * @param {string} url - URL để gửi yêu cầu đến
+   * @param {FormData} formData - Form data chứa tệp để tải lên
+   * @param {Function} onProgress - Hàm gọi lại tiến trình
+   * @returns {Promise} - Promise phản hồi
    */
   upload: (url, formData, onProgress = null) => {
     return apiClient.post(url, formData, {
@@ -286,12 +288,13 @@ const apiService = {
     });
   },
   /**
-   * Download a file with progress tracking
-   * @param {string} url - The URL to make the request to
-   * @param {Function} onProgress - Progress callback function
-   * @param {Object} params - Query parameters
-   * @returns {Promise} - The response promise
-   */ download: (url, onProgress = null, params = {}) => {
+   * Tải xuống tệp với theo dõi tiến trình
+   * @param {string} url - URL để gửi yêu cầu đến
+   * @param {Function} onProgress - Hàm gọi lại tiến trình
+   * @param {Object} params - Các tham số truy vấn
+   * @returns {Promise} - Promise phản hồi
+   */ 
+  download: (url, onProgress = null, params = {}) => {
     return apiClient.get(url, {
       params,
       responseType: "blob",

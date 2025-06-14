@@ -1,10 +1,9 @@
 import React, { useState, useEffect } from "react";
 import { format, parse, isValid, isSameDay, startOfToday, addDays, eachDayOfInterval } from "date-fns";
 import { vi } from "date-fns/locale";
-// Remove the import from consultants.js 
-// import { appoinments as appointments } from "../../data/consultants";
-// Import appointment service instead
+// Import appointment and user services
 import appointmentService from "../../services/appointmentService";
+import userService from "../../services/userService";
 // Import toast service
 import toastService from "../../utils/toastService";
 
@@ -19,53 +18,78 @@ import ConsultantDetail from "../../components/booking/ConsultantDetail";
 const Booking = () => {
   // Add state for appointments data and loading status
   const [appointments, setAppointments] = useState([]);
+  const [allConsultants, setAllConsultants] = useState([]);
   const [isLoading, setIsLoading] = useState(true);
   const [loadError, setLoadError] = useState(null);
+  const [refreshKey, setRefreshKey] = useState(0); // Add a refreshKey state
 
-  // Fetch appointments data from API
+  // Fetch appointments and consultants data from API
   useEffect(() => {
-    const fetchAppointments = async () => {
+    const fetchData = async () => {
       try {
         setIsLoading(true);
-        const response = await appointmentService.getAll();
-        setAppointments(response.data || []);
+        
+        // Fetch all consultants by role
+        const consultantsResponse = await userService.getAllByRole("consultant");
+        setAllConsultants(consultantsResponse || []);
+        
+
+        // Fetch all appointments
+        const appointmentsResponse = await appointmentService.getAll();
+        // Check the structure and extract the actual array
+        setAppointments(Array.isArray(appointmentsResponse.data) 
+          ? appointmentsResponse.data 
+          : appointmentsResponse.data?.data || []);
+        
         setLoadError(null);
       } catch (error) {
-        console.error("Failed to fetch appointments:", error);
-        setLoadError("Không thể tải dữ liệu lịch hẹn. Vui lòng thử lại sau.");
+        console.error("Failed to fetch data:", error);
+        setLoadError("Không thể tải dữ liệu. Vui lòng thử lại sau.");
       } finally {
         setIsLoading(false);
       }
     };
 
-    fetchAppointments();
-  }, []);
+    fetchData();
+  }, [refreshKey]); // Modify your useEffect to depend on the refreshKey
 
   // Transform appointments data to consultant data
   const formatConsultants = () => {
-    if (!appointments.length) return [];
-    
+    // Start with all consultants from the API
     const consultantsMap = {};
     
-    // Extract all unique consultants and initialize their data
+    // First, initialize all consultants with empty booked shifts
+    allConsultants.forEach(consultant => {
+      consultantsMap[consultant.id] = {
+        id: consultant.id,
+        name: consultant.name || "Unknown",
+        specialty: consultant.specialty || "Tư vấn sức khỏe",
+        image: consultant.avatarUrl || "",
+        rating: 5,
+        reviewCount: 0,
+        bio: consultant.bio || "Chuyên gia tư vấn sức khỏe sinh sản và tình dục.",
+        bookedShifts: {}
+      };
+    });
+    
+    // Then add booking information from appointments
     appointments.forEach(appointment => {
-      if (!consultantsMap[appointment.consultantId]) {
-        // Use the consultant data from the API response
-        consultantsMap[appointment.consultantId] = {
-          id: appointment.consultantId,
-          name: appointment.consultant?.name || "Unknown",
-          specialty: appointment.consultant?.specialty || "Tư vấn sức khỏe",
-          image: appointment.consultant?.avatarUrl || "",
-          rating: 5,
-          reviewCount: 0,
-          bio: "Chuyên gia tư vấn sức khỏe sinh sản và tình dục.",
-          bookedShifts: {}
-        };
-      }
-      
-      // Add booked shifts for this consultant
-      if (appointment.status !== 2) { // Ignore cancelled appointments
-        // Date format from API
+      if (appointment.consultantId && appointment.status !== 2) {
+        // Make sure this consultant exists in the map
+        if (!consultantsMap[appointment.consultantId]) {
+          consultantsMap[appointment.consultantId] = {
+            id: appointment.consultantId,
+            name: appointment.consultant?.name || "Unknown",
+            specialty: appointment.consultant?.specialty || "Tư vấn sức khỏe",
+            image: appointment.consultant?.avatarUrl || "",
+            rating: 5,
+            reviewCount: 0,
+            bio: "Chuyên gia tư vấn sức khỏe sinh sản và tình dục.",
+            bookedShifts: {}
+          };
+        }
+        
+        // Add booked shifts for this consultant
         const dateKey = appointment.appointmentDate;
         
         if (!consultantsMap[appointment.consultantId].bookedShifts[dateKey]) {
@@ -219,7 +243,6 @@ const Booking = () => {
         notes: formData.reason
       };
       
-      console.log("Submitting appointment data:", dataToSubmit);
       
       // Call API to create appointment
       await appointmentService.create(dataToSubmit);
@@ -260,13 +283,16 @@ const Booking = () => {
       email: "",
       phone: "",
       reason: "",
+      customerId: null
     });
     setSelectedConsultant(null);
     setSelectedTimeSlot(null);
     setSelectedDate(null);
+    setLocalBookedSlots({}); // Clear locally tracked booked slots
     
-    // Optional: Show toast when reset
-    toastService.info("Bạn có thể đặt lịch hẹn mới");
+    // Increment the refreshKey to trigger a new API call
+    setRefreshKey(prevKey => prevKey + 1);
+
   };
 
   // Update the return section to handle loading status

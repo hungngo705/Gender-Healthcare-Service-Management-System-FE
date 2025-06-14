@@ -2,9 +2,9 @@ import React, { useState, useEffect } from "react";
 import PropTypes from "prop-types";
 // Import appointment service
 import appointmentService from "../../../services/appointmentService";
-import authService from "../../../services/authService";
-import userService from "../../../services/userService"; // Add this import
-import stiTestingService from "../../../services/stiTestingService"; // Add this import
+import userService from "../../../services/userService";
+import stiTestingService from "../../../services/stiTestingService";
+import testResultService from "../../../services/testResultService";
 import { X } from "lucide-react"; // For close button icon
 
 function ConsultantAppointmentsTab({ role }) {
@@ -23,31 +23,25 @@ function ConsultantAppointmentsTab({ role }) {
   const [isLoadingDetail, setIsLoadingDetail] = useState(false);
   const [detailError, setDetailError] = useState(null);
 
-  // Get user ID from JWT token
+  // Get current user profile instead of relying on JWT token
   useEffect(() => {
-    // Get decoded token
-    const decodedToken = authService.getDecodedToken();
-    console.log("Decoded token:", decodedToken);
+    const fetchCurrentUser = async () => {
+      try {
+        const response = await userService.getCurrentUserProfile();
+        console.log("Current user profile:", response);
 
-    // Extract user ID from token claims
-    // JWT tokens can have different claim names for the user ID
-    let extractedUserId = null;
+        // Extract user ID from response
+        const extractedUserId = response.id || response.data?.id;
+        console.log("User ID from profile:", extractedUserId);
 
-    if (decodedToken) {
-      // Check common claim names for user ID
-      extractedUserId =
-        decodedToken.sub ||
-        decodedToken.userId ||
-        decodedToken.id ||
-        decodedToken.nameid ||
-        decodedToken[
-          "http://schemas.xmlsoap.org/ws/2005/05/identity/claims/nameidentifier"
-        ] ||
-        null;
-    }
+        setUserId(extractedUserId);
+      } catch (err) {
+        console.error("Error fetching current user profile:", err);
+        setError("Không thể tải thông tin người dùng. Vui lòng đăng nhập lại.");
+      }
+    };
 
-    console.log("Extracted userId from JWT:", extractedUserId);
-    setUserId(extractedUserId);
+    fetchCurrentUser();
   }, []);
 
   // Map status numbers to strings
@@ -67,31 +61,43 @@ function ConsultantAppointmentsTab({ role }) {
 
     // Fetch appointments for this consultant from API
     const fetchAppointments = async () => {
+      setIsLoading(true);
       try {
-        // Call API with the userId to get consultant's appointments
+        console.log("Fetching appointments for consultant ID:", userId);
         const response = await appointmentService.getByConsultant(userId);
-        console.log("API response:", response);
-
-        // Transform to expected format
-        const formattedAppointments = (response.data || []).map((appointment) => ({
-          id: appointment.id,
-          customerName: appointment.customer?.name || "Unknown",
-          date: appointment.appointmentDate,
-          time: getTimeBySlot(appointment.slot),
-          type: getServiceType(appointment.serviceId),
-          status: statusMap[appointment.status] || "unknown",
-          phone: appointment.customer?.phoneNumber || "No phone",
-          symptoms: appointment.notes || "No symptoms recorded",
-          testResults:
-            appointment.serviceId?.includes("sti") && appointment.status !== 1
-              ? "Đang chờ kết quả"
-              : null,
-        }));
-
-        setConsultantAppointments(formattedAppointments);
+        console.log("Raw API response:", response);
+        
+        // Extract appointments array from the nested structure
+        const appointmentsArray = response?.data?.data || [];
+        
+        // Now transform the appointments with the new structure
+        const transformedAppointments = appointmentsArray.map((appointment) => {
+          return {
+            id: appointment.id,
+            customerId: appointment.customerId,
+            customerName: appointment.customer?.name || 'Khách hàng',
+            customerEmail: appointment.customer?.email,
+            phone: appointment.customer?.phoneNumber,
+            avatarUrl: appointment.customer?.avatarUrl,
+            serviceId: appointment.serviceId,
+            type: getServiceType(appointment.serviceId),
+            serviceType: getServiceType(appointment.serviceId),
+            date: appointment.appointmentDate, // Changed from date to appointmentDate
+            slotNumber: appointment.slot, // Changed from slotNumber to slot
+            time: getTimeBySlot(appointment.slot),
+            status: statusMap[appointment.status] || "unknown", // Map status number to string
+            statusCode: appointment.status, // Keep the original status code
+            reason: appointment.notes || "Không có lý do", // Changed from reason to notes
+            symptoms: appointment.notes || "Không có chi tiết", // Also map notes to symptoms
+            createdAt: appointment.createdAt
+          };
+        });
+        
+        setConsultantAppointments(transformedAppointments);
+        console.log("Transformed appointments:", transformedAppointments);
       } catch (err) {
         console.error("Error fetching appointments:", err);
-        setError("Không thể tải danh sách lịch hẹn. Vui lòng thử lại sau.");
+        setError("Không thể tải danh sách cuộc hẹn. Vui lòng thử lại sau.");
       } finally {
         setIsLoading(false);
       }
@@ -162,13 +168,67 @@ function ConsultantAppointmentsTab({ role }) {
     try {
       // Fetch customer profile
       const userResponse = await userService.getUserById(customerId);
-      const customerData = userResponse.data;
-      setCustomerDetail(customerData);
+      setCustomerDetail(userResponse);
+      console.log("Customer profile data:", userResponse);
 
-      // Fetch STI testing results
-      const testsResponse = await stiTestingService.getByUser(customerId);
-      const testsData = testsResponse.data || [];
-      setCustomerTests(testsData);
+      // Fetch all test results and filter by customerId
+      const testsResponse = await testResultService.getAll();
+      console.log("All test results:", testsResponse);
+
+      // Extract the data array from the response
+      const allTestResults = testsResponse || testsResponse.data?.data || testsResponse.data || [];
+      console.log("Extracted test results:", allTestResults);
+
+      // Process and flatten test results for display
+      const processedTests = [];
+
+
+      allTestResults.forEach(result => {
+        // Check if this result belongs to the selected customer
+        const stiTesting = result.stiTesting;
+        console.log("STI Testing data-----:", stiTesting.customerId, customerId);
+        if (!stiTesting || stiTesting.customerId !== customerId) {
+          return; // Skip if not related to this customer
+        }
+
+        // Map test types
+        const getTestTypeName = (typeCode) => {
+          const types = {
+            0: "Xét nghiệm chung",
+            1: "Xét nghiệm Giang mai (Syphilis)",
+            2: "Xét nghiệm Lậu (Gonorrhea)",
+            3: "Xét nghiệm Chlamydia",
+            4: "Xét nghiệm HIV",
+            5: "Xét nghiệm Viêm gan B (HBV)",
+            6: "Xét nghiệm Viêm gan C (HCV)",
+          };
+          return types[typeCode] || "Không xác định";
+        };
+
+        // Extract result status
+        const getResultStatus = (resultData) => {
+          if (!resultData) return "pending";
+          if (resultData.toLowerCase().includes("negative")) return "negative";
+          if (resultData.toLowerCase().includes("positive")) return "positive";
+          return "pending";
+        };
+
+        // Create a simplified test result object for display
+        processedTests.push({
+          id: result.id,
+          testType: getTestTypeName(stiTesting.testType),
+          testDate: stiTesting.collectedDate,
+          result: getResultStatus(result.resultData),
+          resultData: result.resultData,
+          notes: result.resultData,
+          status: result.status,
+          examinedAt: result.examinedAt,
+          examiner: result.staff?.name || "Không có thông tin"
+        });
+      });
+
+      setCustomerTests(processedTests);
+      console.log("Processed test results:", processedTests);
     } catch (err) {
       console.error("Error fetching customer details:", err);
       setDetailError("Không thể tải thông tin chi tiết khách hàng. Vui lòng thử lại.");
@@ -401,7 +461,7 @@ function ConsultantAppointmentsTab({ role }) {
                         </button>
                       </>
                     )}
-                    {appointment.type.includes("Xét nghiệm") && (
+                    {appointment.type && appointment.type.includes("Xét nghiệm") && (
                       <button className="text-purple-600 hover:text-purple-900">
                         {appointment.testResults
                           ? "Xem kết quả"
@@ -513,7 +573,10 @@ function ConsultantAppointmentsTab({ role }) {
                                 Kết quả
                               </th>
                               <th scope="col" className="px-4 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
-                                Ghi chú
+                                Ngày xác nhận
+                              </th>
+                              <th scope="col" className="px-4 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                                Người xác nhận
                               </th>
                             </tr>
                           </thead>
@@ -521,7 +584,7 @@ function ConsultantAppointmentsTab({ role }) {
                             {customerTests.map(test => (
                               <tr key={test.id}>
                                 <td className="px-4 py-3 whitespace-nowrap">
-                                  {new Date(test.testDate).toLocaleDateString('vi-VN')}
+                                  {test.testDate ? new Date(test.testDate).toLocaleDateString('vi-VN') : 'Không có thông tin'}
                                 </td>
                                 <td className="px-4 py-3">
                                   {test.testType}
@@ -536,9 +599,13 @@ function ConsultantAppointmentsTab({ role }) {
                                      test.result === 'negative' ? 'Âm tính' : 
                                      'Đang chờ kết quả'}
                                   </span>
+                                  <p className="text-xs text-gray-500 mt-1">{test.resultData}</p>
                                 </td>
-                                <td className="px-4 py-3">
-                                  {test.notes || 'Không có ghi chú'}
+                                <td className="px-4 py-3 text-sm">
+                                  {test.examinedAt ? new Date(test.examinedAt).toLocaleString('vi-VN') : 'Chưa xác nhận'}
+                                </td>
+                                <td className="px-4 py-3 text-sm">
+                                  {test.examiner}
                                 </td>
                               </tr>
                             ))}

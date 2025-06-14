@@ -1,7 +1,8 @@
 import React, { useEffect, useState } from "react";
 import { format } from "date-fns";
 import { vi } from "date-fns/locale";
-import authService from "../../services/authService";
+import userService from '../../services/userService';
+
 import appointmentService from "../../services/appointmentService";
 import toastService from "../../utils/toastService";
 import PropTypes from 'prop-types';
@@ -36,7 +37,7 @@ const BookingForm = ({
     
     const fetchUserData = async () => {
       try {
-        const currentUser = await authService.getCurrentUser();
+        const currentUser = await userService.getCurrentUserProfile();;
         
         if (currentUser) {
           // Store userId for API submission
@@ -49,8 +50,6 @@ const BookingForm = ({
             phone: currentUser.phoneNumber, // Note: using phoneNumber from user object
             customerId: currentUser.id
           };
-          
-          console.log("Prepared user data for form:", userData);
           
           // Update form data either through prop or internal state
           if (typeof setFormData === 'function') {
@@ -153,12 +152,9 @@ const BookingForm = ({
         notes: displayFormData.reason
       };
       
-      console.log("Submitting appointment data:", appointmentData);
-      
       // Call API to create appointment
       const response = await appointmentService.create(appointmentData);
-      
-      console.log("API response:", response);
+
       
       // Show success message
       toastService.success("Đặt lịch hẹn thành công!");

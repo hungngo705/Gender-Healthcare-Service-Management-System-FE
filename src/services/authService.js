@@ -142,83 +142,11 @@ export const authService = {
 
   /**
    * Get current user from JWT token with localStorage fallback
-   * @returns {Object|null} Current user object or null
+
    */
-  getCurrentUser: async () => {
-    try {
-      // First decode JWT to get user ID
-      const decodedToken = authService.getDecodedToken();
-      console.log("Decoded token:", decodedToken);
-      
-      if (!decodedToken) {
-        console.warn("No valid token found");
-        return null;
-      }
-      
-      // Extract user ID from token claims
-      const userId = 
-        decodedToken.sub || 
-        decodedToken.userId || 
-        decodedToken.id || 
-        decodedToken.nameid || 
-        decodedToken["http://schemas.xmlsoap.org/ws/2005/05/identity/claims/nameidentifier"];
-      
-      if (!userId) {
-        console.warn("Could not extract user ID from token");
-        return null;
-      }
-      
-      console.log("Fetching complete user data for ID:", userId);
-      
-      // Fetch complete user data from API using the ID
-      const response = await apiService.get(config.api.users.getById(userId));
-      
-      if (!response || !response.data) {
-        throw new Error("No user data returned from API");
-      }
-      
-      // Extract user data from response
-      const userData = response.data.data || response.data;
-      
-      // Add role from token if API response doesn't include it
-      if (!userData.role && decodedToken.role) {
-        userData.role = decodedToken.role;
-      }
-      
-      // Store user data in localStorage for offline access
-      localStorage.setItem("user", JSON.stringify(userData));
-      
-      console.log("Retrieved user data:", userData);
-      return userData;
-      
-    } catch (error) {
-      console.error("Error fetching user data from API:", error);
-      
-      // Fallback: Try to get user info from localStorage
-      try {
-        const storedUser = localStorage.getItem("user");
-        if (storedUser) {
-          const userData = JSON.parse(storedUser);
-          console.log("Using cached user data from localStorage:", userData);
-          return userData;
-        }
-      } catch (e) {
-        console.error("Error parsing stored user data:", e);
-      }
-      
-      // If all else fails, extract basic info from token
-      const decodedToken = authService.getDecodedToken();
-      if (decodedToken) {
-        return {
-          id: decodedToken.sub || decodedToken.userId || decodedToken.id,
-          email: decodedToken.email,
-          name: decodedToken.name,
-          role: decodedToken.role
-        };
-      }
-      
-      return null;
-    }
+  getCurrentUser: () => {
+    const user = localStorage.getItem("user");
+    return user ? JSON.parse(user) : null;
   },
 
   /**
@@ -278,7 +206,7 @@ export const authService = {
         config.api.users.changePassword,
         passwordData
       );
-      toastService.success("Password changed successfully");
+      toastService.success("Đổi mật khẩu thành công");
       return response.data;
     } catch (error) {
       // Error handling is done by the axios interceptors
@@ -296,7 +224,7 @@ export const authService = {
       const response = await apiService.get(
         `${config.api.auth.verifyEmail}?token=${token}`
       );
-      toastService.success("Email verified successfully");
+      toastService.success("Email đã được xác minh thành công");
       return response.data;
     } catch (error) {
       // Error handling is done by the axios interceptors
