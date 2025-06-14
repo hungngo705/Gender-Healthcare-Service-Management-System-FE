@@ -204,8 +204,6 @@ function ProtectedRoute({ isLoggedIn, children, roleRequired }) {
       }
     }
   }
-
-  console.log("ProtectedRoute: Access granted");
   return children || <Outlet />;
 }
 

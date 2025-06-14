@@ -52,10 +52,11 @@ const config = {
     users: {
       getAll: "/api/v1/user/getall",
       create: "/api/v1/user/create",
+      getAllByRole: (role) => `/api/v1/user/getall/${role}`,
       getById: (id) => `/api/v1/user/${id}`,
       update: (id) => `/api/v1/user/update/${id}`,
       delete: (id) => `/api/v1/user/delete/${id}`,
-      profile: "/api/v1/user/profile",
+      profile: "/api/v1/user/profile/me",
       changePassword: "/api/v1/user/change-password",
     },
 
@@ -74,7 +75,7 @@ const config = {
       getAll: "/api/v1/appointment/getall",
       create: "/api/v1/appointment/create",
       getById: (id) => `/api/v1/appointment/${id}`,
-      update: (id) => `/api/v1/appointment/${id}`,
+      update: (id) => `/api/v1/appointment/update/${id}`,
       cancel: (id) => `/api/v1/appointment/${id}/cancel`,
       getByUser: (userId) => `/api/v1/appointment/user/${userId}`,
       getByConsultant: (consultantId) =>
@@ -116,6 +117,17 @@ const config = {
       activities: "/api/v1/dashboard/activities",
       monthlyStats: (year, month) =>
         `/api/v1/dashboard/stats/monthly/${year}/${month}`,
+    },
+
+    // TestResult endpoints
+    testResult: {
+      getAll: "/api/v1/testresult/getall",
+      getById: (id) => `/api/v1/testresult/${id}`,
+      create: "/api/v1/testresult/create",
+      update: (id) => `/api/v1/testresult/${id}`,
+      getByAppointment: (appointmentId) =>
+        `/api/v1/testresult/appointment/${appointmentId}`,
+      getByPatient: (patientId) => `/api/v1/testresult/patient/${patientId}`,
     },
   },
 

@@ -287,9 +287,9 @@ function Home() {
             </p>
           </div>{" "}
           <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-8">
-            {consultants.slice(0, 4).map((appointment) => (
+            {consultants.slice(0, 4).map((appointment, index) => (
               <motion.div
-                key={appointment.consultantId}
+                key={`${appointment.consultantId}-${index}`}
                 className="bg-white rounded-xl shadow-md overflow-hidden"
                 whileHover={{ y: -8 }}
                 transition={{ duration: 0.3 }}

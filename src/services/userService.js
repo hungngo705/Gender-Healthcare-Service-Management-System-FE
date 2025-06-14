@@ -185,6 +185,20 @@ export const userService = {
       return Promise.reject(error);
     }
   },
+
+  /**
+   * Get all users by role
+   * @param {string} role - Role to filter users by
+   * @returns {Promise} Promise that resolves with users list filtered by role
+   */
+  getAllByRole: async (role) => {
+    try {
+      const response = await apiService.get(config.api.users.getAllByRole(role));
+      return response.data?.data || response.data;
+    } catch (error) {
+      return Promise.reject(error);
+    }
+  },
 };
 
 export default userService;
