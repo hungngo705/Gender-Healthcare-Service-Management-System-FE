@@ -171,64 +171,58 @@ function ConsultantAppointmentsTab({ role }) {
       setCustomerDetail(userResponse);
       console.log("Customer profile data:", userResponse);
 
-      // Fetch all test results and filter by customerId
-      const testsResponse = await testResultService.getAll();
-      console.log("All test results:", testsResponse);
+      // Fetch test results for this customer
+      try {
+        setIsLoadingDetail(true);
+        
+        // Fetch all test results 
+        const testsResponse = await testResultService.getAll();
+        console.log("All test results:", testsResponse);
+        
+        // Extract the data array from the response
+        const allTestResults = testsResponse.data || [];
+        console.log("Extracted test results:", allTestResults);
+        
+        // Filter test results by customerId
+        const filteredTests = allTestResults.filter(test => test.customerId === customerId);
+        console.log("Filtered test results for customer:", filteredTests);
 
-      // Extract the data array from the response
-      const allTestResults = testsResponse || testsResponse.data?.data || testsResponse.data || [];
-      console.log("Extracted test results:", allTestResults);
-
-      // Process and flatten test results for display
-      const processedTests = [];
-
-
-      allTestResults.forEach(result => {
-        // Check if this result belongs to the selected customer
-        const stiTesting = result.stiTesting;
-        console.log("STI Testing data-----:", stiTesting.customerId, customerId);
-        if (!stiTesting || stiTesting.customerId !== customerId) {
-          return; // Skip if not related to this customer
-        }
-
-        // Map test types
-        const getTestTypeName = (typeCode) => {
-          const types = {
-            0: "Xét nghiệm chung",
-            1: "Xét nghiệm Giang mai (Syphilis)",
-            2: "Xét nghiệm Lậu (Gonorrhea)",
-            3: "Xét nghiệm Chlamydia",
-            4: "Xét nghiệm HIV",
-            5: "Xét nghiệm Viêm gan B (HBV)",
-            6: "Xét nghiệm Viêm gan C (HCV)",
+        // Process test results for display
+        const processedTests = filteredTests.map(test => {
+          // Extract test type from resultData (e.g., "HIV test: Negative" -> "HIV")
+          const testTypeFull = test.resultData.split(':')[0] || '';
+          const testType = testTypeFull.replace(' test', '').trim();
+          
+          // Determine result status
+          let resultStatus = 'pending';
+          if (test.resultData) {
+            if (test.resultData.toLowerCase().includes('negative')) {
+              resultStatus = 'negative';
+            } else if (test.resultData.toLowerCase().includes('positive')) {
+              resultStatus = 'positive'; 
+            }
+          }
+          
+          return {
+            id: test.stiTestingId,
+            testType: testType,
+            resultData: test.resultData,
+            result: resultStatus,
+            status: test.status,
+            examinedAt: test.examinedAt,
+            sentAt: test.sentAt,
+            examiner: test.staff?.name || 'Không có thông tin'
           };
-          return types[typeCode] || "Không xác định";
-        };
-
-        // Extract result status
-        const getResultStatus = (resultData) => {
-          if (!resultData) return "pending";
-          if (resultData.toLowerCase().includes("negative")) return "negative";
-          if (resultData.toLowerCase().includes("positive")) return "positive";
-          return "pending";
-        };
-
-        // Create a simplified test result object for display
-        processedTests.push({
-          id: result.id,
-          testType: getTestTypeName(stiTesting.testType),
-          testDate: stiTesting.collectedDate,
-          result: getResultStatus(result.resultData),
-          resultData: result.resultData,
-          notes: result.resultData,
-          status: result.status,
-          examinedAt: result.examinedAt,
-          examiner: result.staff?.name || "Không có thông tin"
         });
-      });
-
-      setCustomerTests(processedTests);
-      console.log("Processed test results:", processedTests);
+        
+        setCustomerTests(processedTests);
+        
+      } catch (error) {
+        console.error("Error fetching test results:", error);
+        setDetailError("Không thể tải kết quả xét nghiệm.");
+      } finally {
+        setIsLoadingDetail(false);
+      }
     } catch (err) {
       console.error("Error fetching customer details:", err);
       setDetailError("Không thể tải thông tin chi tiết khách hàng. Vui lòng thử lại.");
@@ -405,15 +399,8 @@ function ConsultantAppointmentsTab({ role }) {
                 <tr key={appointment.id}>
                   <td className="px-6 py-4 whitespace-nowrap">
                     <div className="flex items-center">
-                      <div className="flex-shrink-0 h-10 w-10 bg-indigo-100 rounded-full flex items-center justify-center">
-                        <span className="text-indigo-600 text-lg font-medium">
-                          {appointment.customerName.charAt(0)}
-                        </span>
-                      </div>
-                      <div className="ml-4">
                         <div className="text-sm font-medium text-gray-900">
                           {appointment.customerName}
-                        </div>
                         <div className="text-sm text-gray-500">
                           {appointment.phone}
                         </div>
@@ -446,6 +433,13 @@ function ConsultantAppointmentsTab({ role }) {
                     </span>
                   </td>
                   <td className="px-6 py-4 whitespace-nowrap text-right text-sm font-medium">
+                    {appointment.status === "scheduled" && (
+                      <>
+                        <button className="text-green-600 hover:text-green-900 mr-3">
+                          Bắt đầu khám
+                        </button>
+                      </>
+                    )}
                     <button
                       className="text-indigo-600 hover:text-indigo-900 mr-3"
                       onClick={() =>
@@ -454,13 +448,6 @@ function ConsultantAppointmentsTab({ role }) {
                     >
                       Chi tiết
                     </button>
-                    {appointment.status === "scheduled" && (
-                      <>
-                        <button className="text-green-600 hover:text-green-900 mr-3">
-                          Bắt đầu khám
-                        </button>
-                      </>
-                    )}
                     {appointment.type && appointment.type.includes("Xét nghiệm") && (
                       <button className="text-purple-600 hover:text-purple-900">
                         {appointment.testResults
@@ -478,8 +465,8 @@ function ConsultantAppointmentsTab({ role }) {
 
       {/* Customer Detail Popup */}
       {showCustomerDetail && (
-        <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50 p-4">
-          <div className="bg-white rounded-lg shadow-xl max-w-4xl w-full max-h-[90vh] overflow-y-auto">
+        <div className="fixed inset-0 backdrop-blur-md bg-white/30 flex items-center justify-center z-50 p-4">
+          <div className="bg-white rounded-lg border border-gray-300 shadow-2xl max-w-4xl w-full max-h-[90vh] overflow-y-auto">
             <div className="border-b border-gray-200 px-6 py-4 flex justify-between items-center">
               <h3 className="text-lg font-medium text-gray-900">
                 Thông tin chi tiết khách hàng
@@ -513,6 +500,28 @@ function ConsultantAppointmentsTab({ role }) {
                     <h4 className="text-lg font-medium text-gray-900 mb-4">
                       Hồ sơ cá nhân
                     </h4>
+                    <div className="flex items-start mb-4">
+                      {/* Customer Avatar */}
+                      <div className="mr-4">
+                        {customerDetail.avatarUrl ? (
+                          <img 
+                            src={customerDetail.avatarUrl} 
+                            alt={`${customerDetail.name}`}
+                            className="h-32 w-32 rounded-full object-cover border border-gray-200"
+                            onError={(e) => {
+                              e.target.onerror = null;
+                              e.target.src = "https://www.gravatar.com/avatar/00000000000000000000000000000000?d=mp&f=y";
+                            }}
+                          />
+                        ) : (
+                          <div className="h-16 w-16 rounded-full bg-indigo-100 flex items-center justify-center border border-gray-200">
+                            <span className="text-indigo-600 text-xl font-medium">
+                              {customerDetail.name.charAt(0)}
+                            </span>
+                          </div>
+                        )}
+                      </div>
+                    </div>
                     <div className="bg-gray-50 p-4 rounded-lg grid grid-cols-1 md:grid-cols-2 gap-4">
                       <div>
                         <p className="text-sm font-medium text-gray-500">Họ và tên</p>
@@ -573,9 +582,6 @@ function ConsultantAppointmentsTab({ role }) {
                                 Kết quả
                               </th>
                               <th scope="col" className="px-4 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
-                                Ngày xác nhận
-                              </th>
-                              <th scope="col" className="px-4 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
                                 Người xác nhận
                               </th>
                             </tr>
@@ -584,7 +590,7 @@ function ConsultantAppointmentsTab({ role }) {
                             {customerTests.map(test => (
                               <tr key={test.id}>
                                 <td className="px-4 py-3 whitespace-nowrap">
-                                  {test.testDate ? new Date(test.testDate).toLocaleDateString('vi-VN') : 'Không có thông tin'}
+                                  {test.examinedAt ? new Date(test.examinedAt).toLocaleDateString('vi-VN') : 'Không có thông tin'}
                                 </td>
                                 <td className="px-4 py-3">
                                   {test.testType}
@@ -600,9 +606,6 @@ function ConsultantAppointmentsTab({ role }) {
                                      'Đang chờ kết quả'}
                                   </span>
                                   <p className="text-xs text-gray-500 mt-1">{test.resultData}</p>
-                                </td>
-                                <td className="px-4 py-3 text-sm">
-                                  {test.examinedAt ? new Date(test.examinedAt).toLocaleString('vi-VN') : 'Chưa xác nhận'}
                                 </td>
                                 <td className="px-4 py-3 text-sm">
                                   {test.examiner}
