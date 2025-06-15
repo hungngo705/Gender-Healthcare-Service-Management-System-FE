@@ -36,19 +36,6 @@ function Sidebar({ menuItems, activeTab, setActiveTab, onLogout }) {
           ))}
         </ul>
       </nav>
-
-      {/* Logout button */}
-      {onLogout && (
-        <div className="p-4 border-t border-gray-200">
-          <button
-            onClick={onLogout}
-            className="w-full flex items-center px-4 py-2 text-red-600 hover:bg-red-50 rounded-lg"
-          >
-            <LogOut className="h-5 w-5 mr-3" />
-            <span>Đăng xuất</span>
-          </button>
-        </div>
-      )}
     </div>
   );
 }
