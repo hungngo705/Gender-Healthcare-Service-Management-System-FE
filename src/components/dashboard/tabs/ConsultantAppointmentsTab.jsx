@@ -1,9 +1,8 @@
 import React, { useState, useEffect } from "react";
 import PropTypes from "prop-types";
-// Import appointment service
+// Import services
 import appointmentService from "../../../services/appointmentService";
 import userService from "../../../services/userService";
-import stiTestingService from "../../../services/stiTestingService";
 import testResultService from "../../../services/testResultService";
 import { X } from "lucide-react"; // For close button icon
 
@@ -82,13 +81,13 @@ function ConsultantAppointmentsTab({ role }) {
             serviceId: appointment.serviceId,
             type: getServiceType(appointment.serviceId),
             serviceType: getServiceType(appointment.serviceId),
-            date: appointment.appointmentDate, // Changed from date to appointmentDate
-            slotNumber: appointment.slot, // Changed from slotNumber to slot
+            date: appointment.appointmentDate,
+            slotNumber: appointment.slot,
             time: getTimeBySlot(appointment.slot),
-            status: statusMap[appointment.status] || "unknown", // Map status number to string
-            statusCode: appointment.status, // Keep the original status code
-            reason: appointment.notes || "Không có lý do", // Changed from reason to notes
-            symptoms: appointment.notes || "Không có chi tiết", // Also map notes to symptoms
+            status: statusMap[appointment.status] || "unknown",
+            statusCode: appointment.status,
+            reason: appointment.notes || "Không có lý do",
+            symptoms: appointment.notes || "Không có chi tiết",
             createdAt: appointment.createdAt
           };
         });
@@ -127,10 +126,13 @@ function ConsultantAppointmentsTab({ role }) {
     return "Tư vấn";
   };
 
-  const filteredAppointments =
+  // Filter appointments based on selected filter
+  const filteredAppointments = 
     filter === "all"
       ? consultantAppointments
-      : consultantAppointments.filter((app) => app.status === filter);
+      : filter === "upcoming"
+      ? consultantAppointments.filter((app) => app.status === "scheduled")
+      : consultantAppointments.filter((app) => app.status === "completed" || app.status === "cancelled");
 
   const getStatusClass = (status) => {
     switch (status) {
@@ -245,48 +247,42 @@ function ConsultantAppointmentsTab({ role }) {
         <h2 className="text-xl font-semibold text-gray-800">
           Lịch hẹn của bạn
         </h2>
-        <div className="flex space-x-2">
+      </div>
+
+      {/* Tab Navigation - Updated to match AppointmentsTab style */}
+      <div className="border-b border-gray-200 mb-6">
+        <nav className="-mb-px flex space-x-8">
           <button
-            className={`px-3 py-1 rounded-md text-sm ${
-              filter === "all"
-                ? "bg-indigo-100 text-indigo-800"
-                : "bg-gray-100 text-gray-800"
-            }`}
             onClick={() => setFilter("all")}
+            className={`${
+              filter === "all"
+                ? "border-indigo-500 text-indigo-600"
+                : "border-transparent text-gray-500 hover:text-gray-700 hover:border-gray-300"
+            } whitespace-nowrap py-4 px-1 border-b-2 font-medium text-sm`}
           >
             Tất cả
           </button>
           <button
-            className={`px-3 py-1 rounded-md text-sm ${
-              filter === "scheduled"
-                ? "bg-indigo-100 text-indigo-800"
-                : "bg-gray-100 text-gray-800"
-            }`}
-            onClick={() => setFilter("scheduled")}
+            onClick={() => setFilter("upcoming")}
+            className={`${
+              filter === "upcoming"
+                ? "border-indigo-500 text-indigo-600"
+                : "border-transparent text-gray-500 hover:text-gray-700 hover:border-gray-300"
+            } whitespace-nowrap py-4 px-1 border-b-2 font-medium text-sm`}
           >
-            Đã hẹn
+            Sắp tới
           </button>
           <button
-            className={`px-3 py-1 rounded-md text-sm ${
-              filter === "completed"
-                ? "bg-indigo-100 text-indigo-800"
-                : "bg-gray-100 text-gray-800"
-            }`}
             onClick={() => setFilter("completed")}
+            className={`${
+              filter === "completed"
+                ? "border-indigo-500 text-indigo-600"
+                : "border-transparent text-gray-500 hover:text-gray-700 hover:border-gray-300"
+            } whitespace-nowrap py-4 px-1 border-b-2 font-medium text-sm`}
           >
             Hoàn thành
           </button>
-          <button
-            className={`px-3 py-1 rounded-md text-sm ${
-              filter === "cancelled"
-                ? "bg-indigo-100 text-indigo-800"
-                : "bg-gray-100 text-gray-800"
-            }`}
-            onClick={() => setFilter("cancelled")}
-          >
-            Đã hủy
-          </button>
-        </div>
+        </nav>
       </div>
 
       {/* Show loading state */}
@@ -349,9 +345,9 @@ function ConsultantAppointmentsTab({ role }) {
           <p className="text-gray-500">
             {filter === "all"
               ? "Bạn chưa có lịch hẹn nào."
-              : `Không có lịch hẹn nào ở trạng thái "${getStatusText(
-                  filter
-                )}".`}
+              : filter === "upcoming"
+              ? "Không có lịch hẹn sắp tới."
+              : "Không có lịch hẹn đã hoàn thành hoặc đã hủy."}
           </p>
         </div>
       )}

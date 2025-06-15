@@ -187,7 +187,7 @@ export const authService = {
       localStorage.removeItem(config.auth.refreshStorageKey);
       localStorage.removeItem("user");
 
-      toastService.info("Bạn đã đăng xuất thành công");
+      toastService.success("Bạn đã đăng xuất thành công");
       // Redirect to login page
       window.location.href = "/login";
     }
