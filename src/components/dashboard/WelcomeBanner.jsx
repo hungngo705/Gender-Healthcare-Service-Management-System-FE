@@ -13,7 +13,7 @@ function WelcomeBanner({ greeting }) {
             {greeting}, {displayName}!
           </h2>
           <p className="opacity-90 mt-1">
-            Chào mừng bạn quay trở lại hệ thống quản lý Gender Healthcare
+            Chào mừng bạn quay trở lại hệ thống quản lý EverWell
             <span className="ml-2 inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium bg-indigo-300 bg-opacity-25">
               {formattedRole}
             </span>
