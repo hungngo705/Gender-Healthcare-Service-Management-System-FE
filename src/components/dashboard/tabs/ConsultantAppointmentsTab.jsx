@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from "react";
+import React, { useState, useEffect, useRef } from "react";
 import PropTypes from "prop-types";
 // Import services
 import appointmentService from "../../../services/appointmentService";
@@ -21,6 +21,9 @@ function ConsultantAppointmentsTab({ role }) {
   const [customerTests, setCustomerTests] = useState([]);
   const [isLoadingDetail, setIsLoadingDetail] = useState(false);
   const [detailError, setDetailError] = useState(null);
+
+  // Ref for customer detail popup
+  const customerDetailRef = useRef(null);
 
   // Get current user profile instead of relying on JWT token
   useEffect(() => {
@@ -240,6 +243,25 @@ function ConsultantAppointmentsTab({ role }) {
     setCustomerTests([]);
     setSelectedCustomer(null);
   };
+
+  // Close popup on outside click
+  useEffect(() => {
+    function handleClickOutside(event) {
+      if (customerDetailRef.current && !customerDetailRef.current.contains(event.target)) {
+        setShowCustomerDetail(false);
+      }
+    }
+    
+    // Add event listener when the popup is shown
+    if (showCustomerDetail) {
+      document.addEventListener("mousedown", handleClickOutside);
+    }
+    
+    // Cleanup the event listener
+    return () => {
+      document.removeEventListener("mousedown", handleClickOutside);
+    };
+  }, [showCustomerDetail]);
 
   return (
     <div>
@@ -462,7 +484,10 @@ function ConsultantAppointmentsTab({ role }) {
       {/* Customer Detail Popup */}
       {showCustomerDetail && (
         <div className="fixed inset-0 backdrop-blur-md bg-white/30 flex items-center justify-center z-50 p-4">
-          <div className="bg-white rounded-lg border border-gray-300 shadow-2xl max-w-4xl w-full max-h-[90vh] overflow-y-auto">
+          <div 
+            ref={customerDetailRef}
+            className="bg-white rounded-lg border border-gray-300 shadow-2xl max-w-4xl w-full max-h-[90vh] overflow-y-auto"
+          >
             <div className="border-b border-gray-200 px-6 py-4 flex justify-between items-center">
               <h3 className="text-lg font-medium text-gray-900">
                 Thông tin chi tiết khách hàng
