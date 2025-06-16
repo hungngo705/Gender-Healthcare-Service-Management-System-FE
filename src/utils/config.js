@@ -46,9 +46,7 @@ const config = {
       verifyEmail: "/api/v1/verify-email",
       forgotPassword: "/send-reset-code",
       resetPassword: "/verify-code-and-reset",
-    },
-
-    // User endpoints
+    }, // User endpoints
     users: {
       getAll: "/api/v1/user/getall",
       create: "/api/v1/user/create",
@@ -56,6 +54,7 @@ const config = {
       update: (id) => `/api/v1/user/update/${id}`,
       delete: (id) => `/api/v1/user/delete/${id}`,
       profile: "/api/v1/user/profile",
+      myProfile: "/api/v1/user/profile/me",
       changePassword: "/api/v1/user/change-password",
     },
 
@@ -79,15 +78,26 @@ const config = {
       getByUser: (userId) => `/api/v1/appointment/user/${userId}`,
       getByConsultant: (consultantId) =>
         `/api/v1/appointment/consultant/${consultantId}`,
-    },
-
-    // STI testing endpoints
+    }, // STI testing endpoints
     stiTesting: {
       getAll: "/api/v1/sti-test/getall",
       create: "/api/v1/sti-test/create",
       getById: (id) => `/api/v1/sti-test/${id}`,
       getByUser: (userId) => `/api/v1/sti-test/user/${userId}`,
       updateResult: (id) => `/api/v1/sti-test/${id}/result`,
+    },
+
+    // Medical records endpoints
+    medicalRecords: {
+      getAllByUserId: (userId) => `/api/v1/medical-records/user/${userId}`,
+      getById: (id) => `/api/v1/medical-records/${id}`,
+      getStiTestResults: (userId) =>
+        `/api/v1/medical-records/user/${userId}/sti-tests`,
+      getStiTestResultById: (id) => `/api/v1/medical-records/sti-tests/${id}`,
+      downloadPdf: (id) => `/api/v1/medical-records/${id}/pdf`,
+      shareRecord: (id) => `/api/v1/medical-records/${id}/share`,
+      getUserStatistics: (userId) =>
+        `/api/v1/medical-records/user/${userId}/statistics`,
     },
 
     // Blog endpoints

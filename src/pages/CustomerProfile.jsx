@@ -16,6 +16,7 @@ import {
   Edit,
   Shield,
   CreditCard,
+  Clock,
 } from "lucide-react";
 import userUtils from "../utils/userUtils";
 
@@ -25,6 +26,7 @@ import AppointmentsTab from "../components/profile/tabs/AppointmentsTab";
 import MedicalRecordsTab from "../components/profile/tabs/MedicalRecordsTab";
 import NotificationsTab from "../components/profile/tabs/NotificationsTab";
 import SecurityTab from "../components/profile/tabs/SecurityTab";
+import SecuritySessionsTab from "../components/profile/tabs/SecuritySessionsTab";
 import PaymentsTab from "../components/profile/tabs/PaymentsTab";
 import UserAvatar from "../components/user/UserAvatar";
 
@@ -48,6 +50,12 @@ function CustomerProfile() {
     address: "",
     birthday: "",
     gender: "",
+    createdAt: "",
+    lastLoginAt: "",
+    totalAppointments: 0,
+    totalSTITests: 0,
+    totalPosts: 0,
+    isActive: true,
     emergencyContact: "",
   });
 
@@ -82,7 +90,9 @@ function CustomerProfile() {
 
     setNotifications(mockNotifications);
     setUnreadCount(mockNotifications.filter((n) => !n.isRead).length);
-  }, []); // Load user profile data from API
+  }, []);
+
+  // Load user profile data from API
   const loadUserProfile = useCallback(async () => {
     try {
       const userData = await userService.getCurrentUserProfile();
@@ -96,6 +106,13 @@ function CustomerProfile() {
         birthday: userData.birthday || userData.dateOfBirth || "",
         gender: userData.gender || "",
         emergencyContact: userData.emergencyContact || "",
+        avatarUrl: userData.avatarUrl || "",
+        createdAt: userData.createdAt || "",
+        lastLoginAt: userData.lastLoginAt || "",
+        totalAppointments: userData.totalAppointments || 0,
+        totalSTITests: userData.totalSTITests || 0,
+        totalPosts: userData.totalPosts || 0,
+        isActive: userData.isActive || true,
       });
     } catch (error) {
       console.error("Failed to load user profile:", error);
@@ -109,6 +126,13 @@ function CustomerProfile() {
           birthday: currentUser.birthday || currentUser.dateOfBirth || "",
           gender: currentUser.gender || "",
           emergencyContact: currentUser.emergencyContact || "",
+          avatarUrl: currentUser.avatarUrl || "",
+          createdAt: "",
+          lastLoginAt: "",
+          totalAppointments: 0,
+          totalSTITests: 0,
+          totalPosts: 0,
+          isActive: currentUser.isActive || true,
         });
       }
     }
@@ -231,6 +255,11 @@ function CustomerProfile() {
       icon: <Shield size={16} className="mr-3" />,
     },
     {
+      id: "sessions",
+      label: "Phiên đăng nhập",
+      icon: <Clock size={16} className="mr-3" />,
+    },
+    {
       id: "payments",
       label: "Thanh toán",
       icon: <CreditCard size={16} className="mr-3" />,
@@ -245,13 +274,17 @@ function CustomerProfile() {
           <ProfileTab profileData={profileData} onSave={handleSaveProfile} />
         );
       case "appointments":
-        return <AppointmentsTab navigate={navigate} />;
+        return (
+          <AppointmentsTab navigate={navigate} currentUser={profileData} />
+        );
       case "medical-records":
-        return <MedicalRecordsTab />;
+        return <MedicalRecordsTab currentUser={profileData} />;
       case "notifications":
         return <NotificationsTab onMarkAllRead={handleMarkAllAsRead} />;
       case "security":
         return <SecurityTab />;
+      case "sessions":
+        return <SecuritySessionsTab currentUser={profileData} />;
       case "payments":
         return <PaymentsTab />;
       default:

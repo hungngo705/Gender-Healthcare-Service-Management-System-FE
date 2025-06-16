@@ -149,39 +149,43 @@ export const userService = {
   },
 
   /**
-   * Get current user profile
-   * @returns {Promise} Promise that resolves with current user profile
+   * Get current user's profile
+   * @returns {Promise} Promise that resolves with current user profile data
    */
   getCurrentUserProfile: async () => {
     try {
-      const response = await apiService.get(config.api.users.profile);
-      return response.data?.data || response.data;
+      const response = await apiService.get(config.api.users.myProfile);
+      // Handle the unified response format with status_code, message, and data fields
+      if (response.data && response.data.is_success) {
+        return response.data.data;
+      }
+      return response.data;
     } catch (error) {
+      console.error("Error fetching user profile:", error);
       return Promise.reject(error);
     }
   },
 
   /**
-   * Update current user profile
-   * @param {Object} profileData - Profile data to update
+   * Update current user's profile
+   * @param {Object} profileData - Updated profile data
    * @returns {Promise} Promise that resolves with updated profile
    */
   updateCurrentUserProfile: async (profileData) => {
     try {
       const response = await apiService.put(
-        config.api.users.profile,
+        config.api.users.myProfile,
         profileData
       );
-      const responseData = response.data?.data || response.data;
-
-      // Update localStorage user data
-      const currentUser = JSON.parse(localStorage.getItem("user") || "{}");
-      const updatedUser = { ...currentUser, ...responseData };
-      localStorage.setItem("user", JSON.stringify(updatedUser));
-
-      toastService.success("Hồ sơ của bạn đã được cập nhật");
-      return responseData;
+      // Handle the unified response format
+      if (response.data && response.data.is_success) {
+        toastService.success("Thông tin đã được cập nhật thành công");
+        return response.data.data;
+      }
+      return response.data;
     } catch (error) {
+      console.error("Error updating user profile:", error);
+      toastService.error("Không thể cập nhật thông tin. Vui lòng thử lại sau.");
       return Promise.reject(error);
     }
   },
