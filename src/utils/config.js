@@ -11,7 +11,7 @@ const getApiBaseURL = () => {
   const currentHost = window.location.hostname;
 
   if (currentHost === "localhost" || currentHost === "127.0.0.1") {
-    return "https://localhost:7050";
+    return "https://localhost:7050/api/v2";
   }
 
   // For production, you need to set the correct API URL
@@ -25,11 +25,11 @@ const getApiBaseURL = () => {
     console.warn(
       "Production API URL not configured! Please set VITE_API_URL environment variable."
     );
-    return "https://your-production-api-domain.com"; // Replace with actual production URL
+    return "https://your-production-api-domain.com/api/v2"; 
   }
 
   // Fallback for other hosts
-  return `https://${currentHost}:7050`;
+  return `https://${currentHost}:7050/api/v2`; 
 };
 
 const config = {
@@ -39,95 +39,95 @@ const config = {
     timeout: 20000, // 20 seconds
     // Auth endpoints
     auth: {
-      login: "/api/v1/login",
-      register: "/api/v1/register",
-      refreshToken: "/api/v1/refresh-token",
-      logout: "/api/v1/logout",
-      verifyEmail: "/api/v1/verify-email",
+      login: "/login",
+      register: "/register",
+      refreshToken: "/refresh-token",
+      logout: "/logout",
+      verifyEmail: "/verify-email",
       forgotPassword: "/send-reset-code",
       resetPassword: "/verify-code-and-reset",
     },
 
     // User endpoints
     users: {
-      getAll: "/api/v1/user/getall",
-      create: "/api/v1/user/create",
-      getAllByRole: (role) => `/api/v1/user/getall/${role}`,
-      getById: (id) => `/api/v1/user/${id}`,
-      update: (id) => `/api/v1/user/update/${id}`,
-      delete: (id) => `/api/v1/user/delete/${id}`,
-      profile: "/api/v1/user/profile/me",
-      changePassword: "/api/v1/user/change-password",
+      getAll: "/user/getall",
+      create: "/user/create",
+      getAllByRole: (role) => `/user/getall/${role}`,
+      getById: (id) => `/user/${id}`,
+      update: (id) => `/user/update/${id}`,
+      delete: (id) => `/user/delete/${id}`,
+      profile: "/user/profile/me",
+      changePassword: "/user/change-password",
     },
 
     // Consultant endpoints
     consultants: {
-      getAll: "/api/v1/consultant/getall",
-      getById: (id) => `/api/v1/consultant/${id}`,
-      create: "/api/v1/consultant/create",
-      update: (id) => `/api/v1/consultant/${id}`,
-      delete: (id) => `/api/v1/consultant/${id}`,
-      getAvailability: (id) => `/api/v1/consultant/${id}/availability`,
+      getAll: "/consultant/getall",
+      getById: (id) => `/consultant/${id}`,
+      create: "/consultant/create",
+      update: (id) => `/consultant/${id}`,
+      delete: (id) => `/consultant/${id}`,
+      getAvailability: (id) => `/consultant/${id}/availability`,
     },
 
     // Appointment endpoints
     appointments: {
-      getAll: "/api/v1/appointment/getall",
-      create: "/api/v1/appointment/create",
-      getById: (id) => `/api/v1/appointment/${id}`,
-      update: (id) => `/api/v1/appointment/update/${id}`,
-      cancel: (id) => `/api/v1/appointment/${id}/cancel`,
-      getByUser: (userId) => `/api/v1/appointment/user/${userId}`,
+      getAll: "/appointment/getall",
+      create: "/appointment/create",
+      getById: (id) => `/appointment/${id}`,
+      update: (id) => `/appointment/update/${id}`,
+      cancel: (id) => `/appointment/${id}/cancel`,
+      getByUser: (userId) => `/appointment/user/${userId}`,
       getByConsultant: (consultantId) =>
-        `/api/v1/appointment/consultant/${consultantId}`,
+        `/appointment/consultant/${consultantId}`,
     },
 
     // STI testing endpoints
     stiTesting: {
-      getAll: "/api/v1/sti-test/getall",
-      create: "/api/v1/sti-test/create",
-      getById: (id) => `/api/v1/sti-test/${id}`,
-      getByUser: (userId) => `/api/v1/sti-test/user/${userId}`,
-      updateResult: (id) => `/api/v1/sti-test/${id}/result`,
+      getAll: "/sti-test/getall",
+      create: "/sti-test/create",
+      getById: (id) => `/sti-test/${id}`,
+      getByUser: (userId) => `/sti-test/user/${userId}`,
+      updateResult: (id) => `/sti-test/${id}/result`,
     },
 
     // Blog endpoints
     blog: {
-      getAll: "/api/v1/blog/getall",
-      create: "/api/v1/blog/create",
-      getById: (id) => `/api/v1/blog/${id}`,
-      update: (id) => `/api/v1/blog/${id}`,
-      delete: (id) => `/api/v1/blog/${id}`,
-      getComments: (blogId) => `/api/v1/blog/${blogId}/comments`,
-      addComment: (blogId) => `/api/v1/blog/${blogId}/comments`,
+      getAll: "/blog/getall",
+      create: "/blog/create",
+      getById: (id) => `/blog/${id}`,
+      update: (id) => `/blog/${id}`,
+      delete: (id) => `/blog/${id}`,
+      getComments: (blogId) => `/blog/${blogId}/comments`,
+      addComment: (blogId) => `/blog/${blogId}/comments`,
     }, // Service endpoints
     services: {
-      getAll: "/api/v1/service/getall",
-      create: "/api/v1/service/create",
-      getById: (id) => `/api/v1/service/${id}`,
-      update: (id) => `/api/v1/service/${id}`,
-      delete: (id) => `/api/v1/service/${id}`,
+      getAll: "/service/getall",
+      create: "/service/create",
+      getById: (id) => `/service/${id}`,
+      update: (id) => `/service/${id}`,
+      delete: (id) => `/service/${id}`,
     }, // Dashboard endpoints
     dashboard: {
-      stats: "/api/v1/dashboard/stats",
-      data: "/api/v1/dashboard/data",
-      usersByRole: "/api/v1/dashboard/users-by-role",
-      appointmentsByStatus: "/api/v1/dashboard/appointments-by-status",
-      statsByRole: (role) => `/api/v1/dashboard/stats/role/${role}`,
-      activities: "/api/v1/dashboard/activities",
+      stats: "/dashboard/stats",
+      data: "/dashboard/data",
+      usersByRole: "/dashboard/users-by-role",
+      appointmentsByStatus: "/dashboard/appointments-by-status",
+      statsByRole: (role) => `/dashboard/stats/role/${role}`,
+      activities: "/dashboard/activities",
       monthlyStats: (year, month) =>
-        `/api/v1/dashboard/stats/monthly/${year}/${month}`,
+        `/dashboard/stats/monthly/${year}/${month}`,
     },
 
     // TestResult endpoints
     testResult: {
-      getAll: "/api/v1/testresult/getall",
-      getById: (id) => `/api/v1/testresult/${id}`,
-      create: "/api/v1/testresult/create",
-      update: (id) => `/api/v1/testresult/${id}`,
+      getAll: "/testresult/getall",
+      getById: (id) => `/testresult/${id}`,
+      create: "/testresult/create",
+      update: (id) => `/testresult/${id}`,
       getByAppointment: (appointmentId) =>
-        `/api/v1/testresult/appointment/${appointmentId}`,
-      getByPatient: (patientId) => `/api/v1/testresult/patient/${patientId}`,
+        `/testresult/appointment/${appointmentId}`,
+      getByPatient: (patientId) => `/testresult/patient/${patientId}`,
     },
   },
 
