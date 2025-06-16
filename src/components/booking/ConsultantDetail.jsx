@@ -6,9 +6,9 @@ const ConsultantDetail = ({ consultant }) => {
       <div className="px-6 py-5">
         <h2 className="text-lg font-medium text-gray-900 mb-4">Thông tin tư vấn viên</h2>
         <div className="flex flex-col md:flex-row">
-          <div className="mb-4 md:mb-0 md:mr-6">
+          <div className="mb-4 md:mb-0 md:mr-6 flex-shrink-0">
             <img
-              className="h-60 w-150 rounded-lg object-cover"
+              className="max-h-100 max-w-[500px] rounded-lg object-contain"
               src={consultant.image}
               alt={consultant.name}
             />

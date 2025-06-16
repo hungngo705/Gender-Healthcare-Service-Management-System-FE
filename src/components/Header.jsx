@@ -1,4 +1,4 @@
-import React, { useState } from "react";
+import React, { useState, useRef, useEffect } from "react"; // Added useRef and useEffect
 import { NavLink, useNavigate } from "react-router-dom";
 import logo from "../assets/logo2.svg";
 import { Menu, X, User, LogOut } from "lucide-react";
@@ -8,14 +8,66 @@ import userUtils from "../utils/userUtils";
 function Header() {
   const [isMenuOpen, setIsMenuOpen] = useState(false);
   const [isProfileMenuOpen, setIsProfileMenuOpen] = useState(false);
+  const [isLoggingOut, setIsLoggingOut] = useState(false); // New state for tracking logout in progress
+  const [isFullScreenLoading, setIsFullScreenLoading] = useState(false);
   const { logout, isAuthenticated, isStaffOrHigher } = useAuth();
   const { displayName, avatarInfo } = userUtils.useUserInfo();
   const navigate = useNavigate();
 
-  const handleLogout = () => {
-    logout();
-    navigate("/");
-    setIsProfileMenuOpen(false);
+  // Add ref for the profile menu dropdown
+  const profileMenuRef = useRef(null);
+
+  // Handle clicks outside of the profile menu
+  useEffect(() => {
+    function handleClickOutside(event) {
+      if (
+        profileMenuRef.current &&
+        !profileMenuRef.current.contains(event.target)
+      ) {
+        setIsProfileMenuOpen(false);
+      }
+    }
+
+    // Add event listener when the menu is open
+    if (isProfileMenuOpen) {
+      document.addEventListener("mousedown", handleClickOutside);
+    }
+
+    // Cleanup the event listener
+    return () => {
+      document.removeEventListener("mousedown", handleClickOutside);
+    };
+  }, [isProfileMenuOpen]);
+
+  const handleLogout = async (e) => {
+    e.preventDefault(); // Prevent any default button behaviors
+
+    try {
+      // Show both button loading and full-screen loading
+      setIsLoggingOut(true);
+      setIsFullScreenLoading(true);
+
+      // Close menus
+      setIsProfileMenuOpen(false);
+      setIsMenuOpen(false);
+
+      // Wait for logout to complete
+      await logout();
+
+      // Small delay to ensure state updates have processed
+      setTimeout(() => {
+        navigate("/login", { replace: true });
+
+        // Reset loading states after navigation
+        setIsLoggingOut(false);
+        setIsFullScreenLoading(false);
+      }, 300);
+    } catch (error) {
+      console.error("Error during logout:", error);
+      setIsLoggingOut(false);
+      setIsFullScreenLoading(false);
+      navigate("/login", { replace: true });
+    }
   };
 
   return (
@@ -138,7 +190,10 @@ function Header() {
                   </button>
 
                   {isProfileMenuOpen && (
-                    <div className="absolute right-0 mt-2 w-48 bg-white rounded-md shadow-lg py-1 z-50">
+                    <div
+                      ref={profileMenuRef} // Add ref here
+                      className="absolute right-0 mt-2 w-48 bg-white rounded-md shadow-lg py-1 z-50"
+                    >
                       {" "}
                       {!isStaffOrHigher() && (
                         <>
@@ -167,13 +222,24 @@ function Header() {
                           Dashboard
                         </NavLink>
                       )}
+                      {/* Desktop logout button */}
                       <button
                         onClick={handleLogout}
+                        disabled={isLoggingOut}
                         className="block w-full text-left px-4 py-2 text-sm text-red-600 hover:bg-gray-100"
                       >
                         <div className="flex items-center">
-                          <LogOut size={16} className="mr-2" />
-                          <span>Đăng Xuất</span>
+                          {isLoggingOut ? (
+                            <>
+                              <div className="animate-spin h-4 w-4 border-2 border-red-600 border-t-transparent rounded-full mr-2"></div>
+                              <span>Đang đăng xuất...</span>
+                            </>
+                          ) : (
+                            <>
+                              <LogOut size={16} className="mr-2" />
+                              <span>Đăng Xuất</span>
+                            </>
+                          )}
                         </div>
                       </button>
                     </div>
@@ -339,13 +405,24 @@ function Header() {
                       </li>
                     </>
                   )}
+                  {/* Mobile logout button - update this one too */}
                   <li>
                     <button
                       onClick={handleLogout}
+                      disabled={isLoggingOut}
                       className="flex items-center text-red-600 hover:text-red-700"
                     >
-                      <LogOut size={16} className="mr-2" />
-                      <span>Đăng Xuất</span>
+                      {isLoggingOut ? (
+                        <>
+                          <div className="animate-spin h-4 w-4 border-2 border-red-600 border-t-transparent rounded-full mr-2"></div>
+                          <span>Đang đăng xuất...</span>
+                        </>
+                      ) : (
+                        <>
+                          <LogOut size={16} className="mr-2" />
+                          <span>Đăng Xuất</span>
+                        </>
+                      )}
                     </button>
                   </li>
                 </>
@@ -362,6 +439,23 @@ function Header() {
               )}
             </ul>
           </nav>
+        </div>
+      )}
+
+      {isFullScreenLoading && (
+        <div className="fixed inset-0 bg-black/30 backdrop-blur-sm flex items-center justify-center z-50">
+          <div className="bg-white rounded-lg shadow-2xl p-6 max-w-sm w-full mx-4 text-center">
+            <div className="flex justify-center">
+              <div className="w-16 h-16 relative">
+                <div className="absolute inset-0 rounded-full border-4 border-indigo-100"></div>
+                <div className="absolute inset-0 rounded-full border-4 border-indigo-600 border-t-transparent animate-spin"></div>
+              </div>
+            </div>
+            <h3 className="text-xl font-semibold text-gray-800 mt-4">
+              Đang đăng xuất...
+            </h3>
+            <p className="text-gray-500 mt-2">Vui lòng đợi trong giây lát</p>
+          </div>
         </div>
       )}
     </header>

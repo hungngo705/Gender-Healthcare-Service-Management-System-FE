@@ -141,8 +141,8 @@ export const authService = {
   },
 
   /**
-   * Get current user from localStorage
-   * @returns {Object|null} Current user object or null
+   * Get current user from JWT token with localStorage fallback
+
    */
   getCurrentUser: () => {
     const user = localStorage.getItem("user");
@@ -187,7 +187,7 @@ export const authService = {
       localStorage.removeItem(config.auth.refreshStorageKey);
       localStorage.removeItem("user");
 
-      toastService.info("Bạn đã đăng xuất thành công");
+      toastService.success("Bạn đã đăng xuất thành công");
       // Redirect to login page
       window.location.href = "/login";
     }
@@ -206,7 +206,7 @@ export const authService = {
         config.api.users.changePassword,
         passwordData
       );
-      toastService.success("Password changed successfully");
+      toastService.success("Đổi mật khẩu thành công");
       return response.data;
     } catch (error) {
       // Error handling is done by the axios interceptors
@@ -224,7 +224,7 @@ export const authService = {
       const response = await apiService.get(
         `${config.api.auth.verifyEmail}?token=${token}`
       );
-      toastService.success("Email verified successfully");
+      toastService.success("Email đã được xác minh thành công");
       return response.data;
     } catch (error) {
       // Error handling is done by the axios interceptors

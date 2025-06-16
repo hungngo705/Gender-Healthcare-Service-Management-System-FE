@@ -1,10 +1,9 @@
 import React, { useState, useEffect } from "react";
 import { format, parse, isValid, isSameDay, startOfToday, addDays, eachDayOfInterval } from "date-fns";
 import { vi } from "date-fns/locale";
-// Remove the import from consultants.js 
-// import { appoinments as appointments } from "../../data/consultants";
-// Import appointment service instead
+// Import appointment and user services
 import appointmentService from "../../services/appointmentService";
+import userService from "../../services/userService";
 // Import toast service
 import toastService from "../../utils/toastService";
 
@@ -19,53 +18,78 @@ import ConsultantDetail from "../../components/booking/ConsultantDetail";
 const Booking = () => {
   // Add state for appointments data and loading status
   const [appointments, setAppointments] = useState([]);
+  const [allConsultants, setAllConsultants] = useState([]);
   const [isLoading, setIsLoading] = useState(true);
   const [loadError, setLoadError] = useState(null);
+  const [refreshKey, setRefreshKey] = useState(0); // Add a refreshKey state
 
-  // Fetch appointments data from API
+  // Fetch appointments and consultants data from API
   useEffect(() => {
-    const fetchAppointments = async () => {
+    const fetchData = async () => {
       try {
         setIsLoading(true);
-        const response = await appointmentService.getAll();
-        setAppointments(response.data || []);
+        
+        // Fetch all consultants by role
+        const consultantsResponse = await userService.getAllByRole("consultant");
+        setAllConsultants(consultantsResponse || []);
+        
+
+        // Fetch all appointments
+        const appointmentsResponse = await appointmentService.getAll();
+        // Check the structure and extract the actual array
+        setAppointments(Array.isArray(appointmentsResponse.data) 
+          ? appointmentsResponse.data 
+          : appointmentsResponse.data?.data || []);
+        
         setLoadError(null);
       } catch (error) {
-        console.error("Failed to fetch appointments:", error);
-        setLoadError("Không thể tải dữ liệu lịch hẹn. Vui lòng thử lại sau.");
+        console.error("Failed to fetch data:", error);
+        setLoadError("Không thể tải dữ liệu. Vui lòng thử lại sau.");
       } finally {
         setIsLoading(false);
       }
     };
 
-    fetchAppointments();
-  }, []);
+    fetchData();
+  }, [refreshKey]); // Modify your useEffect to depend on the refreshKey
 
   // Transform appointments data to consultant data
   const formatConsultants = () => {
-    if (!appointments.length) return [];
-    
+    // Start with all consultants from the API
     const consultantsMap = {};
     
-    // Extract all unique consultants and initialize their data
+    // First, initialize all consultants with empty booked shifts
+    allConsultants.forEach(consultant => {
+      consultantsMap[consultant.id] = {
+        id: consultant.id,
+        name: consultant.name || "Unknown",
+        specialty: consultant.specialty || "Tư vấn sức khỏe",
+        image: consultant.avatarUrl || "",
+        rating: 5,
+        reviewCount: 0,
+        bio: consultant.bio || "Chuyên gia tư vấn sức khỏe sinh sản và tình dục.",
+        bookedShifts: {}
+      };
+    });
+    
+    // Then add booking information from appointments
     appointments.forEach(appointment => {
-      if (!consultantsMap[appointment.consultantId]) {
-        // Use the consultant data from the API response
-        consultantsMap[appointment.consultantId] = {
-          id: appointment.consultantId,
-          name: appointment.consultant?.name || "Unknown",
-          specialty: appointment.consultant?.specialty || "Tư vấn sức khỏe",
-          image: appointment.consultant?.avatarUrl || "",
-          rating: 5,
-          reviewCount: 0,
-          bio: "Chuyên gia tư vấn sức khỏe sinh sản và tình dục.",
-          bookedShifts: {}
-        };
-      }
-      
-      // Add booked shifts for this consultant
-      if (appointment.status !== 2) { // Ignore cancelled appointments
-        // Date format from API
+      if (appointment.consultantId && appointment.status !== 2) {
+        // Make sure this consultant exists in the map
+        if (!consultantsMap[appointment.consultantId]) {
+          consultantsMap[appointment.consultantId] = {
+            id: appointment.consultantId,
+            name: appointment.consultant?.name || "Unknown",
+            specialty: appointment.consultant?.specialty || "Tư vấn sức khỏe",
+            image: appointment.consultant?.avatarUrl || "",
+            rating: 5,
+            reviewCount: 0,
+            bio: "Chuyên gia tư vấn sức khỏe sinh sản và tình dục.",
+            bookedShifts: {}
+          };
+        }
+        
+        // Add booked shifts for this consultant
         const dateKey = appointment.appointmentDate;
         
         if (!consultantsMap[appointment.consultantId].bookedShifts[dateKey]) {
@@ -89,6 +113,7 @@ const Booking = () => {
     email: "",
     phone: "",
     reason: "",
+    customerId: null
   });
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [bookingSuccess, setBookingSuccess] = useState(false);
@@ -197,7 +222,7 @@ const Booking = () => {
   };
 
   // Update handleSubmit to use the toast service
-  const handleSubmit = async (e) => {
+  const handleSubmit = async (e, appointmentData) => {
     e.preventDefault();
     
     if (!selectedConsultant || !selectedTimeSlot) {
@@ -207,28 +232,25 @@ const Booking = () => {
     
     setIsSubmitting(true);
     
-    // Format date for API
-    const dateKey = format(selectedDate, "yyyy-MM-dd");
-    
     try {
-      // Prepare appointment data for API
-      const appointmentData = {
+      // If appointmentData is provided by BookingForm, use it directly
+      const dataToSubmit = appointmentData || {
+        customerId: formData.customerId, // Use customer ID from form data
         consultantId: selectedConsultant.id,
-        appointmentDate: dateKey,
+        serviceId: "c8d9e0f1-2a3b-4c5d-6e7f-8a9b0c1d2e3f", // Default service ID
+        appointmentDate: format(selectedDate, "yyyy-MM-dd"),
         slot: selectedTimeSlot.id,
-        patientName: formData.name,
-        patientEmail: formData.email,
-        patientPhone: formData.phone,
-        reason: formData.reason,
-        // Add other fields as required by your API
+        notes: formData.reason
       };
       
+      
       // Call API to create appointment
-      await appointmentService.create(appointmentData);
+      await appointmentService.create(dataToSubmit);
       
       // Update local state to reflect the booking
       setLocalBookedSlots(prev => {
         const updatedSlots = { ...prev };
+        const dateKey = dataToSubmit.appointmentDate;
         
         if (!updatedSlots[selectedConsultant.id]) {
           updatedSlots[selectedConsultant.id] = {};
@@ -238,7 +260,7 @@ const Booking = () => {
           updatedSlots[selectedConsultant.id][dateKey] = [];
         }
         
-        updatedSlots[selectedConsultant.id][dateKey].push(selectedTimeSlot.id);
+        updatedSlots[selectedConsultant.id][dateKey].push(dataToSubmit.slot);
         
         return updatedSlots;
       });
@@ -261,13 +283,16 @@ const Booking = () => {
       email: "",
       phone: "",
       reason: "",
+      customerId: null
     });
     setSelectedConsultant(null);
     setSelectedTimeSlot(null);
     setSelectedDate(null);
+    setLocalBookedSlots({}); // Clear locally tracked booked slots
     
-    // Optional: Show toast when reset
-    toastService.info("Bạn có thể đặt lịch hẹn mới");
+    // Increment the refreshKey to trigger a new API call
+    setRefreshKey(prevKey => prevKey + 1);
+
   };
 
   // Update the return section to handle loading status
@@ -391,6 +416,8 @@ const Booking = () => {
                       onInputChange={handleInputChange}
                       onSubmit={handleSubmit}
                       isSubmitting={isSubmitting}
+                      setFormData={setFormData} // Add this line
+                      onBookingSuccess={() => setBookingSuccess(true)} // Add this line
                     />
                   ) : (
                     <div className="px-6 py-12 text-center">
