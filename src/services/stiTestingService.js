@@ -11,7 +11,7 @@ const stiTestingService = {
    * @returns {Promise} - The STI tests response promise
    */
   getAll: (params = {}) => {
-    return apiService.get(config.api.stiTesting.getAll, params);
+    return apiService.get(config.api.stiTesting.getAll, { params });
   },
 
   /**
@@ -33,23 +33,22 @@ const stiTestingService = {
   },
 
   /**
-   * Get STI tests by user ID
-   * @param {string|number} userId - The user ID
-   * @param {Object} params - Query parameters for filtering, pagination, etc.
-   * @returns {Promise} - The STI tests response promise
+   * Update STI test
+   * @param {string} id - The STI test ID
+   * @param {Object} testData - The test data to update
+   * @returns {Promise} - The update STI test response promise
    */
-  getByUser: (userId, params = {}) => {
-    return apiService.get(config.api.stiTesting.getByUser(userId), params);
+  update: (id, testData) => {
+    return apiService.put(config.api.stiTesting.update(id), testData);
   },
 
   /**
-   * Update STI test result
-   * @param {string|number} id - The STI test ID
-   * @param {Object} resultData - The test result data
-   * @returns {Promise} - The update STI test result response promise
+   * Delete STI test
+   * @param {string} id - The STI test ID
+   * @returns {Promise} - The delete STI test response promise
    */
-  updateResult: (id, resultData) => {
-    return apiService.put(config.api.stiTesting.updateResult(id), resultData);
+  delete: (id) => {
+    return apiService.delete(config.api.stiTesting.delete(id));
   },
 };
 

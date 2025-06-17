@@ -95,20 +95,13 @@ function CustomerProfile() {
   // Load user profile data from API
   const loadUserProfile = useCallback(async () => {
     try {
-      const userData = await userService.getCurrentUserProfile();
-
-      // Map API response to local state structure
+      const userData = await userService.getCurrentUserProfile(); // Map API response to local state structure
       setProfileData({
         name: userData.name || "",
         email: userData.email || "",
         phone: userData.phoneNumber || "",
         address: userData.address || "",
-        birthday: userData.birthday || userData.dateOfBirth || "",
-        gender: userData.gender || "",
-        emergencyContact: userData.emergencyContact || "",
         avatarUrl: userData.avatarUrl || "",
-        createdAt: userData.createdAt || "",
-        lastLoginAt: userData.lastLoginAt || "",
         totalAppointments: userData.totalAppointments || 0,
         totalSTITests: userData.totalSTITests || 0,
         totalPosts: userData.totalPosts || 0,
@@ -123,12 +116,7 @@ function CustomerProfile() {
           email: currentUser.email || "",
           phone: currentUser.phoneNumber || currentUser.phone || "",
           address: currentUser.address || "",
-          birthday: currentUser.birthday || currentUser.dateOfBirth || "",
-          gender: currentUser.gender || "",
-          emergencyContact: currentUser.emergencyContact || "",
           avatarUrl: currentUser.avatarUrl || "",
-          createdAt: "",
-          lastLoginAt: "",
           totalAppointments: 0,
           totalSTITests: 0,
           totalPosts: 0,
@@ -150,26 +138,22 @@ function CustomerProfile() {
         email: updatedData.email,
         phoneNumber: updatedData.phone,
         address: updatedData.address,
-        birthday: updatedData.birthday,
-        gender: updatedData.gender,
-        emergencyContact: updatedData.emergencyContact,
       };
 
       // Call API to update profile
       const updatedProfile = await userService.updateCurrentUserProfile(
         apiData
-      );
-
-      // Update local state with response data
+      ); // Update local state with response data
       setProfileData({
         name: updatedProfile.name || updatedData.name,
         email: updatedProfile.email || updatedData.email,
         phone: updatedProfile.phoneNumber || updatedData.phone,
         address: updatedProfile.address || updatedData.address,
-        birthday: updatedProfile.birthday || updatedData.birthday,
-        gender: updatedProfile.gender || updatedData.gender,
-        emergencyContact:
-          updatedProfile.emergencyContact || updatedData.emergencyContact,
+        avatarUrl: profileData.avatarUrl,
+        totalAppointments: profileData.totalAppointments || 0,
+        totalSTITests: profileData.totalSTITests || 0,
+        totalPosts: profileData.totalPosts || 0,
+        isActive: profileData.isActive || true,
       }); // Reload profile data to ensure consistency
       await loadUserProfile();
     } catch (error) {

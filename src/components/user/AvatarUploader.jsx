@@ -1,5 +1,5 @@
 import React, { useState } from "react";
-import { Upload, X, Check } from "lucide-react";
+import { Upload, X, Check, Link, Image } from "lucide-react";
 import UserAvatar from "./UserAvatar";
 import userUtils from "../../utils/userUtils";
 import userService from "../../services/userService";
@@ -12,9 +12,10 @@ function AvatarUploader() {
   const [isUploading, setIsUploading] = useState(false);
   const [uploadError, setUploadError] = useState(null);
   const [selectedFile, setSelectedFile] = useState(null);
+  const [imageUrl, setImageUrl] = useState("");
+  const [uploadMethod, setUploadMethod] = useState("file"); // "file" or "url"
 
-  const { currentUser } = userUtils.useUserInfo();
-  // Handle file selection
+  const { currentUser } = userUtils.useUserInfo(); // Handle file selection
   const handleFileChange = (event) => {
     const file = event.target.files[0];
     if (!file) return;
@@ -35,6 +36,7 @@ function AvatarUploader() {
 
     // Store the selected file
     setSelectedFile(file);
+    setImageUrl("");
 
     // Create preview URL
     const fileReader = new FileReader();
@@ -43,45 +45,127 @@ function AvatarUploader() {
       setUploadError(null);
     };
     fileReader.readAsDataURL(file);
+  };
+
+  // Handle URL input
+  const handleUrlChange = (event) => {
+    setImageUrl(event.target.value);
+    setSelectedFile(null);
+    setUploadError(null);
+  };
+
+  // Preview image from URL
+  const handleUrlPreview = () => {
+    if (!imageUrl) {
+      setUploadError("Vui lòng nhập URL hình ảnh");
+      return;
+    }
+    const isValidUrl = /^(https?:\/\/)([\w.-]+)([\/\w.-]*)*\/?$/.test(imageUrl);
+
+    if (!isValidUrl) {
+      setUploadError("URL không hợp lệ. Vui lòng nhập đúng định dạng URL");
+      return;
+    }
+
+    // Set preview URL to input URL
+    setPreviewUrl(imageUrl);
+    setUploadError(null);
   }; // Upload avatar to server
   const handleUpload = async () => {
-    if (!previewUrl || !selectedFile || !currentUser?.id) return;
+    if (!previewUrl || (!selectedFile && !imageUrl) || !currentUser?.id) return;
 
     setIsUploading(true);
     setUploadError(null);
 
     try {
-      // Create FormData for file upload
-      const formData = new FormData();
-      formData.append("avatar", selectedFile);
+      let result;
 
-      console.log("Uploading avatar for user:", currentUser.id);
-      console.log("File details:", {
-        name: selectedFile.name,
-        size: selectedFile.size,
-        type: selectedFile.type,
-      });
+      if (selectedFile) {
+        // File upload method
+        // Create FormData for file upload
+        const formData = new FormData();
+        formData.append("avatar", selectedFile);
+        console.log("Uploading avatar file");
+        console.log("File details:", {
+          name: selectedFile.name,
+          size: selectedFile.size,
+          type: selectedFile.type,
+        }); // Upload avatar using userService
+        result = await userService.updateUserAvatar(formData);
+      } else if (imageUrl) {
+        // URL upload method
+        console.log("Uploading avatar URL");
+        console.log("URL:", imageUrl); // For pravatar.cc, add a unique identifier to prevent caching
+        let finalImageUrl = imageUrl;
+        if (imageUrl.includes("pravatar.cc")) {
+          // Add a random query parameter to avoid caching
+          finalImageUrl = `${imageUrl}${
+            imageUrl.includes("?") ? "&" : "?"
+          }r=${Math.random()}`;
+          console.log(
+            "Modified pravatar URL to prevent caching:",
+            finalImageUrl
+          );
+        }
 
-      // Upload avatar using userService
-      const result = await userService.updateUserAvatar(
-        currentUser.id,
-        formData
-      );
-
+        // Upload avatar URL
+        result = await userService.updateUserAvatarUrl({
+          avatarUrl: finalImageUrl,
+        });
+      }
       console.log("Avatar upload successful:", result);
 
       // Success handling
       setIsUploading(false);
       setPreviewUrl(null);
       setSelectedFile(null);
+      setImageUrl("");
 
-      // Show success message briefly before reload
+      // Show success message
       setUploadError("Ảnh đại diện đã được cập nhật thành công!");
 
-      // Reload the page after a short delay to show updated avatar
-      setTimeout(() => {
-        window.location.reload();
-      }, 1500);
+      // Update user data in local storage
+      try {
+        // Get the latest user profile data from the server
+        const updatedProfile = await userService.getCurrentUserProfile();
+        console.log("Updated profile:", updatedProfile);
+
+        // Update the local storage with the new data
+        if (updatedProfile) {
+          const currentUserData = JSON.parse(
+            localStorage.getItem("user") || "{}"
+          ); // If we used pravatar URL directly and the profile doesn't have it yet, use our URL
+          const avatarUrlToUse =
+            updatedProfile.avatarUrl ||
+            imageUrl ||
+            (selectedFile ? URL.createObjectURL(selectedFile) : null);
+
+          console.log("Avatar URL to use:", avatarUrlToUse);
+
+          const updatedUserData = {
+            ...currentUserData,
+            avatarUrl: avatarUrlToUse,
+            avatar: avatarUrlToUse, // Add both fields to ensure compatibility
+            profileImage: avatarUrlToUse,
+          };
+
+          // Update user data in localStorage
+          localStorage.setItem("user", JSON.stringify(updatedUserData));
+          console.log("User data updated in localStorage", updatedUserData);
+
+          // Reload the page after a short delay to show updated avatar
+          setTimeout(() => {
+            window.location.reload();
+          }, 1000);
+        }
+      } catch (profileError) {
+        console.error("Failed to update profile data:", profileError);
+
+        // Still reload the page after a delay
+        setTimeout(() => {
+          window.location.reload();
+        }, 1500);
+      }
     } catch (error) {
       console.error("Upload failed:", error);
       let errorMessage = "Không thể tải ảnh lên. Vui lòng thử lại.";
@@ -98,11 +182,11 @@ function AvatarUploader() {
       setUploadError(errorMessage);
       setIsUploading(false);
     }
-  };
-  // Cancel upload
+  }; // Cancel upload
   const handleCancel = () => {
     setPreviewUrl(null);
     setSelectedFile(null);
+    setImageUrl("");
     setUploadError(null);
   };
 
@@ -120,19 +204,70 @@ function AvatarUploader() {
         ) : (
           <UserAvatar size="xl" />
         )}
-      </div>
+      </div>{" "}
       {!previewUrl && (
         <div className="mb-4 flex flex-col items-center">
-          <label className="flex items-center justify-center px-4 py-2 bg-indigo-50 text-indigo-600 rounded-md cursor-pointer hover:bg-indigo-100 transition-colors">
-            <Upload className="w-4 h-4 mr-2" />
-            <span>Chọn ảnh</span>
-            <input
-              type="file"
-              className="hidden"
-              accept="image/*"
-              onChange={handleFileChange}
-            />
-          </label>
+          <div className="flex mb-3 bg-gray-100 rounded-md p-1">
+            <button
+              type="button"
+              className={`px-3 py-1 rounded-md text-sm font-medium ${
+                uploadMethod === "file"
+                  ? "bg-white shadow-sm text-indigo-600"
+                  : "text-gray-700 hover:bg-gray-200"
+              }`}
+              onClick={() => setUploadMethod("file")}
+            >
+              <Upload className="w-3 h-3 inline mr-1" />
+              Tải tệp
+            </button>
+            <button
+              type="button"
+              className={`px-3 py-1 rounded-md text-sm font-medium ${
+                uploadMethod === "url"
+                  ? "bg-white shadow-sm text-indigo-600"
+                  : "text-gray-700 hover:bg-gray-200"
+              }`}
+              onClick={() => setUploadMethod("url")}
+            >
+              <Link className="w-3 h-3 inline mr-1" />
+              Dùng URL
+            </button>
+          </div>
+
+          {uploadMethod === "file" ? (
+            <label className="flex items-center justify-center px-4 py-2 bg-indigo-50 text-indigo-600 rounded-md cursor-pointer hover:bg-indigo-100 transition-colors">
+              <Image className="w-4 h-4 mr-2" />
+              <span>Chọn ảnh</span>
+              <input
+                type="file"
+                className="hidden"
+                accept="image/*"
+                onChange={handleFileChange}
+              />
+            </label>
+          ) : (
+            <div className="w-full max-w-sm flex flex-col items-center">
+              <div className="flex w-full">
+                <input
+                  type="text"
+                  placeholder="Nhập URL hình ảnh"
+                  className="flex-grow px-3 py-2 border border-gray-300 rounded-l-md focus:outline-none focus:ring-1 focus:ring-indigo-500 text-sm"
+                  value={imageUrl}
+                  onChange={handleUrlChange}
+                />
+                <button
+                  type="button"
+                  onClick={handleUrlPreview}
+                  className="px-3 py-2 bg-indigo-600 text-white rounded-r-md hover:bg-indigo-700 text-sm"
+                >
+                  Xem
+                </button>
+              </div>
+              <p className="text-xs text-gray-500 mt-2">
+                Nhập URL đầy đủ hợp lệ đến hình ảnh
+              </p>
+            </div>
+          )}
         </div>
       )}{" "}
       {uploadError && (

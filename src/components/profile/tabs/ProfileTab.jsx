@@ -198,59 +198,6 @@ function ProfileTab({ profileData, onSave }) {
                   {errors.phone}
                 </p>
               )}
-            </div>
-            <div>
-              <label className="text-sm font-medium text-gray-700 mb-2 flex items-center">
-                <Calendar size={16} className="mr-2 text-gray-500" />
-                Ngày sinh
-              </label>
-              <input
-                type="date"
-                name="birthday"
-                value={formData.birthday || ""}
-                onChange={handleChange}
-                className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500 transition"
-              />
-            </div>{" "}
-            <div>
-              <label className="text-sm font-medium text-gray-700 mb-2 flex items-center">
-                <UserIcon size={16} className="mr-2 text-gray-500" />
-                Giới tính
-              </label>
-              <select
-                name="gender"
-                value={formData.gender || ""}
-                onChange={handleChange}
-                className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500 transition appearance-none bg-no-repeat bg-right"
-                style={{
-                  backgroundImage:
-                    'url(\'data:image/svg+xml;charset=US-ASCII,<svg width="20" height="20" xmlns="http://www.w3.org/2000/svg"><path d="M7 7l3-3 3 3m0 6l-3 3-3-3" fill="none" stroke="%239fa6b2" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/></svg>\')',
-                  backgroundPosition: "right 0.5rem center",
-                  paddingRight: "2.5rem",
-                }}
-              >
-                <option value="">Chọn giới tính</option>
-                <option value="male">Nam</option>
-                <option value="female">Nữ</option>
-                <option value="other">Khác</option>
-              </select>
-            </div>
-            <div>
-              <label className="text-sm font-medium text-gray-700 mb-2 flex items-center">
-                <Phone size={16} className="mr-2 text-gray-500" />
-                Người liên hệ khi khẩn cấp
-              </label>
-              <input
-                type="text"
-                name="emergencyContact"
-                value={formData.emergencyContact || ""}
-                onChange={handleChange}
-                placeholder="Tên & Số điện thoại"
-                className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500 transition"
-              />
-              <p className="mt-2 text-xs text-gray-500">
-                Người thân hoặc bạn bè có thể liên lạc trong trường hợp khẩn cấp
-              </p>
             </div>{" "}
             <div className="md:col-span-2">
               <label className="text-sm font-medium text-gray-700 mb-2 flex items-center">
@@ -367,46 +314,6 @@ function ProfileTab({ profileData, onSave }) {
                 </dd>
               </div>
             </div>
-            <div className="flex">
-              <div className="flex-shrink-0 mr-3">
-                <Calendar size={20} className="text-gray-400" />
-              </div>
-              <div>
-                <dt className="text-sm font-medium text-gray-500">Ngày sinh</dt>
-                <dd className="mt-1 text-base text-gray-900">
-                  {profileData.birthday
-                    ? new Date(profileData.birthday).toLocaleDateString("vi-VN")
-                    : "Chưa cập nhật"}
-                </dd>
-              </div>
-            </div>
-            <div className="flex">
-              <div className="flex-shrink-0 mr-3">
-                <User size={20} className="text-gray-400" />
-              </div>
-              <div>
-                <dt className="text-sm font-medium text-gray-500">Giới tính</dt>
-                <dd className="mt-1 text-base text-gray-900">
-                  {profileData.gender === "male" && "Nam"}
-                  {profileData.gender === "female" && "Nữ"}
-                  {profileData.gender === "other" && "Khác"}
-                  {!profileData.gender && "Chưa cập nhật"}
-                </dd>
-              </div>
-            </div>
-            <div className="flex">
-              <div className="flex-shrink-0 mr-3">
-                <Phone size={20} className="text-gray-400" />
-              </div>
-              <div>
-                <dt className="text-sm font-medium text-gray-500">
-                  Người liên hệ khi khẩn cấp
-                </dt>
-                <dd className="mt-1 text-base text-gray-900">
-                  {profileData.emergencyContact || "Chưa cập nhật"}
-                </dd>
-              </div>
-            </div>
             <div className="md:col-span-2 flex">
               <div className="flex-shrink-0 mr-3">
                 <MapPin size={20} className="text-gray-400" />
@@ -438,9 +345,6 @@ ProfileTab.propTypes = {
     email: PropTypes.string,
     phone: PropTypes.string,
     address: PropTypes.string,
-    birthday: PropTypes.string,
-    gender: PropTypes.string,
-    emergencyContact: PropTypes.string,
   }).isRequired,
   onSave: PropTypes.func.isRequired,
 };

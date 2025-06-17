@@ -50,7 +50,6 @@ const appointmentService = {
   cancel: (id) => {
     return apiService.post(config.api.appointments.cancel(id));
   },
-
   /**
    * Get appointments by user ID
    * @param {string|number} userId - The user ID
@@ -58,7 +57,11 @@ const appointmentService = {
    * @returns {Promise} - The appointments response promise
    */
   getByUser: (userId, params = {}) => {
-    return apiService.get(config.api.appointments.getByUser(userId), params);
+    // Nếu không có userId cụ thể, sử dụng endpoint 'me' để lấy cuộc hẹn của người dùng hiện tại
+    const endpoint = userId
+      ? config.api.appointments.getByUser(userId)
+      : config.api.appointments.getByCurrentUser;
+    return apiService.get(endpoint, { params });
   },
 
   /**

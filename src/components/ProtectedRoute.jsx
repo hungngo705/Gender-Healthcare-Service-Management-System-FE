@@ -3,7 +3,6 @@ import { useAuth } from "../contexts/AuthContext";
 import PropTypes from "prop-types";
 import userUtils from "../utils/userUtils";
 import { useState, useEffect } from "react";
-import serverHealth from "../utils/serverHealth";
 
 // Helper function to extract role name from role object
 const extractRoleName = (roleObj) => {
@@ -119,24 +118,15 @@ function ProtectedRoute({ isLoggedIn, children, roleRequired }) {
   // Use provided isLoggedIn prop or fall back to context's isAuthenticated
   const isUserLoggedIn =
     isLoggedIn !== undefined ? isLoggedIn : isAuthenticated;
-
   // For basic sync validation (backwards compatibility)
   const isTokenValidSync = validateTokenSync();
 
-  // Enhanced validation with server check for critical routes
+  // Enhanced validation for critical routes
   useEffect(() => {
     const performEnhancedValidation = async () => {
       if (roleRequired && currentUser && isTokenValidSync) {
         setIsValidating(true);
-
-        // Check server connectivity for critical protected routes
-        const isServerUp = await serverHealth.checkServerConnectivity();
-        if (!isServerUp) {
-          console.log(
-            "Server appears to be down, using local token validation"
-          );
-        }
-
+        // No server health check needed
         setIsValidating(false);
       }
     };

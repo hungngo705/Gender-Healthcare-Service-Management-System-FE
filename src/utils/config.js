@@ -25,11 +25,11 @@ const getApiBaseURL = () => {
     console.warn(
       "Production API URL not configured! Please set VITE_API_URL environment variable."
     );
-    return "https://your-production-api-domain.com/api/v2"; 
+    return "https://your-production-api-domain.com/api/v2";
   }
 
   // Fallback for other hosts
-  return `https://${currentHost}:7050/api/v2`; 
+  return `https://${currentHost}:7050/api/v2`;
 };
 
 const config = {
@@ -66,9 +66,7 @@ const config = {
       update: (id) => `/consultant/${id}`,
       delete: (id) => `/consultant/${id}`,
       getAvailability: (id) => `/consultant/${id}/availability`,
-    },
-
-    // Appointment endpoints
+    }, // Appointment endpoints
     appointments: {
       getAll: "/appointment/getall",
       create: "/appointment/create",
@@ -76,17 +74,16 @@ const config = {
       update: (id) => `/appointment/update/${id}`,
       cancel: (id) => `/appointment/${id}/cancel`,
       getByUser: (userId) => `/appointment/user/${userId}`,
+      getByCurrentUser: "/appointment/getall",
       getByConsultant: (consultantId) =>
         `/appointment/consultant/${consultantId}`,
-    },
-
-    // STI testing endpoints
+    }, // STI testing endpoints
     stiTesting: {
-      getAll: "/sti-test/getall",
-      create: "/sti-test/create",
-      getById: (id) => `/sti-test/${id}`,
-      getByUser: (userId) => `/sti-test/user/${userId}`,
-      updateResult: (id) => `/sti-test/${id}/result`,
+      getAll: "/stitesting/getall",
+      create: "/stitesting/create",
+      getById: (id) => `/stitesting/${id}`,
+      update: (id) => `/stitesting/update/${id}`,
+      delete: (id) => `/stitesting/delete/${id}`,
     },
 
     // Blog endpoints

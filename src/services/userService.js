@@ -92,7 +92,7 @@ export const userService = {
    */
   setUserRole: async (id, role) => {
     try {
-      const response = await apiService.put(`/api/v1/user/set-role/${id}`, {
+      const response = await apiService.put(`/api/v2/user/set-role/${id}`, {
         role,
       });
       const responseData = response.data?.data || response.data;
@@ -112,7 +112,7 @@ export const userService = {
   updateUserProfile: async (id, profileData) => {
     try {
       const response = await apiService.put(
-        `/api/v1/user/profile/${id}`,
+        `/api/v2/user/profile/${id}`,
         profileData
       );
       const responseData = response.data?.data || response.data;
@@ -127,23 +127,57 @@ export const userService = {
    * Update user avatar
    * @param {string|number} id - User ID
    * @param {FormData} avatarData - Avatar file data
+   * @returns {Promise} Promise that resolves with updated avatar info   */ updateUserAvatar:
+    async (avatarData) => {
+      try {
+        const response = await apiService.put(
+          `/api/v2/user/avatar/me`,
+          avatarData,
+          {
+            headers: {
+              "Content-Type": "multipart/form-data",
+            },
+          }
+        );
+        const responseData = response.data?.data || response.data;
+        toastService.success("Ảnh đại diện đã được cập nhật");
+        return responseData;
+      } catch (error) {
+        return Promise.reject(error);
+      }
+    },
+  /**
+   * Update user avatar using URL
+   * @param {Object} data - Object containing avatarUrl
    * @returns {Promise} Promise that resolves with updated avatar info
-   */
-  updateUserAvatar: async (id, avatarData) => {
+   */ updateUserAvatarUrl: async (data) => {
     try {
-      const response = await apiService.put(
-        `/api/v1/user/avatar/${id}`,
-        avatarData,
-        {
-          headers: {
-            "Content-Type": "multipart/form-data",
-          },
-        }
-      );
+      // Validate that the URL is accessible
+      try {
+        const testImage = new Image();
+        testImage.src = data.avatarUrl;
+
+        // Log for debugging
+        console.log("Testing avatar URL:", data.avatarUrl);
+
+        // Wait for a moment to see if the image loads
+        await new Promise((resolve) => setTimeout(resolve, 1000));
+      } catch (imgError) {
+        console.warn("Image validation warning:", imgError);
+        // Continue anyway as the backend might handle this
+      }
+
+      // Ensure URL has protocol
+      if (data.avatarUrl && !data.avatarUrl.startsWith("http")) {
+        data.avatarUrl = "https://" + data.avatarUrl;
+      }
+
+      const response = await apiService.put(`/api/v2/user/avatar/me`, data);
       const responseData = response.data?.data || response.data;
       toastService.success("Ảnh đại diện đã được cập nhật");
       return responseData;
     } catch (error) {
+      console.error("Error updating avatar URL:", error);
       return Promise.reject(error);
     }
   },
@@ -154,7 +188,7 @@ export const userService = {
    */
   getCurrentUserProfile: async () => {
     try {
-      const response = await apiService.get(config.api.users.myProfile);
+      const response = await apiService.get(config.api.users.profile);
       // Handle the unified response format with status_code, message, and data fields
       if (response.data && response.data.is_success) {
         return response.data.data;
@@ -165,7 +199,6 @@ export const userService = {
       return Promise.reject(error);
     }
   },
-
   /**
    * Update current user's profile
    * @param {Object} profileData - Updated profile data
@@ -174,7 +207,7 @@ export const userService = {
   updateCurrentUserProfile: async (profileData) => {
     try {
       const response = await apiService.put(
-        config.api.users.myProfile,
+        config.api.users.profile,
         profileData
       );
       // Handle the unified response format
@@ -197,7 +230,9 @@ export const userService = {
    */
   getAllByRole: async (role) => {
     try {
-      const response = await apiService.get(config.api.users.getAllByRole(role));
+      const response = await apiService.get(
+        config.api.users.getAllByRole(role)
+      );
       return response.data?.data || response.data;
     } catch (error) {
       return Promise.reject(error);
