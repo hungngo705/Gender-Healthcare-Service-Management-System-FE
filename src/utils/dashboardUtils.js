@@ -8,7 +8,7 @@ export function getDashboardConfig(userRole) {
     consultant: {
       title: "Bảng điều khiển dành cho bác sĩ tư vấn",
       menuItems: [
-        { id: "overview", label: "Tổng quan", icon: "chart-pie" },
+        // { id: "overview", label: "Tổng quan", icon: "chart-pie" },
         {
           id: "consultantAppointments",
           label: "Lịch hẹn tư vấn",

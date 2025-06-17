@@ -11,7 +11,7 @@ const getApiBaseURL = () => {
   const currentHost = window.location.hostname;
 
   if (currentHost === "localhost" || currentHost === "127.0.0.1") {
-    return "https://localhost:7050/api/v2";
+    return "https://localhost:7050"; // Changed to remove /api/v2
   }
 
   // For production, you need to set the correct API URL
@@ -25,109 +25,133 @@ const getApiBaseURL = () => {
     console.warn(
       "Production API URL not configured! Please set VITE_API_URL environment variable."
     );
-    return "https://your-production-api-domain.com/api/v2"; 
+    return "https://your-production-api-domain.com"; // Changed to remove /api/v2
   }
 
   // Fallback for other hosts
-  return `https://${currentHost}:7050/api/v2`; 
+  return `https://${currentHost}:7050`; // Changed to remove /api/v2
 };
 
 const config = {
   // API URLs
   api: {
     baseURL: getApiBaseURL(),
+    apiPrefix: "/api/v2", // Add this line to define the API prefix
     timeout: 20000, // 20 seconds
-    // Auth endpoints
+
+    // Auth endpoints - add API prefix
     auth: {
-      login: "/login",
-      register: "/register",
-      refreshToken: "/refresh-token",
-      logout: "/logout",
-      verifyEmail: "/verify-email",
-      forgotPassword: "/send-reset-code",
-      resetPassword: "/verify-code-and-reset",
+      login: "/api/v2/login",
+      register: "/api/v2/register",
+      refreshToken: "/api/v2/refresh-token",
+      logout: "/api/v2/logout",
+      verifyEmail: "/api/v2/verify-email",
+      forgotPassword: "/api/v2/send-reset-code",
+      resetPassword: "/api/v2/verify-code-and-reset",
     },
 
-    // User endpoints
+    // User endpoints - add API prefix
     users: {
-      getAll: "/user/getall",
-      create: "/user/create",
-      getAllByRole: (role) => `/user/getall/${role}`,
-      getById: (id) => `/user/${id}`,
-      update: (id) => `/user/update/${id}`,
-      delete: (id) => `/user/delete/${id}`,
-      profile: "/user/profile/me",
-      changePassword: "/user/change-password",
+      getAll: "/api/v2/user/getall",
+      create: "/api/v2/user/create",
+      getAllByRole: (role) => `/api/v2/user/getall/${role}`,
+      getById: (id) => `/api/v2/user/${id}`,
+      update: (id) => `/api/v2/user/update/${id}`,
+      delete: (id) => `/api/v2/user/delete/${id}`,
+      profile: "/api/v2/user/profile/me",
+      changePassword: "/api/v2/user/change-password",
     },
 
-    // Consultant endpoints
+    // Consultant endpoints - add API prefix
     consultants: {
-      getAll: "/consultant/getall",
-      getById: (id) => `/consultant/${id}`,
-      create: "/consultant/create",
-      update: (id) => `/consultant/${id}`,
-      delete: (id) => `/consultant/${id}`,
-      getAvailability: (id) => `/consultant/${id}/availability`,
+      getAll: "/api/v2/consultant/getall",
+      getById: (id) => `/api/v2/consultant/${id}`,
+      create: "/api/v2/consultant/create",
+      update: (id) => `/api/v2/consultant/${id}`,
+      delete: (id) => `/api/v2/consultant/${id}`,
+      getAvailability: (id) => `/api/v2/consultant/${id}/availability`,
     },
 
-    // Appointment endpoints
+    // Appointment endpoints - add API prefix
     appointments: {
-      getAll: "/appointment/getall",
-      create: "/appointment/create",
-      getById: (id) => `/appointment/${id}`,
-      update: (id) => `/appointment/update/${id}`,
-      cancel: (id) => `/appointment/${id}/cancel`,
-      getByUser: (userId) => `/appointment/user/${userId}`,
+      getAll: "/api/v2/appointment/getall",
+      create: "/api/v2/appointment/create",
+      getById: (id) => `/api/v2/appointment/${id}`,
+      update: (id) => `/api/v2/appointment/update/${id}`,
+      cancel: (id) => `/api/v2/appointment/${id}/cancel`,
+      getByUser: (userId) => `/api/v2/appointment/user/${userId}`,
       getByConsultant: (consultantId) =>
-        `/appointment/consultant/${consultantId}`,
+        `/api/v2/appointment/consultant/${consultantId}`,
     },
 
-    // STI testing endpoints
+    // STI testing endpoints - add API prefix
     stiTesting: {
-      getAll: "/sti-test/getall",
-      create: "/sti-test/create",
-      getById: (id) => `/sti-test/${id}`,
-      getByUser: (userId) => `/sti-test/user/${userId}`,
-      updateResult: (id) => `/sti-test/${id}/result`,
+      getAll: "/api/v2/sti-test/getall",
+      create: "/api/v2/sti-test/create",
+      getById: (id) => `/api/v2/sti-test/${id}`,
+      getByUser: (userId) => `/api/v2/sti-test/user/${userId}`,
+      updateResult: (id) => `/api/v2/sti-test/${id}/result`,
     },
 
-    // Blog endpoints
+    // Blog endpoints - add API prefix
     blog: {
-      getAll: "/blog/getall",
-      create: "/blog/create",
-      getById: (id) => `/blog/${id}`,
-      update: (id) => `/blog/${id}`,
-      delete: (id) => `/blog/${id}`,
-      getComments: (blogId) => `/blog/${blogId}/comments`,
-      addComment: (blogId) => `/blog/${blogId}/comments`,
-    }, // Service endpoints
-    services: {
-      getAll: "/service/getall",
-      create: "/service/create",
-      getById: (id) => `/service/${id}`,
-      update: (id) => `/service/${id}`,
-      delete: (id) => `/service/${id}`,
-    }, // Dashboard endpoints
-    dashboard: {
-      stats: "/dashboard/stats",
-      data: "/dashboard/data",
-      usersByRole: "/dashboard/users-by-role",
-      appointmentsByStatus: "/dashboard/appointments-by-status",
-      statsByRole: (role) => `/dashboard/stats/role/${role}`,
-      activities: "/dashboard/activities",
-      monthlyStats: (year, month) =>
-        `/dashboard/stats/monthly/${year}/${month}`,
+      getAll: "/api/v2/blog/getall",
+      create: "/api/v2/blog/create",
+      getById: (id) => `/api/v2/blog/${id}`,
+      update: (id) => `/api/v2/blog/${id}`,
+      delete: (id) => `/api/v2/blog/${id}`,
+      getComments: (blogId) => `/api/v2/blog/${blogId}/comments`,
+      addComment: (blogId) => `/api/v2/blog/${blogId}/comments`,
     },
 
-    // TestResult endpoints
+    // Service endpoints - add API prefix
+    services: {
+      getAll: "/api/v2/service/getall",
+      create: "/api/v2/service/create",
+      getById: (id) => `/api/v2/service/${id}`,
+      update: (id) => `/api/v2/service/${id}`,
+      delete: (id) => `/api/v2/service/${id}`,
+    },
+
+    // Dashboard endpoints - add API prefix
+    dashboard: {
+      stats: "/api/v2/dashboard/stats",
+      data: "/api/v2/dashboard/data",
+      usersByRole: "/api/v2/dashboard/users-by-role",
+      appointmentsByStatus: "/api/v2/dashboard/appointments-by-status",
+      statsByRole: (role) => `/api/v2/dashboard/stats/role/${role}`,
+      activities: "/api/v2/dashboard/activities",
+      monthlyStats: (year, month) =>
+        `/api/v2/dashboard/stats/monthly/${year}/${month}`,
+    },
+
+    // TestResult endpoints - add API prefix
     testResult: {
-      getAll: "/testresult/getall",
-      getById: (id) => `/testresult/${id}`,
-      create: "/testresult/create",
-      update: (id) => `/testresult/${id}`,
+      getAll: "/api/v2/testresult/getall",
+      getById: (id) => `/api/v2/testresult/${id}`,
+      create: "/api/v2/testresult/create",
+      update: (id) => `/api/v2/testresult/${id}`,
       getByAppointment: (appointmentId) =>
-        `/testresult/appointment/${appointmentId}`,
-      getByPatient: (patientId) => `/testresult/patient/${patientId}`,
+        `/api/v2/testresult/appointment/${appointmentId}`,
+      getByPatient: (patientId) => `/api/v2/testresult/patient/${patientId}`,
+    },
+
+    // Menstrual cycle tracking endpoints - add API prefix
+    menstrualCycle: {
+      getAll: "/api/menstrual-cycle-trackings",
+      create: "/api/menstrual-cycle-trackings",
+      getById: (id) => `/api/menstrual-cycle-trackings/${id}`,
+      update: (id) => `/api/menstrual-cycle-trackings/${id}`,
+      delete: (id) => `/api/menstrual-cycle-trackings/${id}`,
+      getHistory: "/api/menstrual-cycle-trackings/history",
+      predictNext: "/api/menstrual-cycle-trackings/predict-next",
+      getFertilityWindow: "/api/menstrual-cycle-trackings/fertility-window",
+      getAnalytics: "/api/menstrual-cycle-trackings/analytics",
+      getInsights: "/api/menstrual-cycle-trackings/insights",
+      getNotifications: "/api/menstrual-cycle-trackings/notifications",
+      setNotificationPreferences:
+        "/api/menstrual-cycle-trackings/notification-preferences",
+      getTrends: "/api/menstrual-cycle-trackings/trends",
     },
   },
 

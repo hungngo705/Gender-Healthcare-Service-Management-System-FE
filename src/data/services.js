@@ -1,27 +1,27 @@
 const services = [
   {
     id: 1,
-    title: "Tư Vấn Sức Khỏe Sinh Sản",
+    title: "Theo dõi chu kỳ",
     description:
-      "Lời khuyên chuyên môn về các vấn đề sức khỏe sinh sản, kế hoạch hóa gia đình và các phương pháp tránh thai.",
+      "Công cụ theo dõi chu kỳ kinh nguyệt thông minh giúp bạn dự đoán chính xác thời điểm rụng trứng, chu kỳ tới và quản lý sức khỏe sinh sản hiệu quả.",
     icon: "fas fa-user-md",
     link: "/services/tracking",
   },
   {
     id: 2,
-    title: "Xét Nghiệm & Điều Trị STI",
+    title: "Đặt lịch tư vấn trực tuyến",
     description:
-      "Xét nghiệm bảo mật các bệnh lây truyền qua đường tình dục với kết quả nhanh chóng và các lựa chọn điều trị.",
+      "Tư vấn trực tuyến với các chuyên gia sức khỏe từ xa, tiết kiệm thời gian và đảm bảo riêng tư với lịch hẹn linh hoạt phù hợp thời gian của bạn.",
     icon: "fas fa-vial",
-    link: "/services/sti-testing",
+    link: "/services/booking",
   },
   {
     id: 3,
-    title: "Hỗ Trợ Sức Khỏe Tâm Thần",
+    title: "Xét Nghiệm & Điều Trị STI",
     description:
-      "Dịch vụ tư vấn chuyên nghiệp tập trung vào các vấn đề sức khỏe tâm thần liên quan đến giới tính.",
+      "Xét nghiệm bảo mật các bệnh lây truyền qua đường tình dục với kết quả nhanh chóng, chính xác và các lựa chọn điều trị phù hợp.",
     icon: "fas fa-brain",
-    link: "/services/appointments",
+    link: "/services/sti-testing",
   },
 ];
 

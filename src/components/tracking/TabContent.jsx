@@ -2,6 +2,7 @@ import React from "react";
 import CalendarView from "./CalendarView";
 import OvulationPredictor from "./OvulationPrediction";
 import Settings from "./Settings";
+import LogCycleForm from "./LogCycleForm";
 
 const TabContent = ({ activeTab }) => {
   const renderTabContent = () => {
@@ -10,8 +11,8 @@ const TabContent = ({ activeTab }) => {
         return <CalendarView />;
       case "prediction":
         return <OvulationPredictor />;
-      case "settings":
-        return <Settings />;
+      case "logCycle":
+        return <LogCycleForm />;
       default:
         return <CalendarView />;
     }

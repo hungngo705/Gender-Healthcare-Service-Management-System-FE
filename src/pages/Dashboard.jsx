@@ -188,9 +188,9 @@ function Dashboard() {
       );
     }
     switch (activeTab) {
-      case "overview":
-        console.log(`🎯 Rendering OverviewTab with role: ${userRole}`);
-        return <OverviewTab role={userRole} />;
+      // case "overview":
+      //   console.log(`🎯 Rendering OverviewTab with role: ${userRole}`);
+      //   return <OverviewTab role={userRole} />;
       case "appointments":
         console.log(`Rendering AppointmentsTab with role: ${userRole}`);
         return <AppointmentsTab role={userRole} />;

@@ -1,7 +1,8 @@
-import React, { useState } from "react";
+import React, { useState, useEffect } from "react";
+import menstrualCycleService from "../../services/menstrualCycleService";
+import { Loader, AlertCircle, CheckCircle } from "lucide-react";
 
 const Settings = () => {
-  // Sample settings state
   const [settings, setSettings] = useState({
     cycleLength: 28,
     periodLength: 5,
@@ -18,6 +19,45 @@ const Settings = () => {
       dataSharing: false,
     },
   });
+
+  const [loading, setLoading] = useState(true);
+  const [saving, setSaving] = useState(false);
+  const [error, setError] = useState(null);
+  const [success, setSuccess] = useState(false);
+
+  // Load user settings from API
+  useEffect(() => {
+    const fetchSettings = async () => {
+      try {
+        setLoading(true);
+
+        // Fetch insights to get average cycle length data
+        const insights = await menstrualCycleService.getInsights();
+
+        // Fetch notifications to get notification settings
+        const notifications = await menstrualCycleService.getNotifications();
+
+        // Combine the data into our settings format
+        if (insights && insights.length > 0) {
+          setSettings((prevSettings) => ({
+            ...prevSettings,
+            cycleLength: insights[0].averageCycleLength || 28,
+            periodLength: insights[0].averagePeriodLength || 5,
+            notifications: notifications && notifications.length > 0,
+            reminderTime: "08:00", // Default, might come from notification settings
+          }));
+        }
+
+        setLoading(false);
+      } catch (err) {
+        console.error("Failed to load settings:", err);
+        setError("Không thể tải cài đặt. Vui lòng thử lại sau.");
+        setLoading(false);
+      }
+    };
+
+    fetchSettings();
+  }, []);
 
   // Handle settings changes
   const handleInputChange = (e) => {
@@ -40,15 +80,57 @@ const Settings = () => {
     }
   };
 
-  const handleSaveSettings = (e) => {
+  const handleSaveSettings = async (e) => {
     e.preventDefault();
-    // Would save to backend in real app
-    alert("Lưu cài đặt thành công!");
+    try {
+      setSaving(true);
+      setError(null);
+
+      // Save notification preferences
+      await menstrualCycleService.setNotificationPreferences({
+        enabled: settings.notifications,
+        reminderTime: settings.reminderTime,
+        notifyBeforeDays: 1, // Default
+      });
+
+      // Show success message
+      setSuccess(true);
+      setTimeout(() => setSuccess(false), 3000);
+
+      setSaving(false);
+    } catch (err) {
+      console.error("Failed to save settings:", err);
+      setError("Không thể lưu cài đặt. Vui lòng thử lại.");
+      setSaving(false);
+    }
   };
+
+  if (loading) {
+    return (
+      <div className="flex items-center justify-center h-64">
+        <Loader className="animate-spin h-8 w-8 text-indigo-600" />
+        <span className="ml-2 text-gray-600">Đang tải cài đặt...</span>
+      </div>
+    );
+  }
 
   return (
     <div className="space-y-8">
       <h2 className="text-2xl font-bold text-gray-800">Cài Đặt Theo Dõi</h2>
+
+      {error && (
+        <div className="bg-red-50 p-4 rounded-lg flex items-center">
+          <AlertCircle className="h-5 w-5 text-red-500 mr-2" />
+          <p className="text-red-600">{error}</p>
+        </div>
+      )}
+
+      {success && (
+        <div className="bg-green-50 p-4 rounded-lg flex items-center">
+          <CheckCircle className="h-5 w-5 text-green-500 mr-2" />
+          <p className="text-green-600">Lưu cài đặt thành công!</p>
+        </div>
+      )}
 
       <form onSubmit={handleSaveSettings}>
         {/* Cycle Settings */}
@@ -239,7 +321,8 @@ const Settings = () => {
           </div>
 
           <p className="mt-2 text-sm text-gray-500">
-            Thông tin cá nhân của bạn sẽ được giữ kín. Chỉ dữ liệu thống kê ẩn danh mới được chia sẻ.
+            Thông tin cá nhân của bạn sẽ được giữ kín. Chỉ dữ liệu thống kê ẩn
+            danh mới được chia sẻ.
           </p>
         </div>
 
@@ -247,9 +330,11 @@ const Settings = () => {
         <div className="flex justify-end">
           <button
             type="submit"
-            className="px-6 py-3 bg-indigo-600 text-white rounded-md font-medium hover:bg-indigo-700 transition-colors"
+            disabled={saving}
+            className="px-6 py-3 bg-indigo-600 text-white rounded-md font-medium hover:bg-indigo-700 transition-colors disabled:opacity-50 flex items-center"
           >
-            Lưu Cài Đặt
+            {saving && <Loader className="animate-spin h-4 w-4 mr-2" />}
+            {saving ? "Đang lưu..." : "Lưu Cài Đặt"}
           </button>
         </div>
       </form>
