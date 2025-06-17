@@ -1,5 +1,4 @@
 import config from "./config";
-import serverHealth from "./serverHealth";
 
 /**
  * Utility for handling authentication tokens and cleanup
@@ -33,14 +32,9 @@ export const tokenManager = {
       console.log("No token found for server validation");
       return false;
     }
-
     try {
-      // Check server connectivity first
-      const isServerUp = await serverHealth.checkServerConnectivity();
-      if (!isServerUp) {
-        console.log("Server is down, cannot validate token");
-        return false;
-      }
+      // Skip server connectivity check
+      // Always continue with token validation
 
       // Make a lightweight request to validate token
       const response = await fetch(

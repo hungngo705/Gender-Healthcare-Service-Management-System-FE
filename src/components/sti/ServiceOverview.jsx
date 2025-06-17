@@ -2,7 +2,7 @@ import React from "react";
 
 function ServiceOverview() {
   return (
-    <div className="mb-16">
+    <div id="service-overview" className="mb-16">
       <h2 className="text-3xl font-bold text-gray-900 mb-6 text-center">
         Dịch Vụ Xét Nghiệm STI Của Chúng Tôi
       </h2>
@@ -30,8 +30,9 @@ function ServiceOverview() {
                     Bảo Mật Hoàn Toàn
                   </span>
                   <p className="text-gray-600 mt-1">
-                    Quyền riêng tư của bạn là ưu tiên hàng đầu của chúng tôi. Tất cả các xét nghiệm và kết quả 
-                    được xử lý với sự bảo mật tối đa.
+                    Quyền riêng tư của bạn là ưu tiên hàng đầu của chúng tôi.
+                    Tất cả các xét nghiệm và kết quả được xử lý với sự bảo mật
+                    tối đa.
                   </p>
                 </div>
               </li>
@@ -52,8 +53,9 @@ function ServiceOverview() {
                     Gửi Kết Quả An Toàn
                   </span>
                   <p className="text-gray-600 mt-1">
-                    Truy cập kết quả của bạn trực tuyến thông qua cổng thông tin khách hàng an toàn, 
-                    đảm bảo quyền riêng tư và truy cập nhanh chóng.
+                    Truy cập kết quả của bạn trực tuyến thông qua cổng thông tin
+                    khách hàng an toàn, đảm bảo quyền riêng tư và truy cập nhanh
+                    chóng.
                   </p>
                 </div>
               </li>
@@ -74,8 +76,9 @@ function ServiceOverview() {
                     Chăm Sóc Toàn Diện
                   </span>
                   <p className="text-gray-600 mt-1">
-                    Nếu xét nghiệm phát hiện nhiễm trùng, các nhà cung cấp dịch vụ y tế của chúng tôi 
-                    có thể kê đơn điều trị và cung cấp dịch vụ chăm sóc theo dõi.
+                    Nếu xét nghiệm phát hiện nhiễm trùng, các nhà cung cấp dịch
+                    vụ y tế của chúng tôi có thể kê đơn điều trị và cung cấp
+                    dịch vụ chăm sóc theo dõi.
                   </p>
                 </div>
               </li>
@@ -91,11 +94,10 @@ function ServiceOverview() {
                   1
                 </div>
                 <div>
-                  <p className="font-medium text-gray-900">
-                    Đặt lịch hẹn
-                  </p>
+                  <p className="font-medium text-gray-900">Đặt lịch hẹn</p>
                   <p className="text-gray-600 mt-1">
-                    Đặt lịch trực tuyến hoặc qua điện thoại theo sự thuận tiện của bạn
+                    Đặt lịch trực tuyến hoặc qua điện thoại theo sự thuận tiện
+                    của bạn
                   </p>
                 </div>
               </li>
@@ -104,9 +106,12 @@ function ServiceOverview() {
                   2
                 </div>
                 <div>
-                  <p className="font-medium text-gray-900">Đến phòng khám của chúng tôi</p>
+                  <p className="font-medium text-gray-900">
+                    Đến phòng khám của chúng tôi
+                  </p>
                   <p className="text-gray-600 mt-1">
-                    Gặp gỡ các chuyên gia y tế của chúng tôi trong môi trường thoải mái, riêng tư
+                    Gặp gỡ các chuyên gia y tế của chúng tôi trong môi trường
+                    thoải mái, riêng tư
                   </p>
                 </div>
               </li>
@@ -115,9 +120,12 @@ function ServiceOverview() {
                   3
                 </div>
                 <div>
-                  <p className="font-medium text-gray-900">Thu thập mẫu xét nghiệm</p>
+                  <p className="font-medium text-gray-900">
+                    Thu thập mẫu xét nghiệm
+                  </p>
                   <p className="text-gray-600 mt-1">
-                    Thu thập mẫu nhanh chóng và dễ dàng bởi các chuyên gia được đào tạo
+                    Thu thập mẫu nhanh chóng và dễ dàng bởi các chuyên gia được
+                    đào tạo
                   </p>
                 </div>
               </li>

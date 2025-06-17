@@ -22,14 +22,32 @@ const userUtils = {
    * Lấy avatar URL hoặc chữ cái đầu tiên của tên để sử dụng trong avatar
    * @param {Object} user - Đối tượng người dùng
    * @returns {Object} - Avatar URL hoặc chữ cái đầu tiên
-   */
-  getAvatarInfo: (user) => {
+   */ getAvatarInfo: (user) => {
     if (!user) return { initial: "?", imageUrl: null };
 
-    // Nếu có avatar URL trong đối tượng user
-    if (user.avatar || user.avatarUrl || user.profileImage) {
-      const imageUrl = user.avatar || user.avatarUrl || user.profileImage;
-      return { initial: null, imageUrl };
+    // Log user object to help debug avatar issues
+    console.log("Avatar info for user:", user);
+
+    // Nếu có avatar URL trong đối tượng user (check all possible field names)
+    if (
+      user.avatar ||
+      user.avatarUrl ||
+      user.profileImage ||
+      user.imageUrl ||
+      user.photo
+    ) {
+      const imageUrl =
+        user.avatar ||
+        user.avatarUrl ||
+        user.profileImage ||
+        user.imageUrl ||
+        user.photo;
+      console.log("Found avatar URL:", imageUrl);
+
+      // Only return valid URLs (some backends might return empty strings)
+      if (imageUrl && typeof imageUrl === "string" && imageUrl.trim() !== "") {
+        return { initial: null, imageUrl };
+      }
     }
 
     // Fallback vào chữ cái đầu tiên của tên

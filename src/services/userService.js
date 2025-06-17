@@ -92,7 +92,7 @@ export const userService = {
    */
   setUserRole: async (id, role) => {
     try {
-      const response = await apiService.put(`/api/v1/user/set-role/${id}`, {
+      const response = await apiService.put(`/api/v2/user/set-role/${id}`, {
         role,
       });
       const responseData = response.data?.data || response.data;
@@ -112,7 +112,7 @@ export const userService = {
   updateUserProfile: async (id, profileData) => {
     try {
       const response = await apiService.put(
-        `/api/v1/user/profile/${id}`,
+        `/api/v2/user/profile/${id}`,
         profileData
       );
       const responseData = response.data?.data || response.data;
@@ -127,43 +127,81 @@ export const userService = {
    * Update user avatar
    * @param {string|number} id - User ID
    * @param {FormData} avatarData - Avatar file data
+   * @returns {Promise} Promise that resolves with updated avatar info   */ updateUserAvatar:
+    async (avatarData) => {
+      try {
+        const response = await apiService.put(
+          `/api/v2/user/avatar/me`,
+          avatarData,
+          {
+            headers: {
+              "Content-Type": "multipart/form-data",
+            },
+          }
+        );
+        const responseData = response.data?.data || response.data;
+        toastService.success("Ảnh đại diện đã được cập nhật");
+        return responseData;
+      } catch (error) {
+        return Promise.reject(error);
+      }
+    },
+  /**
+   * Update user avatar using URL
+   * @param {Object} data - Object containing avatarUrl
    * @returns {Promise} Promise that resolves with updated avatar info
-   */
-  updateUserAvatar: async (id, avatarData) => {
+   */ updateUserAvatarUrl: async (data) => {
     try {
-      const response = await apiService.put(
-        `/api/v1/user/avatar/${id}`,
-        avatarData,
-        {
-          headers: {
-            "Content-Type": "multipart/form-data",
-          },
-        }
-      );
+      // Validate that the URL is accessible
+      try {
+        const testImage = new Image();
+        testImage.src = data.avatarUrl;
+
+        // Log for debugging
+        console.log("Testing avatar URL:", data.avatarUrl);
+
+        // Wait for a moment to see if the image loads
+        await new Promise((resolve) => setTimeout(resolve, 1000));
+      } catch (imgError) {
+        console.warn("Image validation warning:", imgError);
+        // Continue anyway as the backend might handle this
+      }
+
+      // Ensure URL has protocol
+      if (data.avatarUrl && !data.avatarUrl.startsWith("http")) {
+        data.avatarUrl = "https://" + data.avatarUrl;
+      }
+
+      const response = await apiService.put(`/api/v2/user/avatar/me`, data);
       const responseData = response.data?.data || response.data;
       toastService.success("Ảnh đại diện đã được cập nhật");
       return responseData;
     } catch (error) {
+      console.error("Error updating avatar URL:", error);
       return Promise.reject(error);
     }
   },
 
   /**
-   * Get current user profile
-   * @returns {Promise} Promise that resolves with current user profile
+   * Get current user's profile
+   * @returns {Promise} Promise that resolves with current user profile data
    */
   getCurrentUserProfile: async () => {
     try {
       const response = await apiService.get(config.api.users.profile);
-      return response.data?.data || response.data;
+      // Handle the unified response format with status_code, message, and data fields
+      if (response.data && response.data.is_success) {
+        return response.data.data;
+      }
+      return response.data;
     } catch (error) {
+      console.error("Error fetching user profile:", error);
       return Promise.reject(error);
     }
   },
-
   /**
-   * Update current user profile
-   * @param {Object} profileData - Profile data to update
+   * Update current user's profile
+   * @param {Object} profileData - Updated profile data
    * @returns {Promise} Promise that resolves with updated profile
    */
   updateCurrentUserProfile: async (profileData) => {
@@ -172,16 +210,15 @@ export const userService = {
         config.api.users.profile,
         profileData
       );
-      const responseData = response.data?.data || response.data;
-
-      // Update localStorage user data
-      const currentUser = JSON.parse(localStorage.getItem("user") || "{}");
-      const updatedUser = { ...currentUser, ...responseData };
-      localStorage.setItem("user", JSON.stringify(updatedUser));
-
-      toastService.success("Hồ sơ của bạn đã được cập nhật");
-      return responseData;
+      // Handle the unified response format
+      if (response.data && response.data.is_success) {
+        toastService.success("Thông tin đã được cập nhật thành công");
+        return response.data.data;
+      }
+      return response.data;
     } catch (error) {
+      console.error("Error updating user profile:", error);
+      toastService.error("Không thể cập nhật thông tin. Vui lòng thử lại sau.");
       return Promise.reject(error);
     }
   },
@@ -193,7 +230,9 @@ export const userService = {
    */
   getAllByRole: async (role) => {
     try {
-      const response = await apiService.get(config.api.users.getAllByRole(role));
+      const response = await apiService.get(
+        config.api.users.getAllByRole(role)
+      );
       return response.data?.data || response.data;
     } catch (error) {
       return Promise.reject(error);

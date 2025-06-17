@@ -18,15 +18,29 @@ const UserAvatar = ({ size = "md", className = "" }) => {
   };
 
   const sizeClass = sizeClasses[size] || sizeClasses.md;
+  // State to handle image loading errors
+  const [imgError, setImgError] = React.useState(false);
+
+  // For monitoring/debugging purposes
+  React.useEffect(() => {
+    if (avatarInfo.imageUrl) {
+      console.log("Avatar component using URL:", avatarInfo.imageUrl);
+    }
+  }, [avatarInfo.imageUrl]);
 
   // Determine what to render inside the avatar circle
   const renderAvatarContent = () => {
-    if (avatarInfo.imageUrl) {
+    if (avatarInfo.imageUrl && !imgError) {
       return (
         <img
           src={avatarInfo.imageUrl}
           alt="User avatar"
           className="w-full h-full object-cover"
+          crossOrigin="anonymous"
+          onError={(e) => {
+            console.error("Avatar image failed to load:", e);
+            setImgError(true);
+          }}
         />
       );
     } else if (avatarInfo.initial) {

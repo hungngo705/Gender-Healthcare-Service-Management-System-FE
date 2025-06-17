@@ -34,10 +34,10 @@ function HeroSection() {
             </svg>
           </a>
           <a
-            href="#faq"
+            href="#service-overview"
             className="px-6 py-3 bg-transparent border border-white text-white rounded-full font-medium hover:bg-white hover:bg-opacity-10 transition-all flex items-center"
           >
-            Tìm Hiểu Thêms
+            Tìm Hiểu Thêm
             <svg
               xmlns="http://www.w3.org/2000/svg"
               className="h-5 w-5 ml-1"

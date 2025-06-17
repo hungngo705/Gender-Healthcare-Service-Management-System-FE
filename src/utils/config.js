@@ -9,9 +9,8 @@ const getApiBaseURL = () => {
 
   // Auto-detect based on current host
   const currentHost = window.location.hostname;
-
   if (currentHost === "localhost" || currentHost === "127.0.0.1") {
-    return "https://localhost:7050"; // Changed to remove /api/v2
+    return "https://localhost:7050"; // Changed to remove
   }
 
   // For production, you need to set the correct API URL
@@ -29,16 +28,14 @@ const getApiBaseURL = () => {
   }
 
   // Fallback for other hosts
-  return `https://${currentHost}:7050`; // Changed to remove /api/v2
+  return `https://${currentHost}:7050`;
 };
 
 const config = {
   // API URLs
   api: {
     baseURL: getApiBaseURL(),
-    apiPrefix: "/api/v2", // Add this line to define the API prefix
     timeout: 20000, // 20 seconds
-
     // Auth endpoints - add API prefix
     auth: {
       login: "/api/v2/login",
@@ -48,9 +45,7 @@ const config = {
       verifyEmail: "/api/v2/verify-email",
       forgotPassword: "/api/v2/send-reset-code",
       resetPassword: "/api/v2/verify-code-and-reset",
-    },
-
-    // User endpoints - add API prefix
+    }, // User endpoints - add API prefix
     users: {
       getAll: "/api/v2/user/getall",
       create: "/api/v2/user/create",
@@ -60,9 +55,7 @@ const config = {
       delete: (id) => `/api/v2/user/delete/${id}`,
       profile: "/api/v2/user/profile/me",
       changePassword: "/api/v2/user/change-password",
-    },
-
-    // Consultant endpoints - add API prefix
+    }, // Consultant endpoints - add API prefix
     consultants: {
       getAll: "/api/v2/consultant/getall",
       getById: (id) => `/api/v2/consultant/${id}`,
@@ -70,9 +63,7 @@ const config = {
       update: (id) => `/api/v2/consultant/${id}`,
       delete: (id) => `/api/v2/consultant/${id}`,
       getAvailability: (id) => `/api/v2/consultant/${id}/availability`,
-    },
-
-    // Appointment endpoints - add API prefix
+    }, // Appointment endpoints - add API prefix
     appointments: {
       getAll: "/api/v2/appointment/getall",
       create: "/api/v2/appointment/create",
@@ -80,20 +71,17 @@ const config = {
       update: (id) => `/api/v2/appointment/update/${id}`,
       cancel: (id) => `/api/v2/appointment/${id}/cancel`,
       getByUser: (userId) => `/api/v2/appointment/user/${userId}`,
+      getByCurrentUser: "/api/v2/appointment/getall",
       getByConsultant: (consultantId) =>
         `/api/v2/appointment/consultant/${consultantId}`,
-    },
-
-    // STI testing endpoints - add API prefix
+    }, // STI testing endpoints - add API prefix
     stiTesting: {
-      getAll: "/api/v2/sti-test/getall",
-      create: "/api/v2/sti-test/create",
-      getById: (id) => `/api/v2/sti-test/${id}`,
-      getByUser: (userId) => `/api/v2/sti-test/user/${userId}`,
-      updateResult: (id) => `/api/v2/sti-test/${id}/result`,
-    },
-
-    // Blog endpoints - add API prefix
+      getAll: "/api/v2/stitesting/getall",
+      create: "/api/v2/stitesting/create",
+      getById: (id) => `/api/v2/stitesting/${id}`,
+      update: (id) => `/api/v2/stitesting/update/${id}`,
+      delete: (id) => `/api/v2/stitesting/delete/${id}`,
+    }, // Blog endpoints - add API prefix
     blog: {
       getAll: "/api/v2/blog/getall",
       create: "/api/v2/blog/create",
@@ -123,9 +111,7 @@ const config = {
       activities: "/api/v2/dashboard/activities",
       monthlyStats: (year, month) =>
         `/api/v2/dashboard/stats/monthly/${year}/${month}`,
-    },
-
-    // TestResult endpoints - add API prefix
+    }, // TestResult endpoints - add API prefix
     testResult: {
       getAll: "/api/v2/testresult/getall",
       getById: (id) => `/api/v2/testresult/${id}`,

@@ -8,7 +8,6 @@ export function getDashboardConfig(userRole) {
     consultant: {
       title: "Bảng điều khiển dành cho bác sĩ tư vấn",
       menuItems: [
-        // { id: "overview", label: "Tổng quan", icon: "chart-pie" },
         {
           id: "consultantAppointments",
           label: "Lịch hẹn tư vấn",
@@ -21,29 +20,27 @@ export function getDashboardConfig(userRole) {
     staff: {
       title: "Bảng điều khiển dành cho nhân viên",
       menuItems: [
-        { id: "overview", label: "Tổng quan", icon: "chart-pie" },
         {
           id: "blogManagement",
           label: "Quản lý bài viết",
           icon: "document-text",
         },
         { id: "appointments", label: "Lịch hẹn", icon: "calendar" },
-        { id: "customers", label: "Khách hàng", icon: "users" },
+        { id: "sti-proccess", label: "Xử lí xét nghiệm", icon: "labs" },
+        { id: "messages", label: "Tin nhắn", icon: "chat" },
       ],
       description: "Tạo các bài đăng và quản lý thông tin khách hàng",
     },
     manager: {
       title: "Bảng điều khiển dành cho quản lý",
       menuItems: [
-        { id: "overview", label: "Tổng quan", icon: "chart-pie" },
         {
           id: "servicesManagement",
           label: "Quản lý dịch vụ",
           icon: "clipboard",
         },
         { id: "appointments", label: "Theo dõi lịch hẹn", icon: "calendar" },
-        { id: "reports", label: "Báo cáo & Thống kê", icon: "chart-bar" },
-        { id: "finance", label: "Tài chính", icon: "cash" },
+        { id: "messages", label: "Tin nhắn", icon: "chat" },
       ],
       description: "Thêm và quản lý các dịch vụ",
     },
@@ -58,8 +55,7 @@ export function getDashboardConfig(userRole) {
           icon: "clipboard",
         },
         { id: "reports", label: "Báo cáo & Thống kê", icon: "chart-bar" },
-        { id: "system", label: "Cài đặt hệ thống", icon: "cog" },
-        { id: "logs", label: "Nhật ký hệ thống", icon: "document-text" },
+        { id: "messages", label: "Tin nhắn", icon: "chat" },
       ],
       description: "Thêm và quản lý người dùng và cài đặt hệ thống",
     },
