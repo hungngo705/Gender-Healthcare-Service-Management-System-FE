@@ -42,8 +42,8 @@ const config = {
       refreshToken: "/api/v2/refresh-token",
       logout: "/api/v2/logout",
       verifyEmail: "/api/v2/verify-email",
-      forgotPassword: "/api/v2/send-reset-code",
-      resetPassword: "/api/v2/verify-code-and-reset",
+      forgotPassword: "/send-reset-code",
+      resetPassword: "/verify-code-and-reset",
     }, // User endpoints    users: {
     getAll: "/api/v2/user/getall",
     create: "/api/v2/user/create",
