@@ -55,6 +55,12 @@ const ForgotPasswordPage = lazy(() =>
 const ResetPasswordPage = lazy(() =>
   import(/* webpackChunkName: "reset-password" */ "./pages/ResetPasswordPage")
 );
+const Payment = lazy(() =>
+  import(/* webpackChunkName: "payment" */ "./pages/Payment")
+);
+const PaymentSuccess = lazy(() =>
+  import(/* webpackChunkName: "payment-success" */ "./pages/PaymentSuccess")
+);
 
 function App() {
   return (
@@ -134,6 +140,9 @@ function App() {
                 </ProtectedRoute>
               }
             />
+            {/* Hệ thống thanh toán */}
+            <Route path="payment" element={<Payment />} />
+            <Route path="payment-success" element={<PaymentSuccess />} />
             {/* Trang hồ sơ khách hàng */}{" "}
             <Route
               path="profile"
