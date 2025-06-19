@@ -5,6 +5,7 @@ import PricingTable from "../components/sti/PricingTable";
 import BookingForm from "../components/sti/BookingForm";
 import Faq from "../components/sti/Faq";
 import CallToAction from "../components/sti/CallToAction";
+import PaymentButton from '../components/PaymentButton';
 
 function STITesting() {
   return (

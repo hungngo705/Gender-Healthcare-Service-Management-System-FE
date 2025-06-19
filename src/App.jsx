@@ -55,6 +55,9 @@ const ForgotPasswordPage = lazy(() =>
 const ResetPasswordPage = lazy(() =>
   import(/* webpackChunkName: "reset-password" */ "./pages/ResetPasswordPage")
 );
+const PaymentResult = lazy(() =>
+  import(/* webpackChunkName: "payment-result" */ "./pages/PaymentResult")
+);
 
 function App() {
   return (
@@ -151,6 +154,7 @@ function App() {
                 </ProtectedRoute>
               }
             />
+            <Route path="payment-result" element={<PaymentResult />} />
           </Route>
 
           {/* Redirect không hợp lệ URLs về trang chính */}

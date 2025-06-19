@@ -6,3 +6,30 @@
   --light-gray: #f5f5f5;
   --dark-gray: #444;
 }
+
+/* Payment Button Animation */
+@keyframes spin {
+  0% { transform: rotate(0deg); }
+  100% { transform: rotate(360deg); }
+}
+
+.payment-button:hover:not(:disabled) {
+  transform: translateY(-1px);
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
+}
+
+.payment-button:active:not(:disabled) {
+  transform: translateY(0);
+}
+
+/* Payment Result Page Animations */
+.payment-status-enter {
+  opacity: 0;
+  transform: scale(0.9);
+}
+
+.payment-status-enter-active {
+  opacity: 1;
+  transform: scale(1);
+  transition: opacity 300ms, transform 300ms;
+}
