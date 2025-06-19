@@ -78,15 +78,31 @@ const Payment = () => {
       maximumFractionDigits: 0,
     }).format(amount);
   };
-
   const processPayment = async (e) => {
     e.preventDefault();
     setIsProcessing(true);
 
     try {
       // Simulate payment processing
-      await new Promise((resolve) => setTimeout(resolve, 1500)); // Submit the booking data to the backend
-      const response = await stiTestingService.create(bookingData);
+      await new Promise((resolve) => setTimeout(resolve, 1500));
+      // Lấy dữ liệu API đã chuẩn bị từ bookingData
+      const apiData = bookingData.apiData || {
+        testPackage: bookingData.testPackage || 0,
+        customParameters: bookingData.customParameters || [],
+        status: 0, // Scheduled
+        scheduleDate:
+          bookingData.scheduleDate ||
+          bookingData.preferredDate ||
+          format(new Date(), "yyyy-MM-dd"),
+        slot: bookingData.slot || 0,
+        totalPrice: totalAmount,
+        notes: bookingData.notes || bookingData.note || "",
+      };
+
+      console.log("Gửi dữ liệu API:", apiData);
+
+      // Submit the booking data to the backend
+      const response = await stiTestingService.create(apiData);
 
       if (response?.data?.is_success) {
         toast.success("Thanh toán thành công!");
@@ -99,6 +115,15 @@ const Payment = () => {
               paymentMethod,
               paymentTime: new Date().toISOString(),
               totalAmount,
+              // Tạo mã đặt lịch nếu API không trả về
+              bookingId:
+                response.data?.data?.id ||
+                `STI${Math.floor(Math.random() * 100000)}`,
+              // Tạo mã xét nghiệm ẩn danh nếu cần
+              anonymousCode: bookingData.isAnonymous
+                ? response.data?.data?.anonymousCode ||
+                  `ANO${Math.floor(Math.random() * 100000)}`
+                : undefined,
             },
           },
         });

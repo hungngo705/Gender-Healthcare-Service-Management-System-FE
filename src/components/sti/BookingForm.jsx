@@ -6,14 +6,18 @@ import { toast } from "react-toastify";
 
 function BookingForm() {
   const { currentUser } = useAuth();
-  const navigate = useNavigate();
-  // State for appointment form
+  const navigate = useNavigate(); // State for appointment form
   const [formData, setFormData] = useState({
     userId: currentUser?.id || "",
-    testTypes: [],
-    preferredDate: format(new Date(), "yyyy-MM-dd"), // ISO format cho input date
-    note: "",
-    isAnonymous: false,
+    testPackage: 0, // 0: Basic, 1: Advanced, 2: Custom
+    customParameters: [], // Các tham số xét nghiệm tùy chỉnh
+    status: 0, // 0: Scheduled, 1: SampleTaken, 2: Processing, 3: Completed, 4: Cancelled
+    scheduleDate: format(new Date(), "yyyy-MM-dd"), // ISO format cho input date
+    slot: 0, // Khung giờ, sẽ được chọn sau
+    totalPrice: 0, // Tổng giá tiền
+    notes: "", // Ghi chú
+    isAnonymous: false, // Thêm vào để duy trì tính năng hiện tại
+    testTypes: [], // Giữ lại để tương thích với UI hiện tại
   }); // State for form submission
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [submitError, setSubmitError] = useState(null); // Handle form input changes
@@ -37,7 +41,40 @@ function BookingForm() {
         [name]: value,
       }));
     }
-  }; // Handle test type selection
+  }; // Handle test type selection  // Hàm ánh xạ id xét nghiệm trong UI sang enum TestParameter trong API
+  const mapToApiTestParameter = (testTypeId) => {
+    // Dựa trên enum TestParameter từ API
+    // Chlamydia = 0, Gonorrhoeae = 1, Syphilis = 2, HIV = 3, Herpes = 4,
+    // HepatitisB = 5, HepatitisC = 6, Trichomonas = 7, MycoplasmaGenitalium = 8
+
+    const mapping = {
+      0: 3, // HIV -> 3
+      1: 1, // Gonorrhea -> 1
+      2: 2, // Syphilis -> 2
+      3: null, // HPV -> không có trong API
+      4: 0, // Chlamydia -> 0
+      5: 4, // Herpes -> 4
+      6: 5, // Hepatitis B -> 5
+      7: 6, // Hepatitis C -> 6
+      8: 7, // Trichomonas -> 7
+    };
+
+    return mapping[testTypeId] !== undefined ? mapping[testTypeId] : null;
+  };
+
+  // Hàm tính lại tổng giá tiền dựa trên các xét nghiệm đã chọn
+  const recalculateTotalPrice = (selectedTypes) => {
+    return selectedTypes.reduce((total, typeId) => {
+      const test = testTypes.find((t) => t.id === typeId);
+      if (test) {
+        // Extract numeric price from string (e.g. "45.000đ" -> 45000)
+        const price = parseInt(test.price.replace(/\D/g, ""));
+        return total + price;
+      }
+      return total;
+    }, 0);
+  };
+
   const handleTestTypeChange = (testTypeId) => {
     setFormData((prev) => {
       // Check if the test type is already selected
@@ -49,22 +86,62 @@ function BookingForm() {
 
       if (isSelected) {
         // Remove the test type if already selected
+        // Cập nhật customParameters cho API
+        let updatedCustomParams = [...prev.customParameters];
+        if (!isPackage) {
+          const apiTestParam = mapToApiTestParameter(testTypeId);
+          updatedCustomParams = updatedCustomParams.filter(
+            (param) => param !== apiTestParam
+          );
+        }
+
+        // Cập nhật testPackage nếu bỏ chọn một package
+        let newTestPackage = prev.testPackage;
+        if (isPackage) {
+          if (testTypeId === 100) newTestPackage = 0; // Basic
+          else if (testTypeId === 101) newTestPackage = 0; // Advanced
+          else if (testTypeId === 102) newTestPackage = 0; // Custom
+        }
+
         return {
           ...prev,
           testTypes: prev.testTypes.filter((id) => id !== testTypeId),
+          customParameters: updatedCustomParams,
+          testPackage: newTestPackage,
+          totalPrice: recalculateTotalPrice(
+            prev.testTypes.filter((id) => id !== testTypeId)
+          ),
         };
       } else {
         let newTestTypes;
+        let newCustomParams = [...prev.customParameters];
+        let newTestPackage = prev.testPackage;
 
         if (isPackage) {
+          // Xác định TestPackage từ API enum (0: Basic, 1: Advanced, 2: Custom)
+          if (testTypeId === 100) newTestPackage = 0; // Basic
+          else if (testTypeId === 101) newTestPackage = 1; // Advanced
+          else if (testTypeId === 102) newTestPackage = 2; // Custom
+
           // Special handling for "Xét Nghiệm Mục Tiêu" package (id: 102)
           if (testTypeId === 102) {
             // For targeted package, only select the package itself
             // Individual tests will be selected separately
             newTestTypes = [testTypeId];
+            newCustomParams = []; // Reset customParameters khi chọn package Custom
           } else {
             // For other packages, remove any other packages and individual tests
             newTestTypes = [testTypeId];
+
+            // Cập nhật customParameters dựa trên gói xét nghiệm
+            newCustomParams = [];
+            if (testTypeId === 100) {
+              // Basic Package: Chlamydia, Gonorrhea, Syphilis
+              newCustomParams = [0, 1, 2]; // Chlamydia = 0, Gonorrhoeae = 1, Syphilis = 2
+            } else if (testTypeId === 101) {
+              // Advanced Package: Basic + HIV, Herpes, Hepatitis, etc
+              newCustomParams = [0, 1, 2, 3, 4, 5, 6, 7]; // All test parameters
+            }
           }
         } else {
           // If selecting an individual test
@@ -80,6 +157,15 @@ function BookingForm() {
             if (currentIndividualTests.length < 3) {
               // Can add more individual tests to targeted package
               newTestTypes = [...prev.testTypes, testTypeId];
+
+              // Cập nhật customParameters cho API
+              const apiTestParam = mapToApiTestParameter(testTypeId);
+              if (
+                apiTestParam !== null &&
+                !newCustomParams.includes(apiTestParam)
+              ) {
+                newCustomParams.push(apiTestParam);
+              }
             } else {
               // Already have 3 individual tests, replace the oldest one
               const otherPackages = prev.testTypes.filter((id) => {
@@ -92,6 +178,21 @@ function BookingForm() {
                 ...newestIndividualTests,
                 testTypeId,
               ];
+
+              // Cập nhật customParameters, loại bỏ loại cũ nhất và thêm loại mới
+              const oldestTestId = currentIndividualTests[0];
+              const oldestApiParam = mapToApiTestParameter(oldestTestId);
+              const newApiParam = mapToApiTestParameter(testTypeId);
+
+              newCustomParams = newCustomParams.filter(
+                (param) => param !== oldestApiParam
+              );
+              if (
+                newApiParam !== null &&
+                !newCustomParams.includes(newApiParam)
+              ) {
+                newCustomParams.push(newApiParam);
+              }
             }
           } else {
             // Remove any other packages first, then add individual test
@@ -102,12 +203,26 @@ function BookingForm() {
               ...prev.testTypes.filter((id) => !packages.includes(id)),
               testTypeId,
             ];
+
+            // Cập nhật customParameters cho API
+            const apiTestParam = mapToApiTestParameter(testTypeId);
+            if (apiTestParam !== null) {
+              // Nếu không có gói được chọn, cập nhật customParameters chỉ với xét nghiệm riêng lẻ
+              if (
+                newCustomParams.find((id) => id === apiTestParam) === undefined
+              ) {
+                newCustomParams.push(apiTestParam);
+              }
+            }
           }
         }
 
         return {
           ...prev,
           testTypes: newTestTypes,
+          customParameters: newCustomParams,
+          testPackage: newTestPackage,
+          totalPrice: recalculateTotalPrice(newTestTypes),
         };
       }
     });
@@ -122,7 +237,7 @@ function BookingForm() {
         throw new Error("Vui lòng chọn ít nhất một loại xét nghiệm");
       }
 
-      // Convert selected test types from ids to full objects
+      // Convert selected test types from ids to full objects for UI display
       const selectedTests = formData.testTypes.map((typeId) => {
         const test = testTypes.find((t) => t.id === typeId);
         return {
@@ -133,15 +248,31 @@ function BookingForm() {
         };
       });
 
-      // Prepare data for API
+      // Prepare data for API - format theo cấu trúc API
+      const apiRequestData = {
+        testPackage: formData.testPackage,
+        customParameters: formData.customParameters,
+        status: 0, // Mặc định là Scheduled
+        scheduleDate: formData.scheduleDate,
+        slot: formData.slot,
+        totalPrice: formData.totalPrice || calculateTotal(),
+        notes: formData.notes || "",
+      };
+
+      console.log("Dữ liệu API sẽ gửi:", apiRequestData);
+
+      // Prepare data for payment page (bao gồm cả dữ liệu API và dữ liệu UI)
       const submitData = {
         ...formData,
         // For logged-in users, BE will get userId from token
         userId: currentUser ? undefined : formData.userId,
         testTypes: selectedTests,
         totalAmount: calculateTotal(),
-      }; // Thông báo trước khi chuyển hướng để xác nhận dữ liệu đã sẵn sàng
-      toast.info("Đang chuyển đến trang thanh toán...", { autoClose: 1500 });
+        apiData: apiRequestData, // Thêm dữ liệu API vào để trang thanh toán có thể sử dụng
+      };
+
+      // Thông báo trước khi chuyển hướng để xác nhận dữ liệu đã sẵn sàng
+      toast.info("Đang chuyển đến trang thanh toán...", { autoClose: 2000 });
       console.log("Chuyển đến trang thanh toán với dữ liệu:", submitData);
 
       // Chuyển hướng đến trang thanh toán và truyền dữ liệu

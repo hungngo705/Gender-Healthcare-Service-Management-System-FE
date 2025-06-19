@@ -132,14 +132,6 @@ function App() {
                 </ProtectedRoute>
               }
             />
-            <Route
-              path="medical-records"
-              element={
-                <ProtectedRoute roleRequired="customer">
-                  <div>Medical Records</div>
-                </ProtectedRoute>
-              }
-            />
             {/* Hệ thống thanh toán */}
             <Route path="payment" element={<Payment />} />
             <Route path="payment-success" element={<PaymentSuccess />} />

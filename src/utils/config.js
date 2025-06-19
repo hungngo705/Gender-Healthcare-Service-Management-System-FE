@@ -81,6 +81,14 @@ const config = {
       getById: (id) => `/api/v2.5/stitesting/${id}`,
       update: (id) => `/api/v2.5/stitesting/update/${id}`,
       delete: (id) => `/api/v2.5/stitesting/delete/${id}`,
+    },
+    // Test Result endpoints
+    testResult: {
+      getAll: "/api/v2.5/testresult/getall",
+      create: "/api/v2.5/testresult/create",
+      getById: (id) => `/api/v2.5/testresult/${id}`,
+      update: (id) => `/api/v2.5/testresult/update/${id}`,
+      delete: (id) => `/api/v2.5/testresult/delete/${id}`,
     }, // Blog endpoints - add API prefix
     blog: {
       getAll: "/api/v2.5/blog/getall",
@@ -112,15 +120,6 @@ const config = {
       monthlyStats: (year, month) =>
         `/api/v2.5/dashboard/stats/monthly/${year}/${month}`,
     }, // TestResult endpoints - add API prefix
-    testResult: {
-      getAll: "/api/v2.5/testresult/getall",
-      getById: (id) => `/api/v2.5/testresult/${id}`,
-      create: "/api/v2.5/testresult/create",
-      update: (id) => `/api/v2.5/testresult/${id}`,
-      getByAppointment: (appointmentId) =>
-        `/api/v2.5/testresult/appointment/${appointmentId}`,
-      getByPatient: (patientId) => `/api/v2.5/testresult/patient/${patientId}`,
-    },
 
     // Menstrual cycle tracking endpoints - add API prefix
     menstrualCycle: {
