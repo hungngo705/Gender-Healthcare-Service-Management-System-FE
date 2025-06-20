@@ -1,9 +1,48 @@
-import React from "react";
+import React, { useState, useEffect } from "react";
 import PropTypes from "prop-types";
-import userUtils from "../../utils/userUtils";
+import userService from "../../services/userService"; // Changed from userUtils
 
 function WelcomeBanner({ greeting }) {
-  const { displayName, formattedRole } = userUtils.useUserInfo();
+  const [userProfile, setUserProfile] = useState({
+    displayName: "",
+    formattedRole: "",
+  });
+
+  // Fetch user profile data using userService
+  useEffect(() => {
+    const fetchUserProfile = async () => {
+      try {
+        const userData = await userService.getCurrentUserProfile();
+
+        // Extract display name from user data
+        const displayName =
+          userData.name || userData.email?.split("@")[0] || "User";
+
+        // Format role information
+        let formattedRole = "Người dùng";
+        if (userData.role && userData.role.name) {
+          const roleName = userData.role.name.toString();
+          if (roleName === "0") formattedRole = "Người dùng";
+          else if (roleName === "1") formattedRole = "Tư vấn viên";
+          else if (roleName === "2") formattedRole = "Nhân viên";
+          else if (roleName === "3") formattedRole = "Quản lý";
+          else if (roleName === "4") formattedRole = "Quản trị viên";
+        }
+
+        setUserProfile({ displayName, formattedRole });
+      } catch (error) {
+        console.error("Failed to fetch user profile:", error);
+        setUserProfile({
+          displayName: "Người dùng",
+          formattedRole: "Khách",
+        });
+      }
+    };
+
+    fetchUserProfile();
+  }, []);
+
+  const { displayName, formattedRole } = userProfile;
 
   return (
     <div className="bg-gradient-to-r from-indigo-500 to-purple-600 rounded-lg shadow-md p-6 mb-6 text-white">

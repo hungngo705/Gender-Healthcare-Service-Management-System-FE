@@ -1,14 +1,16 @@
 import React from "react";
 import PropTypes from "prop-types";
 import { User } from "lucide-react";
-import userUtils from "../../utils/userUtils";
 
 /**
  * Component to display user avatar with optional badge
  */
-const UserAvatar = ({ size = "md", className = "" }) => {
-  const { avatarInfo } = userUtils.useUserInfo();
-
+const UserAvatar = ({
+  size = "md",
+  className = "",
+  imageUrl = "",
+  initial = "",
+}) => {
   // Size classes
   const sizeClasses = {
     sm: "w-8 h-8",
@@ -23,17 +25,17 @@ const UserAvatar = ({ size = "md", className = "" }) => {
 
   // For monitoring/debugging purposes
   React.useEffect(() => {
-    if (avatarInfo.imageUrl) {
-      console.log("Avatar component using URL:", avatarInfo.imageUrl);
+    if (imageUrl) {
+      console.log("Avatar component using URL:", imageUrl);
     }
-  }, [avatarInfo.imageUrl]);
+  }, [imageUrl]);
 
   // Determine what to render inside the avatar circle
   const renderAvatarContent = () => {
-    if (avatarInfo.imageUrl && !imgError) {
+    if (imageUrl && !imgError) {
       return (
         <img
-          src={avatarInfo.imageUrl}
+          src={imageUrl}
           alt="User avatar"
           className="w-full h-full object-cover"
           crossOrigin="anonymous"
@@ -43,10 +45,8 @@ const UserAvatar = ({ size = "md", className = "" }) => {
           }}
         />
       );
-    } else if (avatarInfo.initial) {
-      return (
-        <span className="font-semibold text-lg">{avatarInfo.initial}</span>
-      );
+    } else if (initial) {
+      return <span className="font-semibold text-lg">{initial}</span>;
     } else {
       return <User />;
     }
@@ -65,8 +65,9 @@ const UserAvatar = ({ size = "md", className = "" }) => {
 
 UserAvatar.propTypes = {
   size: PropTypes.oneOf(["sm", "md", "lg", "xl"]),
-  showBadge: PropTypes.bool,
   className: PropTypes.string,
+  imageUrl: PropTypes.string,
+  initial: PropTypes.string,
 };
 
 export default UserAvatar;
