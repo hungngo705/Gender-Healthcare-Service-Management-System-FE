@@ -1,7 +1,7 @@
 import React from "react";
 import { format } from "date-fns";
 import { vi } from "date-fns/locale";
-import { X, CheckCircle, XCircle, AlertCircle } from "lucide-react";
+import { X, CheckCircle, XCircle, Clipboard } from "lucide-react";
 
 const slotLabels = {
   0: "Sáng (8:00 - 12:00)",
@@ -23,24 +23,7 @@ const statusLabels = {
   4: { label: "Đã hủy", color: "bg-red-100 text-red-800" },
 };
 
-// Parameters for STI tests
-const parameterLabels = {
-  0: "HIV",
-  1: "Giang mai",
-  2: "Lậu",
-  3: "Chlamydia",
-  4: "Viêm gan B",
-  5: "Viêm gan C",
-};
-
-// Outcome for test results
-const outcomeLabels = {
-  0: { label: "Âm tính", color: "text-green-600" },
-  1: { label: "Dương tính", color: "text-red-600" },
-  2: { label: "Không xác định", color: "text-yellow-600" },
-};
-
-function TestDetailModal({ test, onClose, onStatusChange }) {
+function TestDetailModal({ test, onClose, onStatusChange, onShowResults }) {
   const formatDate = (dateString) => {
     if (!dateString) return "N/A";
     try {
@@ -87,6 +70,7 @@ function TestDetailModal({ test, onClose, onStatusChange }) {
       return parameterCount * parameterPrice;
     }
   };
+
   return (
     <div className="fixed inset-0 bg-opacity-60 backdrop-blur-sm flex justify-center items-center p-4 z-50">
       <div className="bg-white rounded-lg p-6 max-w-4xl w-full max-h-[90vh] overflow-y-auto shadow-xl">
@@ -102,8 +86,22 @@ function TestDetailModal({ test, onClose, onStatusChange }) {
             <X size={24} />
           </button>
         </div>
+        
+        {/* Navigation buttons - Replace tabs with direct navigation */}
+        <div className="mb-6 flex justify-between items-center">
+          <h3 className="text-lg font-medium">Thông tin chi tiết</h3>
+          <button
+            onClick={() => onShowResults(test)}
+            className="bg-indigo-600 hover:bg-indigo-700 text-white py-2 px-4 rounded-md flex items-center"
+          >
+            <Clipboard size={18} className="mr-2" />
+            Xem kết quả xét nghiệm
+          </button>
+        </div>
 
+        {/* Thông tin chi tiết */}
         <div className="grid grid-cols-1 md:grid-cols-2 gap-6 mb-6">
+          {/* Customer information */}
           <div className="space-y-4">
             <h3 className="text-lg font-medium text-gray-900">
               Thông tin khách hàng
@@ -122,9 +120,7 @@ function TestDetailModal({ test, onClose, onStatusChange }) {
                 </span>
               </div>
               <div className="mb-3">
-                <span className="block text-sm text-gray-500">
-                  Số điện thoại
-                </span>
+                <span className="block text-sm text-gray-500">Số điện thoại</span>
                 <span className="block font-medium">
                   {test.customer?.phoneNumber || "N/A"}
                 </span>
@@ -138,6 +134,7 @@ function TestDetailModal({ test, onClose, onStatusChange }) {
             </div>
           </div>
 
+          {/* Appointment information */}
           <div className="space-y-4">
             <h3 className="text-lg font-medium text-gray-900">
               Thông tin lịch hẹn
@@ -177,6 +174,7 @@ function TestDetailModal({ test, onClose, onStatusChange }) {
         </div>
 
         <div className="grid grid-cols-1 md:grid-cols-2 gap-6 mb-6">
+          {/* Test information */}
           <div className="space-y-4">
             <h3 className="text-lg font-medium text-gray-900">
               Thông tin xét nghiệm
@@ -235,6 +233,7 @@ function TestDetailModal({ test, onClose, onStatusChange }) {
             </div>
           </div>
 
+          {/* Status management */}
           <div className="space-y-4">
             <h3 className="text-lg font-medium text-gray-900">
               Quản lý trạng thái
@@ -285,31 +284,31 @@ function TestDetailModal({ test, onClose, onStatusChange }) {
               <div className="text-sm text-gray-500 pt-2">
                 {test.status === 0 && (
                   <p className="flex items-center">
-                    <AlertCircle size={16} className="mr-1 text-blue-500" />
+                    <span className="mr-1 text-blue-500">ℹ️</span>
                     Sau khi lấy mẫu, cập nhật trạng thái để bắt đầu xử lý
                   </p>
                 )}
                 {test.status === 1 && (
                   <p className="flex items-center">
-                    <AlertCircle size={16} className="mr-1 text-yellow-500" />
+                    <span className="mr-1 text-yellow-500">⚠️</span>
                     Tiếp tục quy trình xử lý mẫu
                   </p>
                 )}
                 {test.status === 2 && (
                   <p className="flex items-center">
-                    <AlertCircle size={16} className="mr-1 text-purple-500" />
+                    <span className="mr-1 text-purple-500">🔍</span>
                     Nhập kết quả xét nghiệm để hoàn thành
                   </p>
                 )}
                 {test.status === 3 && (
                   <p className="flex items-center">
-                    <CheckCircle size={16} className="mr-1 text-green-500" />
+                    <span className="mr-1 text-green-500">✓</span>
                     Xét nghiệm đã hoàn thành
                   </p>
                 )}
                 {test.status === 4 && (
                   <p className="flex items-center">
-                    <XCircle size={16} className="mr-1 text-red-500" />
+                    <span className="mr-1 text-red-500">✗</span>
                     Xét nghiệm đã bị hủy
                   </p>
                 )}
@@ -318,73 +317,7 @@ function TestDetailModal({ test, onClose, onStatusChange }) {
           </div>
         </div>
 
-        {/* Test Results Section */}
-        <div className="space-y-4 mb-6">
-          <h3 className="text-lg font-medium text-gray-900">
-            Kết quả xét nghiệm
-          </h3>
-
-          {test.testResult && test.testResult.length > 0 ? (
-            <div className="overflow-x-auto">
-              <table className="min-w-full divide-y divide-gray-200">
-                <thead className="bg-gray-50">
-                  <tr>
-                    <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
-                      Thông số
-                    </th>
-                    <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
-                      Kết quả
-                    </th>
-                    <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
-                      Ghi chú
-                    </th>
-                    <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
-                      Nhân viên xử lý
-                    </th>
-                    <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
-                      Thời gian
-                    </th>
-                  </tr>
-                </thead>
-                <tbody className="bg-white divide-y divide-gray-200">
-                  {test.testResult.map((result) => (
-                    <tr key={result.id}>
-                      <td className="px-6 py-4 whitespace-nowrap text-sm font-medium text-gray-900">
-                        {parameterLabels[result.parameter] || "Không xác định"}
-                      </td>
-                      <td className="px-6 py-4 whitespace-nowrap">
-                        <span
-                          className={`inline-block font-medium ${
-                            outcomeLabels[result.outcome]?.color ||
-                            "text-gray-700"
-                          }`}
-                        >
-                          {outcomeLabels[result.outcome]?.label ||
-                            "Không xác định"}
-                        </span>
-                      </td>
-                      <td className="px-6 py-4 text-sm text-gray-500">
-                        {result.comments || "Không có ghi chú"}
-                      </td>
-                      <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-500">
-                        {result.staff?.name || "N/A"}
-                      </td>
-                      <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-500">
-                        {formatDateTime(result.processedAt)}
-                      </td>
-                    </tr>
-                  ))}
-                </tbody>
-              </table>
-            </div>
-          ) : (
-            <div className="bg-gray-50 p-6 rounded-lg text-center">
-              <p className="text-gray-500">Chưa có kết quả xét nghiệm</p>
-            </div>
-          )}
-        </div>
-
-        <div className="flex justify-end">
+        <div className="flex justify-end mt-6">
           <button
             onClick={onClose}
             className="px-4 py-2 bg-gray-100 text-gray-700 rounded-md hover:bg-gray-200 transition"

@@ -83,9 +83,11 @@ const PaymentSummary = ({
           <div className="flex justify-between">
             <span className="text-sm text-gray-600">Khung giờ</span>
             <span className="text-sm font-medium">
-              {bookingData.slot === 0 ? "Sáng (8:00-12:00)" : 
-               bookingData.slot === 1 ? "Chiều (13:00-17:00)" : 
-               "Tối (17:00-20:00)"}
+              {bookingData.slot === 0 ? "Sáng sớm (7:00-10:00)" : 
+               bookingData.slot === 1 ? "Trưa (10:00-13:00)" : 
+               bookingData.slot === 2 ? "Chiều (13:00-16:00)" : 
+               bookingData.slot === 3 ? "Tối (16:00-19:00)" : 
+               "Không xác định"}
             </span>
           </div>
         )}
@@ -218,4 +220,4 @@ const PaymentSummary = ({
   );
 };
 
-export default PaymentSummary; 
+export default PaymentSummary;

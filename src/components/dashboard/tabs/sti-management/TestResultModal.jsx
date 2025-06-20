@@ -1,336 +1,466 @@
 import React, { useState, useEffect } from "react";
-import { toast } from "react-toastify";
-import { X, Plus, Save, Trash2 } from "lucide-react";
-
-// Import API services
+import { format } from "date-fns";
+import { vi } from "date-fns/locale";
 import {
-  getTestResults,
-  createTestResult,
-  updateTestResult,
-  deleteTestResult,
-} from "../../../../services/testResultService";
-import { updateTestingStatus } from "../../../../services/stiTestingService";
+  X,
+  AlertCircle,
+  CheckCircle,
+  PlusCircle,
+  FileText,
+  ArrowLeft,
+} from "lucide-react";
+import testResultService from "../../../../services/testResultService";
+import stiTestingService from "../../../../services/stiTestingService";
+import { toast } from "react-toastify";
+import UpdateTestResultModal from "./UpdateTestResultModal";
 
-// Parameters for STI tests
+// Parameters for STI tests - aligned with API enum
 const parameterLabels = {
-  0: "HIV",
-  1: "Giang mai",
-  2: "Lậu",
-  3: "Chlamydia",
-  4: "Viêm gan B",
-  5: "Viêm gan C",
+  0: "Chlamydia",
+  1: "Lậu",
+  2: "Giang mai",
+  3: "HIV",
+  4: "Herpes",
+  5: "Viêm gan B",
+  6: "Viêm gan C",
+  7: "Trichomonas",
+  8: "Mycoplasma Genitalium",
 };
 
 // Outcome for test results
 const outcomeLabels = {
-  0: "Âm tính",
-  1: "Dương tính",
-  2: "Không xác định",
+  0: { label: "Âm tính", color: "text-green-600" },
+  1: { label: "Dương tính", color: "text-red-600" },
+  2: { label: "Không xác định", color: "text-yellow-600" },
 };
 
-// Test package mapping
-const testPackageParameters = {
-  0: [0, 1, 2], // Basic: HIV, Syphilis, Gonorrhea
-  1: [0, 1, 2, 3, 4, 5, 6, 7, 8, 9], // Advanced: All parameters
-  // Custom: depends on user selection
-};
+function TestResultModal({
+  test: initialTest,
+  onClose,
+  onBackToDetails,
+  onTestUpdated,
+}) {
+  const [test, setTest] = useState(initialTest);
+  const [showUpdateResultModal, setShowUpdateResultModal] = useState(false);
+  const [isLoading, setIsLoading] = useState(true);
+  const [selectedResult, setSelectedResult] = useState(null);
 
-function TestResultModal({ test, onClose, onTestResultUpdated }) {
-  const [results, setResults] = useState([]);
-  const [loading, setLoading] = useState(true);
-  const [saving, setSaving] = useState(false);
-  const [parameterOptions, setParameterOptions] = useState([]);
+  const formatDateTime = (dateString) => {
+    if (!dateString) return "N/A";
+    try {
+      return format(new Date(dateString), "HH:mm - dd/MM/yyyy", { locale: vi });
+    } catch (error) {
+      return "N/A";
+    }
+  };
 
-  // Form state for adding/editing a result
-  const [editingResult, setEditingResult] = useState(null);
-  const [formData, setFormData] = useState({
-    parameter: "",
-    outcome: "",
-    comments: "",
-  }); // Fetch test results on mount
+  // Calculate pending parameters
+  const calculatePendingCount = () => {
+    if (!test.customParameters) return 0;
+
+    const selectedParams = test.customParameters || [];
+    const completedParams = (test.testResult || [])
+      .filter((result) => result.outcome !== null && result.outcome !== 2)
+      .map((result) => result.parameter);
+
+    return selectedParams.filter((param) => !completedParams.includes(param))
+      .length;
+  };
+
+  const pendingCount = calculatePendingCount();
+
+  // Load test results
   useEffect(() => {
-    const fetchResults = async () => {
-      setLoading(true);
+    const loadTestResults = async () => {
+      if (!test?.id) return;
+
+      setIsLoading(true);
       try {
-        const response = await getTestResults(test.id);
-        if (response?.data?.is_success && Array.isArray(response.data.data)) {
-          setResults(response.data.data);
-          // Determine available parameters based on package type
-          generateParameterOptions(response.data.data);
+        // Sử dụng stiTestingService.getById thay vì testResultService
+        const response = await stiTestingService.getById(test.id);
+        console.log("STI Testing API response:", response);
+        
+        if (response && response.data && response.data.is_success) {
+          // Lấy đối tượng test từ response
+          const testData = response.data.data;
+          console.log("Test data from API:", testData);
+          
+          // Kiểm tra và lấy testResult từ response
+          if (testData && Array.isArray(testData.testResult)) {
+            console.log("Test results from API:", testData.testResult);
+            
+            // Xử lý dữ liệu để đảm bảo đủ các trường
+            const processedResults = testData.testResult.map(result => ({
+              ...result,
+              comments: result.comments || "",
+              staff: result.staff || null,
+              processedAt: result.processedAt || null,
+              parameter: parseInt(result.parameter)  // Đảm bảo parameter là số
+            }));
+            
+            console.log("Processed test results:", processedResults);
+            
+            // Cập nhật state với cả đối tượng test và testResult
+            setTest(prev => ({
+              ...prev,
+              ...testData,
+              testResult: processedResults
+            }));
+          } else {
+            console.warn("No test results found in API response");
+            
+            // Nếu không có testResult từ API nhưng có customParameters
+            if (testData && Array.isArray(testData.customParameters) && testData.customParameters.length > 0) {
+              const tempResults = testData.customParameters.map(param => ({
+                id: `temp-${param}-${Date.now()}`,
+                parameter: parseInt(param),
+                outcome: 2,  // Default to "Không xác định"
+                comments: "",
+                testingId: test.id,
+                processedAt: null,
+                staff: null,
+                isPending: true
+              }));
+              
+              setTest(prev => ({
+                ...prev,
+                ...testData,
+                testResult: tempResults
+              }));
+            } else {
+              // Kiểm tra nếu đã có test result từ initialTest
+              if (Array.isArray(test.testResult) && test.testResult.length > 0) {
+                console.log("Using existing test results from props");
+              } else {
+                console.warn("No test results or custom parameters found");
+              }
+            }
+          }
         } else {
-          setResults([]);
-          generateParameterOptions([]);
-          console.log("API response structure:", response); // For debugging
+          toast.error("Không thể tải dữ liệu xét nghiệm");
         }
       } catch (error) {
-        console.error("Error fetching test results:", error);
-        setResults([]);
-        generateParameterOptions([]);
+        console.error("Error loading test data:", error);
+        toast.error("Có lỗi khi tải dữ liệu xét nghiệm");
       } finally {
-        setLoading(false);
+        setIsLoading(false);
       }
     };
 
-    fetchResults();
+    loadTestResults();
   }, [test.id]);
 
-  // Generate parameter options based on package type and existing results
-  const generateParameterOptions = (currentResults) => {
-    let availableParameters = [];
-
-    if (test.testPackage === 0 || test.testPackage === 1) {
-      // For basic and advanced packages, use predefined parameters
-      availableParameters = [...testPackageParameters[test.testPackage]];
-    } else if (test.testPackage === 2) {
-      // For custom package, check the custom parameters
-      // Assuming custom parameters are stored somewhere in the test object
-      // This might need adjustment based on your actual data structure
-      if (test.customParameters && Array.isArray(test.customParameters)) {
-        availableParameters = [...test.customParameters];
-      } else if (typeof test.customParameters === "string") {
-        // If it's a string like "0,1,2", convert to array of numbers
-        availableParameters = test.customParameters
-          .split(",")
-          .map((p) => parseInt(p.trim()))
-          .filter((p) => !isNaN(p));
-      }
-    }
-
-    // Filter out parameters that already have results
-    const usedParameters = currentResults.map((r) => r.parameter);
-    const options = availableParameters
-      .filter((p) => !usedParameters.includes(p))
-      .map((p) => ({
-        value: p,
-        label: parameterLabels[p] || `Thông số ${p}`,
-      }));
-
-    setParameterOptions(options);
-
-    // If we're editing, add the current parameter back to options
-    if (editingResult) {
-      const usedParameter = editingResult.parameter;
-      if (!options.some((o) => o.value === usedParameter)) {
-        options.push({
-          value: usedParameter,
-          label: parameterLabels[usedParameter] || `Thông số ${usedParameter}`,
-        });
-      }
-    }
-
-    // Set default parameter if available
-    if (options.length > 0 && !formData.parameter) {
-      setFormData((prev) => ({ ...prev, parameter: options[0].value }));
-    }
-  };
-
-  // Handle input change
-  const handleInputChange = (e) => {
-    const { name, value } = e.target;
-    setFormData((prev) => ({
-      ...prev,
-      [name]:
-        name === "parameter" || name === "outcome" ? parseInt(value) : value,
-    }));
-  };
-
-  // Start adding a new result
-  const handleAddResult = () => {
-    setEditingResult(null);
-    setFormData({
-      parameter: parameterOptions.length > 0 ? parameterOptions[0].value : "",
-      outcome: 0, // Default to negative
-      comments: "",
-    });
-  };
-
-  // Start editing an existing result
-  const handleEditResult = (result) => {
-    setEditingResult(result);
-    setFormData({
-      parameter: result.parameter,
-      outcome: result.outcome,
-      comments: result.comments || "",
-    });
-
-    // Regenerate options to include the current parameter
-    generateParameterOptions(results);
-  };
-
-  // Save result (create or update)
-  const handleSaveResult = async () => {
-    // Validate form
-    if (formData.parameter === "" || formData.outcome === "") {
-      toast.error("Vui lòng điền đầy đủ thông tin");
-      return;
-    }
-
-    setSaving(true);
-    try {
-      let response;
-
-      if (editingResult) {
-        // Update existing result
-        response = await updateTestResult(
-          editingResult.id,
-          test.id,
-          formData.parameter,
-          formData.outcome,
-          formData.comments
-        );
-      } else {
-        // Create new result
-        response = await createTestResult(
-          test.id,
-          formData.parameter,
-          formData.outcome,
-          formData.comments
-        );
-      }
-      console.log("form dataaaa:", formData); // For debugging
-      if (response?.data?.is_success) {
-        toast.success(
-          editingResult ? "Cập nhật thành công" : "Thêm kết quả thành công"
-        );
-
-        // Refresh results
-        const updatedResponse = await getTestResults(test.id);
-        if (
-          updatedResponse?.data?.is_success &&
-          Array.isArray(updatedResponse.data.data)
-        ) {
-          setResults(updatedResponse.data.data);
-          generateParameterOptions(updatedResponse.data.data);
-        }
-
-        // Update test status to "processing" if it wasn't already
-        if (test.status < 2) {
-          await updateTestingStatus(test.id, 2); // Set to "processing"
-        } // Check if all parameters have results, and update status to "completed" if so
-        const allParametersProcessed = checkAllParametersProcessed(
-          updatedResponse?.data?.data || []
-        );
-        if (allParametersProcessed && test.status < 3) {
-          await updateTestingStatus(test.id, 3); // Set to "completed"
-        }
-
-        // Close form
-        setEditingResult(null);
-        setFormData({
-          parameter: "",
-          outcome: "",
+  // Handle updating results
+  const handleUpdateResults = () => {
+    // Đảm bảo có dữ liệu test result trước khi mở modal
+    if (!test.testResult || test.testResult.length === 0) {
+      // Nếu không có test results nhưng có parameters
+      if (test.customParameters && test.customParameters.length > 0) {
+        // Tạo các kết quả tạm thời từ custom parameters
+        const tempResults = test.customParameters.map(param => ({
+          id: `temp-${param}-${Date.now()}`,
+          parameter: parseInt(param),
+          outcome: 2,
           comments: "",
-        });
-
-        // Notify parent component
-        onTestResultUpdated && onTestResultUpdated();
+          testingId: test.id,
+          isNew: true
+        }));
+        
+        // Cập nhật state với kết quả tạm thời
+        setTest(prev => ({
+          ...prev,
+          testResult: tempResults
+        }));
+        
+        // Sau khi cập nhật state, mở modal
+        setShowUpdateResultModal(true);
       } else {
-        toast.error("Lỗi: " + (response.message || "Không thể lưu kết quả"));
+        // Nếu thực sự không có dữ liệu, hiển thị thông báo
+        toast.warning("Không có thông số xét nghiệm nào để cập nhật");
       }
-    } catch (error) {
-      console.error("Error saving test result:", error);
-      toast.error(
-        "Lỗi khi lưu kết quả: " + (error.message || "Lỗi không xác định")
-      );
-    } finally {
-      setSaving(false);
+    } else {
+      // Nếu có test results, mở modal bình thường
+      setShowUpdateResultModal(true);
     }
   };
 
-  // Delete result
-  const handleDeleteResult = async (resultId) => {
-    if (!window.confirm("Bạn có chắc chắn muốn xóa kết quả này?")) {
+  // Handle results updated
+  const handleResultsUpdated = (updatedResults) => {
+    console.log("Received updated results:", updatedResults);
+    
+    if (!Array.isArray(updatedResults)) {
+      console.error("Expected array of results but got:", updatedResults);
+      toast.error("Định dạng dữ liệu không đúng. Vui lòng làm mới trang.");
+      return;
+    }
+    
+    // Nếu kết quả cập nhật rỗng, tải lại dữ liệu từ API
+    if (updatedResults.length === 0) {
+      handleRefreshData();
       return;
     }
 
-    setSaving(true);
+    const updatedTest = {
+      ...test,
+      testResult: updatedResults,
+    };
+
+    setTest(updatedTest);
+    toast.success("Đã cập nhật kết quả xét nghiệm thành công!");
+
+    // Update parent component if callback provided
+    if (onTestUpdated) {
+      onTestUpdated(updatedTest);
+    }
+  };
+
+  // Add this function in your TestResultModal component
+  const handleDeleteResult = async (resultId, parameterName) => {
+    if (!resultId || resultId.toString().startsWith('temp-')) {
+      toast.error("Không thể xóa kết quả tạm thời");
+      return;
+    }
+    
+    if (!window.confirm(`Bạn có chắc chắn muốn xóa kết quả xét nghiệm "${parameterName}" không?`)) {
+      return;
+    }
+    
     try {
-      const response = await deleteTestResult(resultId);
-      if (response?.data?.is_success) {
-        toast.success("Xóa kết quả thành công");
-
-        // Refresh results
-        const updatedResponse = await getTestResults(test.id);
-        if (
-          updatedResponse?.data?.is_success &&
-          Array.isArray(updatedResponse.data.data)
-        ) {
-          setResults(updatedResponse.data.data);
-          generateParameterOptions(updatedResponse.data.data);
+      const response = await testResultService.deleteTestResult(resultId);
+      console.log("Delete response:", response);
+      
+      if (response && response.is_success) {
+        toast.success("Xóa kết quả xét nghiệm thành công!");
+        
+        // Tải lại dữ liệu từ API sau khi xóa
+        const refreshResponse = await stiTestingService.getById(test.id);
+        if (refreshResponse && refreshResponse.data && refreshResponse.data.is_success) {
+          const refreshedTest = refreshResponse.data.data;
+          
+          // Cập nhật state với dữ liệu mới
+          setTest(prev => ({
+            ...prev,
+            ...refreshedTest
+          }));
+          
+          // Thông báo cho component cha
+          if (onTestUpdated) {
+            onTestUpdated(refreshedTest);
+          }
+        } else {
+          // Nếu không lấy được dữ liệu mới, cập nhật dữ liệu hiện tại
+          const updatedResults = test.testResult.filter(r => r.id !== resultId);
+          setTest(prev => ({
+            ...prev,
+            testResult: updatedResults
+          }));
+          
+          if (onTestUpdated) {
+            onTestUpdated({
+              ...test,
+              testResult: updatedResults
+            });
+          }
         }
-
-        // If editing this result, close form
-        if (editingResult && editingResult.id === resultId) {
-          setEditingResult(null);
-          setFormData({
-            parameter: "",
-            outcome: "",
-            comments: "",
-          });
-        }
-
-        // Notify parent component
-        onTestResultUpdated && onTestResultUpdated();
       } else {
-        toast.error(
-          "Lỗi: " + (response?.data?.message || "Không thể xóa kết quả")
-        );
+        toast.error(`Lỗi: ${response?.message || "Không thể xóa kết quả"}`);
       }
     } catch (error) {
       console.error("Error deleting test result:", error);
-      toast.error(
-        "Lỗi khi xóa kết quả: " + (error.message || "Lỗi không xác định")
-      );
-    } finally {
-      setSaving(false);
+      toast.error("Có lỗi khi xóa kết quả xét nghiệm");
     }
   };
 
-  // Check if all parameters for this test package have results
-  const checkAllParametersProcessed = (currentResults) => {
-    let requiredParameters = [];
+  // Thêm hàm này vào component
+  const handleBulkUpdate = async (parameters, outcome, comments) => {
+    if (!parameters || parameters.length === 0) {
+      toast.warning("Không có thông số nào được chọn");
+      return;
+    }
 
-    if (test.testPackage === 0 || test.testPackage === 1) {
-      // For basic and advanced packages, use predefined parameters
-      requiredParameters = [...testPackageParameters[test.testPackage]];
-    } else if (test.testPackage === 2 && test.customParameters) {
-      // For custom package, check the custom parameters
-      if (Array.isArray(test.customParameters)) {
-        requiredParameters = [...test.customParameters];
-      } else if (typeof test.customParameters === "string") {
-        requiredParameters = test.customParameters
-          .split(",")
-          .map((p) => parseInt(p.trim()))
-          .filter((p) => !isNaN(p));
+    try {
+      let updatedCount = 0;
+      let errors = [];
+
+      // Xử lý từng parameter
+      for (const param of parameters) {
+        // Tìm xem kết quả đã tồn tại chưa
+        const existingResult = test.testResult.find(r => r.parameter === param);
+        
+        try {
+          let response;
+          
+          if (existingResult && !existingResult.isPending) {
+            // Cập nhật kết quả đã tồn tại
+            response = await testResultService.updateTestResult(
+              existingResult.id,
+              outcome,
+              comments
+            );
+          } else {
+            // Tạo kết quả mới
+            response = await testResultService.createTestResult(
+              test.id,
+              param,
+              outcome,
+              comments
+            );
+          }
+          
+          if (response && response.is_success) {
+            updatedCount++;
+          } else {
+            errors.push(`Thông số ${parameterLabels[param]}: ${response?.message || "Lỗi không xác định"}`);
+          }
+        } catch (err) {
+          errors.push(`Thông số ${parameterLabels[param]}: ${err.message || "Lỗi không xác định"}`);
+        }
       }
-    }
 
-    // If no parameters are defined, we can't complete
-    if (requiredParameters.length === 0) {
-      return false;
+      // Hiển thị thông báo kết quả
+      if (updatedCount > 0) {
+        toast.success(`Đã cập nhật ${updatedCount}/${parameters.length} thông số thành công`);
+        
+        // Tải lại dữ liệu sau khi cập nhật
+        const response = await testResultService.getTestResults(test.id);
+        if (response && response.is_success) {
+          const refreshedResults = response.data?.testResult || [];
+          setTest(prev => ({
+            ...prev,
+            testResult: refreshedResults.map(result => ({
+              ...result,
+              comments: result.comments || "",
+              staff: result.staff || null,
+              processedAt: result.processedAt || null
+            }))
+          }));
+          
+          // Thông báo cập nhật cho component cha
+          if (onTestUpdated) {
+            onTestUpdated({
+              ...test,
+              testResult: refreshedResults
+            });
+          }
+        }
+      }
+      
+      if (errors.length > 0) {
+        toast.error(`Có ${errors.length} lỗi khi cập nhật. Chi tiết trong console.`);
+        console.error("Bulk update errors:", errors);
+      }
+    } catch (error) {
+      console.error("Error in bulk update:", error);
+      toast.error("Có lỗi xảy ra khi cập nhật hàng loạt");
     }
-
-    // Check if all required parameters have results
-    const processedParameters = currentResults.map((r) => r.parameter);
-    return requiredParameters.every((p) => processedParameters.includes(p));
   };
 
-  // Cancel editing
-  const handleCancelEdit = () => {
-    setEditingResult(null);
-    setFormData({
-      parameter: "",
-      outcome: "",
+  // Debug log để kiểm tra dữ liệu
+  useEffect(() => {
+    console.log("Current test data:", test);
+    console.log("Test result array:", test.testResult);
+  }, [test]);
+
+  // Thêm vào ngay sau khi khởi tạo state
+  useEffect(() => {
+    // Nếu không có testResult nhưng có customParameters, tạo kết quả tạm thời
+    if ((!test.testResult || test.testResult.length === 0) && 
+        test.customParameters && test.customParameters.length > 0) {
+      
+      // Tạo kết quả tạm thời từ customParameters
+      const tempResults = test.customParameters.map(param => ({
+        id: `temp-${param}-${Date.now()}`,
+        parameter: param,
+        outcome: 2, // Mặc định là không xác định
+        comments: "",
+        testingId: test.id,
+        processedAt: null,
+        staff: null,
+        isPending: true
+      }));
+      
+      // Cập nhật state
+      setTest(prev => ({
+        ...prev,
+        testResult: tempResults
+      }));
+    }
+  }, []);
+
+  // Thêm hàm tạo kết quả mới
+  const handleCreateNewParameter = async () => {
+    // Hiển thị modal chọn thông số
+    const parameters = Object.entries(parameterLabels).map(([value, label]) => ({
+      value: parseInt(value),
+      label
+    }));
+    
+    // Tạo một modal đơn giản để chọn thông số (bạn có thể cải thiện phần UI này)
+    const parameterInput = window.prompt(
+      "Chọn thông số mới (nhập số):\n" + 
+      parameters.map(p => `${p.value}: ${p.label}`).join("\n")
+    );
+    
+    if (parameterInput === null) return; // Người dùng bấm Cancel
+    
+    const paramValue = parseInt(parameterInput.trim());
+    
+    // Kiểm tra giá trị hợp lệ
+    if (isNaN(paramValue) || !parameterLabels[paramValue]) {
+      toast.error("Thông số không hợp lệ");
+      return;
+    }
+    
+    // Kiểm tra thông số đã tồn tại trong test.testResult chưa
+    if (test.testResult && test.testResult.some(r => r.parameter === paramValue)) {
+      toast.error(`Thông số ${parameterLabels[paramValue]} đã tồn tại`);
+      return;
+    }
+    
+    // Mở modal cập nhật với thông số mới
+    const tempResult = {
+      id: `new-${paramValue}-${Date.now()}`,
+      parameter: paramValue,
+      outcome: 2,
       comments: "",
-    });
+      testingId: test.id,
+      isNew: true
+    };
+    
+    // Đặt thông số mới làm selected result và mở modal cập nhật
+    setSelectedResult(tempResult);
+    setShowUpdateResultModal(true);
+  };
+
+  // Thêm hàm làm mới dữ liệu
+  const handleRefreshData = async () => {
+    setIsLoading(true);
+    try {
+      const response = await stiTestingService.getById(test.id);
+      if (response && response.data && response.data.is_success) {
+        const refreshedTest = response.data.data;
+        setTest(prev => ({
+          ...prev,
+          ...refreshedTest
+        }));
+        toast.success("Đã làm mới dữ liệu");
+      } else {
+        toast.error("Không thể làm mới dữ liệu");
+      }
+    } catch (error) {
+      console.error("Error refreshing data:", error);
+      toast.error("Có lỗi khi làm mới dữ liệu");
+    } finally {
+      setIsLoading(false);
+    }
   };
 
   return (
-    <div className="fixed inset-0 bg-black bg-opacity-50 flex justify-center items-center p-4 z-50">
-      <div className="bg-white rounded-lg p-6 max-w-4xl w-full max-h-[90vh] overflow-y-auto">
+    <div className="fixed inset-0 bg-opacity-60 backdrop-blur-sm flex justify-center items-center p-4 z-50">
+      <div className="bg-white rounded-lg p-6 max-w-4xl w-full max-h-[90vh] overflow-y-auto shadow-xl">
         <div className="flex justify-between items-center mb-6">
           <h2 className="text-xl font-bold text-gray-900">
-            Quản lý kết quả xét nghiệm - {test.customer?.name || "Khách hàng"}
+            Kết quả xét nghiệm STI
           </h2>
           <button
             onClick={onClose}
@@ -341,245 +471,223 @@ function TestResultModal({ test, onClose, onTestResultUpdated }) {
           </button>
         </div>
 
-        <div className="mb-6">
-          <div className="bg-blue-50 border-l-4 border-blue-400 p-4 mb-4">
-            <div className="flex">
-              <div className="ml-3">
-                <p className="text-sm text-blue-700">
-                  <span className="font-medium">Thông tin xét nghiệm:</span>{" "}
-                  {test.id}
-                </p>
-                <p className="text-sm text-blue-700">
-                  <span className="font-medium">Gói xét nghiệm:</span>{" "}
-                  {test.testPackage === 0
-                    ? "Gói Cơ Bản"
-                    : test.testPackage === 1
-                    ? "Gói Nâng Cao"
-                    : test.testPackage === 2
-                    ? "Gói Tùy Chọn"
-                    : "Không xác định"}
-                </p>
-              </div>
-            </div>
-          </div>
+        {/* Navigation button to go back to details */}
+        <div className="mb-6 flex items-center">
+          <button
+            onClick={() => onBackToDetails(test)}
+            className="text-indigo-600 hover:text-indigo-800 flex items-center"
+          >
+            <ArrowLeft size={18} className="mr-1" />
+            Quay lại chi tiết xét nghiệm
+          </button>
         </div>
 
-        {/* Results List */}
-        <div className="mb-6">
+        {/* Kết quả xét nghiệm */}
+        <div className="space-y-6">
           <div className="flex justify-between items-center mb-4">
             <h3 className="text-lg font-medium text-gray-900">
               Kết quả xét nghiệm
             </h3>
-            {parameterOptions.length > 0 && !editingResult && (
+            
+            <div className="flex space-x-2">
+              {/* Nút làm mới */}
               <button
-                onClick={handleAddResult}
-                className="flex items-center px-4 py-2 bg-indigo-600 text-white rounded-md hover:bg-indigo-700 transition"
-                disabled={saving}
+                onClick={handleRefreshData}
+                className="inline-flex items-center p-2 text-gray-600 rounded-md hover:bg-gray-100"
+                title="Làm mới dữ liệu"
+                disabled={isLoading}
               >
-                <Plus size={16} className="mr-2" />
-                Thêm kết quả
+                <svg xmlns="http://www.w3.org/2000/svg" className={`h-5 w-5 ${isLoading ? 'animate-spin' : ''}`} fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M4 4v5h.582m15.356 2A8.001 8.001 0 004.582 9m0 0H9m11 11v-5h-.581m0 0a8.003 8.003 0 01-15.357-2m15.357 2H15" />
+                </svg>
               </button>
-            )}
-          </div>
-
-          {loading ? (
-            <div className="flex justify-center items-center h-32">
-              <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-indigo-600"></div>
-            </div>
-          ) : results.length === 0 && !editingResult ? (
-            <div className="bg-gray-50 p-6 rounded-lg text-center">
-              <p className="text-gray-500 mb-4">
-                Chưa có kết quả xét nghiệm. Thêm kết quả để bắt đầu.
-              </p>
-              {parameterOptions.length > 0 && (
-                <button
-                  onClick={handleAddResult}
-                  className="inline-flex items-center px-4 py-2 bg-indigo-600 text-white rounded-md hover:bg-indigo-700 transition"
-                  disabled={saving}
-                >
-                  <Plus size={16} className="mr-2" />
-                  Thêm kết quả
-                </button>
+              
+              {/* Nút thêm kết quả mới */}
+              {(test.status === 1 || test.status === 2) && (
+                <>
+                  <button
+                    onClick={() => {
+                      setSelectedResult(null);
+                      setShowUpdateResultModal(true);
+                    }}
+                    className="inline-flex items-center px-3 py-2 bg-green-600 text-white text-sm font-medium rounded-md hover:bg-green-700 focus:outline-none"
+                  >
+                    <PlusCircle size={16} className="mr-2" />
+                    Tạo kết quả mới
+                  </button>
+                  
+                  <button
+                    onClick={handleUpdateResults}
+                    className="inline-flex items-center px-3 py-2 bg-indigo-600 text-white text-sm font-medium rounded-md hover:bg-indigo-700 focus:outline-none"
+                  >
+                    <PlusCircle size={16} className="mr-2" />
+                    Cập nhật kết quả
+                    {pendingCount > 0 && ` (${pendingCount})`}
+                  </button>
+                </>
               )}
             </div>
-          ) : (
-            <div className="bg-white border rounded-lg overflow-hidden">
-              <table className="min-w-full divide-y divide-gray-200">
-                <thead className="bg-gray-50">
-                  <tr>
-                    <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
-                      Thông số
-                    </th>
-                    <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
-                      Kết quả
-                    </th>
-                    <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
-                      Ghi chú
-                    </th>
-                    <th className="px-6 py-3 text-right text-xs font-medium text-gray-500 uppercase tracking-wider">
-                      Thao tác
-                    </th>
-                  </tr>
-                </thead>
-                <tbody className="bg-white divide-y divide-gray-200">
-                  {results.map((result) => (
-                    <tr key={result.id} className="hover:bg-gray-50">
-                      <td className="px-6 py-4 whitespace-nowrap text-sm font-medium text-gray-900">
-                        {parameterLabels[result.parameter] ||
-                          `Thông số ${result.parameter}`}
-                      </td>
-                      <td className="px-6 py-4 whitespace-nowrap">
-                        <span
-                          className={`inline-block font-medium ${
-                            result.outcome === 0
-                              ? "text-green-600"
-                              : result.outcome === 1
-                              ? "text-red-600"
-                              : "text-yellow-600"
-                          }`}
-                        >
-                          {outcomeLabels[result.outcome] || "Không xác định"}
-                        </span>
-                      </td>
-                      <td className="px-6 py-4 text-sm text-gray-500">
-                        {result.comments || "Không có ghi chú"}
-                      </td>
-                      <td className="px-6 py-4 whitespace-nowrap text-right text-sm font-medium">
-                        <div className="flex justify-end space-x-2">
-                          <button
-                            onClick={() => handleEditResult(result)}
-                            className="text-indigo-600 hover:text-indigo-900"
-                            disabled={saving}
-                          >
-                            Chỉnh sửa
-                          </button>
-                          <button
-                            onClick={() => handleDeleteResult(result.id)}
-                            className="text-red-600 hover:text-red-900"
-                            disabled={saving}
-                          >
-                            Xóa
-                          </button>
-                        </div>
-                      </td>
-                    </tr>
-                  ))}
-                </tbody>
-              </table>
+          </div>
+
+          {isLoading ? (
+            <div className="flex justify-center items-center h-40">
+              <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-indigo-600"></div>
             </div>
+          ) : (
+            <>
+              {/* Debug info */}
+              <div className="mb-4 p-2 bg-gray-100 rounded text-xs overflow-auto">
+                <p>Test ID: {test.id}</p>
+                <p>Test Result Count: {Array.isArray(test.testResult) ? test.testResult.length : 'N/A'}</p>
+              </div>
+              
+              {/* Test results table */}
+              {Array.isArray(test.testResult) && test.testResult.length > 0 ? (
+                <div className="overflow-x-auto bg-white rounded-lg border border-gray-200">
+                  <table className="min-w-full divide-y divide-gray-200">
+                    <thead className="bg-gray-50">
+                      <tr>
+                        <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                          Thông số
+                        </th>
+                        <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                          Kết quả
+                        </th>
+                        <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                          Ghi chú
+                        </th>
+                        <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                          Nhân viên xử lý
+                        </th>
+                        <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                          Thời gian
+                        </th>
+                        <th className="px-6 py-3 text-right text-xs font-medium text-gray-500 uppercase tracking-wider">
+                          Thao tác
+                        </th>
+                      </tr>
+                    </thead>
+                    <tbody className="bg-white divide-y divide-gray-200">
+                      {test.testResult.map((result) => (
+                        <tr key={result.id}>
+                          <td className="px-6 py-4 whitespace-nowrap text-sm font-medium text-gray-900">
+                            {parameterLabels[result.parameter] || `Thông số ${result.parameter}`}
+                          </td>
+                          <td className="px-6 py-4 whitespace-nowrap">
+                            <span
+                              className={`inline-block font-medium ${
+                                outcomeLabels[result.outcome]?.color ||
+                                "text-gray-700"
+                              }`}
+                            >
+                              {outcomeLabels[result.outcome]?.label || "Không xác định"}
+                            </span>
+                          </td>
+                          <td className="px-6 py-4 text-sm text-gray-500">
+                            {result.comments || "Không có ghi chú"}
+                          </td>
+                          <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-500">
+                            {result.staff?.name || "N/A"}
+                          </td>
+                          <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-500">
+                            {result.processedAt ? formatDateTime(result.processedAt) : "N/A"}
+                          </td>
+                          <td className="px-6 py-4 whitespace-nowrap text-right text-sm font-medium">
+                            <div className="flex space-x-2 justify-end">
+                              <button
+                                onClick={() => {
+                                  setSelectedResult(result);
+                                  setShowUpdateResultModal(true);
+                                }}
+                                className="text-indigo-600 hover:text-indigo-900"
+                                title="Sửa kết quả"
+                              >
+                                <svg xmlns="http://www.w3.org/2000/svg" className="h-5 w-5" viewBox="0 0 20 20" fill="currentColor">
+                                  <path d="M13.586 3.586a2 2 0 112.828 2.828l-.793.793-2.828-2.828.793-.793zM11.379 5.793L3 14.172V17h2.828l8.38-8.379-2.83-2.828z" />
+                                </svg>
+                              </button>
+                              
+                              <button
+                                onClick={() => handleDeleteResult(result.id, parameterLabels[result.parameter])}
+                                className="text-red-600 hover:text-red-900"
+                                title="Xóa kết quả"
+                                disabled={test.status === 3}
+                              >
+                                <svg xmlns="http://www.w3.org/2000/svg" className="h-5 w-5" viewBox="0 0 20 20" fill="currentColor">
+                                  <path fillRule="evenodd" d="M9 2a1 1 0 00-.894.553L7.382 4H4a1 1 0 000 2v10a2 2 0 002 2h8a2 2 0 002-2V6a1 1 0 100-2h-3.382l-.724-1.447A1 1 0 0011 2H9zM7 8a1 1 0 012 0v6a1 1 0 11-2 0V8zm5-1a1 1 0 00-1 1v6a1 1 0 102 0V8a1 1 0 00-1-1z" clipRule="evenodd" />
+                                </svg>
+                              </button>
+                            </div>
+                          </td>
+                        </tr>
+                      ))}
+                    </tbody>
+                  </table>
+                </div>
+              ) : (
+                <div className="bg-gray-50 p-8 rounded-lg text-center">
+                  <p className="text-gray-500 mb-4">Chưa có kết quả xét nghiệm.</p>
+                  
+                  {(test.status === 1 || test.status === 2) && (
+                    <div className="flex flex-col items-center space-y-4">
+                      <div className="flex space-x-3">
+                        <button
+                          onClick={handleCreateNewParameter}
+                          className="inline-flex items-center px-4 py-2 bg-green-600 text-white text-sm font-medium rounded-md hover:bg-green-700 focus:outline-none"
+                        >
+                          <PlusCircle size={16} className="mr-2" />
+                          Thêm thông số mới
+                        </button>
+                        
+                        {Array.isArray(test.customParameters) && test.customParameters.length > 0 && (
+                          <button
+                            onClick={handleUpdateResults}
+                            className="inline-flex items-center px-4 py-2 bg-indigo-600 text-white text-sm font-medium rounded-md hover:bg-indigo-700 focus:outline-none"
+                          >
+                            <PlusCircle size={16} className="mr-2" />
+                            Thêm từ tham số mặc định
+                          </button>
+                        )}
+                      </div>
+                      
+                      <p className="text-sm text-gray-500 mt-4">
+                        Bạn cần thêm các thông số xét nghiệm trước khi nhập kết quả.
+                      </p>
+                    </div>
+                  )}
+                </div>
+              )}
+            </>
           )}
+
+          {test.status === 2 &&
+            pendingCount > 0 &&
+            test.testResult?.length > 0 && (
+              <div className="mt-3 bg-yellow-50 p-3 rounded-lg border border-yellow-100">
+                <p className="text-sm text-yellow-700 flex items-center">
+                  <AlertCircle size={16} className="mr-2" />
+                  Còn {pendingCount} xét nghiệm chưa được cập nhật kết quả
+                </p>
+              </div>
+            )}
+
+          {test.testResult &&
+            test.testResult.length > 0 &&
+            test.status === 3 && (
+              <div className="mt-4 bg-green-50 p-4 rounded-lg border border-green-100">
+                <p className="text-green-700 flex items-center mb-3">
+                  <CheckCircle size={18} className="mr-2" />
+                  Tất cả kết quả đã hoàn thành
+                </p>
+                <button className="inline-flex items-center px-4 py-2 bg-green-600 text-white rounded-md hover:bg-green-700">
+                  <FileText size={16} className="mr-2" />
+                  Xuất báo cáo kết quả
+                </button>
+              </div>
+            )}
         </div>
 
-        {/* Add/Edit Form */}
-        {(editingResult || formData.parameter !== "") && (
-          <div className="bg-gray-50 p-6 rounded-lg mb-6">
-            <h3 className="text-lg font-medium text-gray-900 mb-4">
-              {editingResult ? "Chỉnh sửa kết quả" : "Thêm kết quả mới"}
-            </h3>
-
-            <div className="grid grid-cols-1 gap-6 md:grid-cols-2">
-              <div>
-                <label className="block text-sm font-medium text-gray-700 mb-1">
-                  Thông số xét nghiệm
-                </label>
-                <select
-                  name="parameter"
-                  value={formData.parameter}
-                  onChange={handleInputChange}
-                  disabled={saving || parameterOptions.length === 0}
-                  className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-indigo-500 focus:border-indigo-500"
-                >
-                  {parameterOptions.length === 0 ? (
-                    <option value="">Không có thông số nào khả dụng</option>
-                  ) : (
-                    parameterOptions.map((option) => (
-                      <option key={option.value} value={option.value}>
-                        {option.label}
-                      </option>
-                    ))
-                  )}
-                </select>
-              </div>
-
-              <div>
-                <label className="block text-sm font-medium text-gray-700 mb-1">
-                  Kết quả
-                </label>
-                <select
-                  name="outcome"
-                  value={formData.outcome}
-                  onChange={handleInputChange}
-                  disabled={saving}
-                  className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-indigo-500 focus:border-indigo-500"
-                >
-                  {Object.entries(outcomeLabels).map(([value, label]) => (
-                    <option key={value} value={value}>
-                      {label}
-                    </option>
-                  ))}
-                </select>
-              </div>
-
-              <div className="md:col-span-2">
-                <label className="block text-sm font-medium text-gray-700 mb-1">
-                  Ghi chú
-                </label>
-                <textarea
-                  name="comments"
-                  value={formData.comments}
-                  onChange={handleInputChange}
-                  disabled={saving}
-                  rows="3"
-                  className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-indigo-500 focus:border-indigo-500"
-                  placeholder="Nhập ghi chú (nếu có)"
-                ></textarea>
-              </div>
-            </div>
-
-            <div className="flex justify-end space-x-2 mt-6">
-              <button
-                onClick={handleCancelEdit}
-                className="px-4 py-2 bg-gray-100 text-gray-700 rounded-md hover:bg-gray-200 transition"
-                disabled={saving}
-              >
-                Hủy
-              </button>
-              <button
-                onClick={handleSaveResult}
-                disabled={saving || formData.parameter === ""}
-                className="flex items-center px-4 py-2 bg-indigo-600 text-white rounded-md hover:bg-indigo-700 transition disabled:bg-indigo-300 disabled:cursor-not-allowed"
-              >
-                {saving ? (
-                  <div className="mr-2 h-4 w-4 border-2 border-white border-t-transparent rounded-full animate-spin"></div>
-                ) : (
-                  <Save size={16} className="mr-2" />
-                )}
-                {editingResult ? "Cập nhật" : "Lưu kết quả"}
-              </button>
-            </div>
-          </div>
-        )}
-
-        <div className="flex justify-end space-x-2">
-          {/* Check if all parameters have results */}
-          {checkAllParametersProcessed(results) && test.status < 3 && (
-            <button
-              onClick={async () => {
-                try {
-                  await updateTestingStatus(test.id, 3); // Set to "completed"
-                  toast.success("Xét nghiệm đã được đánh dấu là hoàn thành");
-                  onTestResultUpdated && onTestResultUpdated();
-                } catch (error) {
-                  console.error("Error updating status:", error);
-                  toast.error("Không thể cập nhật trạng thái");
-                }
-              }}
-              className="px-4 py-2 bg-green-600 text-white rounded-md hover:bg-green-700 transition"
-            >
-              Hoàn thành xét nghiệm
-            </button>
-          )}
-
+        <div className="flex justify-end mt-6">
           <button
             onClick={onClose}
             className="px-4 py-2 bg-gray-100 text-gray-700 rounded-md hover:bg-gray-200 transition"
@@ -587,6 +695,38 @@ function TestResultModal({ test, onClose, onTestResultUpdated }) {
             Đóng
           </button>
         </div>
+
+        {/* Modal cập nhật kết quả xét nghiệm */}
+        {showUpdateResultModal && test && (
+          <UpdateTestResultModal
+            test={test}
+            initialResult={selectedResult} // Pass the selected result if editing 
+            onClose={() => {
+              setShowUpdateResultModal(false);
+              setSelectedResult(null); // Clear selection on close
+            }}
+            onResultsUpdated={(updatedResults) => {
+              handleResultsUpdated(updatedResults);
+              setShowUpdateResultModal(false);
+              setSelectedResult(null); // Clear selection after update
+            }}
+          />
+        )}
+
+        {/* Debug info - chỉ hiển thị trong môi trường phát triển */}
+        {process.env.NODE_ENV === 'development' && (
+          <details className="mt-4 border-t pt-4">
+            <summary className="cursor-pointer text-sm text-gray-500">Debug Info</summary>
+            <pre className="mt-2 p-2 bg-gray-100 rounded text-xs overflow-auto max-h-60">
+              {JSON.stringify({
+                testId: test.id,
+                status: test.status,
+                resultCount: test.testResult?.length || 0,
+                results: test.testResult
+              }, null, 2)}
+            </pre>
+          </details>
+        )}
       </div>
     </div>
   );

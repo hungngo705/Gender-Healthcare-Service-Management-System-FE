@@ -2,17 +2,7 @@ import { useState, useEffect } from "react";
 import { toast } from "react-toastify";
 import { format } from "date-fns";
 import { vi } from "date-fns/locale";
-import {
-  Search,
-  Filter,
-  RefreshCcw,
-  Eye,
-  Edit,
-  Trash2,
-  CheckCircle,
-  XCircle,
-  AlertCircle,
-} from "lucide-react";
+import { Search, Filter, RefreshCcw, Eye, Edit, Trash2 } from "lucide-react";
 
 // Import services
 import {
@@ -22,9 +12,9 @@ import {
   getById as getSTITestingById,
 } from "../../../services/stiTestingService";
 
-// Import components for test results
-import TestResultModal from "./sti-management/TestResultModal";
+// Import components for test detail
 import TestDetailModal from "./sti-management/TestDetailModal";
+import TestResultModal from "./sti-management/TestResultModal";
 
 const slotLabels = {
   0: "Sáng (8:00 - 12:00)",
@@ -61,8 +51,8 @@ function STITestingManagementTab() {
 
   // Modal states
   const [isDetailModalOpen, setIsDetailModalOpen] = useState(false);
-  const [isResultModalOpen, setIsResultModalOpen] = useState(false);
-  const [isDeleteModalOpen, setIsDeleteModalOpen] = useState(false); // Load all STI testing data
+  const [isDeleteModalOpen, setIsDeleteModalOpen] = useState(false);
+  const [isResultModalOpen, setIsResultModalOpen] = useState(false); // Load all STI testing data
   const fetchTests = async () => {
     setLoading(true);
     try {
@@ -129,9 +119,7 @@ function STITestingManagementTab() {
   const totalPages = Math.ceil(filteredTests.length / testsPerPage); // Handle opening test detail modal
   const handleViewTest = async (test) => {
     try {
-      // Optionally fetch more detailed data if needed
       const response = await getSTITestingById(test.id);
-      // API trả về cấu trúc { status_code, message, is_success, data }
       if (response?.data?.is_success && response.data.data) {
         setSelectedTest(response.data.data);
       } else {
@@ -141,15 +129,45 @@ function STITestingManagementTab() {
     } catch (error) {
       console.error("Error fetching test details:", error);
       toast.error("Không thể tải chi tiết xét nghiệm");
-      setSelectedTest(test); // Use existing data on error
+      setSelectedTest(test);
       setIsDetailModalOpen(true);
     }
   };
 
-  // Handle opening test result modal
-  const handleManageResults = (test) => {
+  // Replace the existing handleManageResults function
+  const handleManageResults = async (test) => {
+    try {
+      console.log("Opening test result modal for:", test);
+
+      const response = await getSTITestingById(test.id);
+      if (response?.data?.is_success && response.data.data) {
+        setSelectedTest(response.data.data);
+      } else {
+        setSelectedTest(test);
+      }
+
+      // Open the result modal directly instead of the detail modal with tabs
+      setIsResultModalOpen(true);
+    } catch (error) {
+      console.error("Error fetching test details:", error);
+      toast.error("Không thể tải chi tiết kết quả xét nghiệm");
+      setSelectedTest(test);
+      setIsResultModalOpen(true);
+    }
+  };
+
+  // Handle showing results from detail modal
+  const handleShowResultsFromDetail = (test) => {
     setSelectedTest(test);
+    setIsDetailModalOpen(false);
     setIsResultModalOpen(true);
+  };
+
+  // Handle going back to details from results modal
+  const handleBackToDetails = (test) => {
+    setSelectedTest(test);
+    setIsDetailModalOpen(true);
+    setIsResultModalOpen(false);
   };
 
   // Handle delete confirmation modal
@@ -227,10 +245,9 @@ function STITestingManagementTab() {
     }
   };
 
-  // Test result updated callback
-  const handleTestResultUpdated = () => {
+  // Sửa hàm handleTestUpdated (thay thế cho handleTestResultUpdated)
+  const handleTestUpdated = () => {
     fetchTests(); // Refresh the list
-    setIsResultModalOpen(false);
   };
 
   // Format date for display
@@ -495,12 +512,14 @@ function STITestingManagementTab() {
         </div>
       )}
 
-      {/* Test Detail Modal */}
+      {/* Test Detail Modal - Cập nhật để bổ sung initialTab */}
       {isDetailModalOpen && selectedTest && (
         <TestDetailModal
           test={selectedTest}
           onClose={() => setIsDetailModalOpen(false)}
           onStatusChange={handleStatusChange}
+          onShowResults={handleShowResultsFromDetail}
+          onTestUpdated={handleTestUpdated}
         />
       )}
 
@@ -509,7 +528,8 @@ function STITestingManagementTab() {
         <TestResultModal
           test={selectedTest}
           onClose={() => setIsResultModalOpen(false)}
-          onTestResultUpdated={handleTestResultUpdated}
+          onBackToDetails={handleBackToDetails}
+          onTestUpdated={handleTestUpdated}
         />
       )}
 

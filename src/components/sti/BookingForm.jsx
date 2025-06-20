@@ -1,54 +1,108 @@
-import React, { useState } from "react";
+import React, { useState, useEffect } from "react";
 import { Link, useNavigate } from "react-router-dom";
 import { useAuth } from "../../contexts/AuthContext";
 import { format } from "date-fns";
 import { toast } from "react-toastify";
 import { STI_PACKAGES, STI_TEST_TYPES } from "./booking-components/constants";
+import { getForCustomer } from "../../services/stiTestingService";
 
 // Time slot component for STI testing booking
-const TimeSlotSelector = ({ selectedSlot, onChange }) => {
+const TimeSlotSelector = ({
+  selectedSlot,
+  onChange,
+  bookedSlots,
+  selectedDate,
+}) => {
   const timeSlots = [
-    { id: 0, time: "8:00 - 12:00", label: "Sáng" },
-    { id: 1, time: "13:00 - 17:00", label: "Chiều" },
-    { id: 2, time: "17:00 - 21:00", label: "Tối" },
+    { id: 0, time: "7:00 - 10:00", label: "Sáng sớm", endHour: 10 },
+    { id: 1, time: "10:00 - 13:00", label: "Trưa", endHour: 13 },
+    { id: 2, time: "13:00 - 16:00", label: "Chiều", endHour: 16 },
+    { id: 3, time: "16:00 - 19:00", label: "Tối", endHour: 19 },
   ];
+
+  // Check if selected date is today
+  const isToday =
+    format(new Date(selectedDate), "yyyy-MM-dd") ===
+    format(new Date(), "yyyy-MM-dd");
+  const currentHour = new Date().getHours();
+
+  // Find the first available slot for today
+  useEffect(() => {
+    // If we don't have a selected slot yet, find the first available one
+    if (selectedSlot === undefined || selectedSlot === "") {
+      let firstAvailableSlot = null;
+
+      for (const slot of timeSlots) {
+        const isPastSlot = isToday && currentHour >= slot.endHour;
+        const isBooked = bookedSlots[slot.id];
+
+        if (!isPastSlot && !isBooked) {
+          firstAvailableSlot = slot.id;
+          break;
+        }
+      }
+
+      if (firstAvailableSlot !== null) {
+        onChange(firstAvailableSlot);
+      }
+    }
+  }, [selectedDate, isToday, currentHour, bookedSlots, selectedSlot, onChange]);
 
   return (
     <div>
       <p className="text-sm font-medium text-gray-700 mb-2">
         Chọn khung giờ xét nghiệm *
       </p>
-      <div className="grid grid-cols-2 md:grid-cols-3 gap-2">
-        {timeSlots.map((slot) => (
-          <div
-            key={slot.id}
-            onClick={() => onChange(slot.id)}
-            className={`cursor-pointer border rounded-md p-3 transition-all duration-200 ${
-              selectedSlot === slot.id
-                ? "border-indigo-500 bg-indigo-50 shadow-sm"
-                : "border-gray-200 hover:border-gray-300 hover:bg-gray-50"
-            }`}
-          >
-            <div className="flex items-center space-x-2">
-              <div
-                className={`w-4 h-4 rounded-full border flex items-center justify-center ${
-                  selectedSlot === slot.id
-                    ? "border-indigo-500 bg-indigo-500"
-                    : "border-gray-300"
-                }`}
-              >
-                {selectedSlot === slot.id && (
-                  <div className="w-1.5 h-1.5 bg-white rounded-full"></div>
-                )}
-              </div>
-              <div>
-                <p className="font-medium text-sm">{slot.time}</p>
-                <p className="text-xs text-gray-500">{slot.label}</p>
+      <div className="grid grid-cols-2 md:grid-cols-4 gap-2">
+        {timeSlots.map((slot) => {
+          // Slot is disabled if:
+          // 1. It's today and the slot's end time has passed, OR
+          // 2. The slot is already booked by this user on this date
+          const isPastSlot = isToday && currentHour >= slot.endHour;
+          const isBooked = bookedSlots[slot.id];
+          const isDisabled = isPastSlot || isBooked;
+
+          return (
+            <div
+              key={slot.id}
+              onClick={() => !isDisabled && onChange(slot.id)}
+              className={`cursor-pointer border rounded-md p-3 transition-all duration-200 ${
+                selectedSlot === slot.id
+                  ? "border-indigo-500 bg-indigo-50 shadow-sm"
+                  : isDisabled
+                  ? "border-gray-100 bg-gray-50 opacity-50 cursor-not-allowed"
+                  : "border-gray-200 hover:border-gray-300 hover:bg-gray-50"
+              }`}
+            >
+              <div className="flex items-center space-x-2">
+                <div
+                  className={`w-4 h-4 rounded-full border flex items-center justify-center ${
+                    selectedSlot === slot.id
+                      ? "border-indigo-500 bg-indigo-500"
+                      : "border-gray-300"
+                  }`}
+                >
+                  {selectedSlot === slot.id && (
+                    <div className="w-1.5 h-1.5 bg-white rounded-full"></div>
+                  )}
+                </div>
+                <div>
+                  <p className="font-medium text-sm">{slot.time}</p>
+                  <p className="text-xs text-gray-500">{slot.label}</p>
+                  {isPastSlot && <p className="text-xs text-red-500">Đã qua</p>}
+                  {isBooked && <p className="text-xs text-amber-500">Đã đặt</p>}
+                </div>
               </div>
             </div>
-          </div>
-        ))}
+          );
+        })}
       </div>
+      {isToday && (
+        <p className="text-xs text-amber-600 mt-1">
+          <span className="font-medium">Lưu ý:</span> Đối với đặt lịch ngày hôm
+          nay, chỉ hiển thị các khung giờ còn khả dụng
+        </p>
+      )}
     </div>
   );
 };
@@ -56,6 +110,12 @@ const TimeSlotSelector = ({ selectedSlot, onChange }) => {
 function BookingForm() {
   const { currentUser } = useAuth();
   const navigate = useNavigate();
+
+  // State for storing customer's existing bookings
+  const [userBookings, setUserBookings] = useState([]);
+  const [bookedSlots, setBookedSlots] = useState({});
+  const [isLoadingBookings, setIsLoadingBookings] = useState(false);
+
   // State for appointment form
   const [formData, setFormData] = useState({
     userId: currentUser?.id || "",
@@ -97,10 +157,7 @@ function BookingForm() {
     }
   }; // Handle test type selection  // Hàm ánh xạ id xét nghiệm trong UI sang enum TestParameter trong API
   const mapToApiTestParameter = (testTypeId) => {
-    // Dựa trên enum TestParameter từ API
-    // Chlamydia = 0, Gonorrhoeae = 1, Syphilis = 2, HIV = 3, Herpes = 4,
-    // HepatitisB = 5, HepatitisC = 6, Trichomonas = 7, MycoplasmaGenitalium = 8
-
+    // Mapped directly to API enum
     const mapping = {
       0: 3, // HIV -> 3
       1: 1, // Gonorrhea -> 1
@@ -111,6 +168,7 @@ function BookingForm() {
       6: 5, // Hepatitis B -> 5
       7: 6, // Hepatitis C -> 6
       8: 7, // Trichomonas -> 7
+      9: 8, // Mycoplasma Genitalium -> 8
     };
 
     return mapping[testTypeId] !== undefined ? mapping[testTypeId] : null;
@@ -348,17 +406,6 @@ function BookingForm() {
       setIsSubmitting(false);
     }
   }; // Get package prices from constants
-  const getPackagePrice = (packageId) => {
-    // Map internal package IDs to constants.js package IDs
-    const packageMapping = {
-      100: 0, // Basic package
-      101: 2, // Advanced package
-      102: 1, // Custom package
-    };
-
-    const pkg = STI_PACKAGES.find((p) => p.id === packageMapping[packageId]);
-    return pkg ? pkg.price : 0;
-  };
 
   const testTypes = [
     // Packages first - these are bundles of tests with special pricing
@@ -384,7 +431,7 @@ function BookingForm() {
       description: "Gói xét nghiệm đầy đủ nhất cho sức khỏe tình dục",
       price: `${STI_PACKAGES[2].price.toLocaleString()}đ`,
       isPackage: true,
-      includedTests: [4, 1, 2, 0, 5, 6, 7, 8], // All basic + HIV, Herpes, Hepatitis B & C, Trichomonas
+      includedTests: [4, 1, 2, 0, 5, 6, 7, 8, 3], // All basic + HIV, Herpes, Hepatitis B & C, Trichomonas
       popular: true,
       features: [
         "Tất cả xét nghiệm của gói Cơ Bản",
@@ -496,6 +543,57 @@ function BookingForm() {
       return total;
     }, 0);
   };
+
+  // Fetch customer's existing bookings on component mount
+  useEffect(() => {
+    async function fetchUserBookings() {
+      if (!currentUser) return;
+
+      setIsLoadingBookings(true);
+      try {
+        const response = await getForCustomer();
+        if (response?.data?.is_success) {
+          setUserBookings(response.data.data || []);
+        }
+      } catch (error) {
+        console.error("Failed to fetch user bookings:", error);
+      } finally {
+        setIsLoadingBookings(false);
+      }
+    }
+
+    fetchUserBookings();
+  }, [currentUser]);
+
+  // When preferred date changes, update the booked slots
+  useEffect(() => {
+    // Find bookings on the selected date
+    const selectedDate = formData.preferredDate;
+    const bookedSlotsOnDate = userBookings
+      .filter(
+        (booking) =>
+          booking.scheduleDate?.substring(0, 10) === selectedDate ||
+          booking.scheduledDate?.substring(0, 10) === selectedDate
+      )
+      .map((booking) => booking.slot);
+
+    // Create a map of booked slots
+    const slotsMap = {};
+    bookedSlotsOnDate.forEach((slot) => {
+      slotsMap[slot] = true;
+    });
+
+    setBookedSlots(slotsMap);
+
+    // If current selected slot is already booked, reset it
+    if (slotsMap[formData.slot]) {
+      setFormData((prev) => ({
+        ...prev,
+        slot: undefined,
+      }));
+    }
+  }, [formData.preferredDate, userBookings]);
+
   return (
     <div id="appointment" className="mb-16 scroll-mt-24">
       <h2 className="text-3xl font-bold text-gray-900 mb-6 text-center">
@@ -568,6 +666,8 @@ function BookingForm() {
             <div>
               <TimeSlotSelector
                 selectedSlot={formData.slot}
+                selectedDate={formData.preferredDate}
+                bookedSlots={bookedSlots}
                 onChange={(slotId) =>
                   setFormData((prev) => ({ ...prev, slot: slotId }))
                 }
@@ -911,44 +1011,34 @@ function BookingForm() {
                                         !individualTest.isPackage
                                       );
                                     })
-                                    .map((individualTestId) => {
+                                    .map((id) => {
                                       const individualTest = testTypes.find(
-                                        (t) => t.id === individualTestId
+                                        (t) => t.id === id
                                       );
-                                      return individualTest ? (
-                                        <div
-                                          key={individualTest.id}
-                                          className="flex justify-between ml-2"
-                                        >
-                                          <p className="text-xs text-gray-600">
-                                            • {individualTest.label}
-                                          </p>
-                                        </div>
-                                      ) : null;
+                                      return (
+                                        individualTest && (
+                                          <div
+                                            key={individualTest.id}
+                                            className="flex justify-between text-sm text-gray-700 py-1"
+                                          >
+                                            <span>
+                                              {individualTest.label}{" "}
+                                              <span className="text-gray-400">
+                                                (Mã: {individualTest.id})
+                                              </span>
+                                            </span>
+                                            <span className="font-semibold">
+                                              {individualTest.price}
+                                            </span>
+                                          </div>
+                                        )
+                                      );
                                     })}
                                 </>
                               ) : (
-                                // Regular package display
-                                <>
-                                  <p className="text-xs font-medium text-gray-700 mb-1">
-                                    Bao gồm các xét nghiệm:
-                                  </p>
-                                  {test.includedTests.map((includedTestId) => {
-                                    const includedTest = testTypes.find(
-                                      (t) => t.id === includedTestId
-                                    );
-                                    return includedTest ? (
-                                      <div
-                                        key={includedTest.id}
-                                        className="flex justify-between ml-2"
-                                      >
-                                        <p className="text-xs text-gray-600">
-                                          • {includedTest.label}
-                                        </p>
-                                      </div>
-                                    ) : null;
-                                  })}
-                                </>
+                                <p className="text-xs text-gray-500 mb-2">
+                                  {test.features.join(", ")}
+                                </p>
                               )}
                             </div>
                           </div>
@@ -958,41 +1048,34 @@ function BookingForm() {
                     })}
                   </>
                 ) : (
-                  // Individual tests display
-                  <>
+                  <div className="space-y-2">
                     {formData.testTypes.map((typeId) => {
                       const test = testTypes.find((t) => t.id === typeId);
-                      return test ? (
-                        <div
-                          key={test.id}
-                          className="flex justify-between ml-2 mb-1"
-                        >
-                          <p className="text-sm text-gray-600">{test.label}</p>
-                          <p className="text-sm font-medium">{test.price}</p>
-                        </div>
-                      ) : null;
+                      return (
+                        test && (
+                          <div
+                            key={test.id}
+                            className="flex justify-between text-sm text-gray-700 py-1"
+                          >
+                            <span>
+                              {test.label}{" "}
+                              <span className="text-gray-400">
+                                (Mã: {test.id})
+                              </span>
+                            </span>
+                            <span className="font-semibold">{test.price}</span>
+                          </div>
+                        )
+                      );
                     })}
-                  </>
+                  </div>
                 )}
               </div>
             ) : (
-              <div className="flex justify-between border-b border-gray-200 py-2">
-                <p className="text-sm text-gray-600">Chưa chọn xét nghiệm</p>
-                <p className="text-sm font-medium">-</p>
-              </div>
-            )}{" "}
-            {/* Preferred Date */}
-            <div className="flex justify-between border-b border-gray-200 py-2">
-              <div>
-                <p className="text-sm font-medium">Ngày xét nghiệm</p>
-                <p className="text-sm text-gray-600">
-                  {formData.preferredDate
-                    ? format(new Date(formData.preferredDate), "dd/MM/yyyy")
-                    : "Chưa chọn"}
-                </p>
-              </div>
-              <p className="text-sm font-medium">-</p>
-            </div>{" "}
+              <p className="text-sm text-gray-500">
+                Chưa có loại xét nghiệm nào được chọn.
+              </p>
+            )}
             {/* Time Slot */}
             <div className="flex justify-between border-b border-gray-200 py-2">
               <div>
@@ -1000,9 +1083,10 @@ function BookingForm() {
                 <p className="text-sm text-gray-600">
                   {(() => {
                     const slots = [
-                      "8:00 - 12:00 (Sáng)",
-                      "13:00 - 17:00 (Chiều)",
-                      "17:00 - 21:00 (Tối)",
+                      "7:00 - 10:00 (Sáng sớm)",
+                      "10:00 - 13:00 (Trưa)",
+                      "13:00 - 16:00 (Chiều)",
+                      "16:00 - 19:00 (Tối)",
                     ];
                     return slots[formData.slot] || "Chưa chọn";
                   })()}
@@ -1010,86 +1094,90 @@ function BookingForm() {
               </div>
               <p className="text-sm font-medium">-</p>
             </div>
-            {/* Anonymous Testing */}
-            <div className="flex justify-between border-b border-gray-200 py-2">
+            {/* Date and Time Info */}
+            <div className="grid grid-cols-2 gap-4 text-sm text-gray-700 mt-4">
               <div>
-                <p className="text-sm font-medium">Xét nghiệm ẩn danh</p>
-                <p className="text-sm text-gray-600">
-                  {formData.isAnonymous ? "Có" : "Không"}
+                <p className="font-medium">Ngày xét nghiệm:</p>
+                <p>{format(new Date(formData.preferredDate), "dd/MM/yyyy")}</p>
+              </div>
+              <div>
+                <p className="font-medium">Giờ xét nghiệm:</p>
+                <p>
+                  {(() => {
+                    const slots = [
+                      "7:00 - 10:00",
+                      "10:00 - 13:00",
+                      "13:00 - 16:00",
+                      "16:00 - 19:00",
+                    ];
+                    return slots[formData.slot] || "Chưa chọn";
+                  })()}
                 </p>
               </div>
-              <p className="text-sm font-medium">-</p>
             </div>
-            {/* Total */}
-            <div className="flex justify-between pt-3">
-              <p className="text-base font-medium">Tổng tiền</p>
-              <p className="text-base font-bold text-indigo-600">
-                {calculateTotal().toLocaleString()}đ
+            {/* Price Summary */}
+            <div className="mt-4">
+              <p className="text-sm font-medium text-gray-800 mb-2">
+                Tóm tắt giá
               </p>
+              <div className="grid grid-cols-2 gap-4 text-sm">
+                <div className="flex justify-between">
+                  <span className="text-gray-700">
+                    Tổng giá trị xét nghiệm:
+                  </span>
+                  <span className="font-semibold text-gray-900">
+                    {calculateTotal().toLocaleString()}đ
+                  </span>
+                </div>
+                <div className="flex justify-between">
+                  <span className="text-gray-700">Giảm giá:</span>
+                  <span className="font-semibold text-gray-900">0đ</span>
+                </div>
+                <div className="flex justify-between border-t border-gray-300 pt-2">
+                  <span className="text-gray-700 font-medium">
+                    Tổng cộng phải thanh toán:
+                  </span>
+                  <span className="font-bold text-indigo-600 text-lg">
+                    {calculateTotal().toLocaleString()}đ
+                  </span>
+                </div>
+              </div>
             </div>
-          </div>
-          <div className="mt-4 md:col-span-2">
-            <p className="text-sm text-gray-500 mb-4">
-              Thông tin của bạn sẽ được giữ bí mật nghiêm ngặt. Bằng cách gửi
-              mẫu đơn này, bạn đồng ý với{" "}
-              <Link
-                to="/privacy-policy"
-                className="text-indigo-600 hover:text-indigo-500"
-              >
-                chính sách bảo mật
-              </Link>{" "}
-              của chúng tôi.
-            </p>{" "}
+          </div>{" "}
+          {/* Submit Button */}
+          <div className="flex justify-end">
             <button
               type="submit"
-              disabled={
-                isSubmitting ||
-                formData.testTypes.length === 0 ||
-                formData.slot === undefined
-              }
-              className={`w-full px-6 py-3 bg-indigo-600 text-white rounded-md font-medium hover:bg-indigo-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-indigo-500 ${
-                isSubmitting ||
-                formData.testTypes.length === 0 ||
-                formData.slot === undefined
-                  ? "opacity-70 cursor-not-allowed"
-                  : ""
-              }`}
+              disabled={isSubmitting}
+              className="inline-flex items-center px-4 py-2 bg-indigo-600 text-white rounded-md shadow-md hover:bg-indigo-700 transition-all duration-200 disabled:opacity-50"
             >
               {isSubmitting ? (
-                <span className="flex items-center justify-center">
-                  <svg
-                    className="animate-spin -ml-1 mr-2 h-5 w-5 text-white"
-                    xmlns="http://www.w3.org/2000/svg"
-                    fill="none"
-                    viewBox="0 0 24 24"
-                  >
-                    <circle
-                      className="opacity-25"
-                      cx="12"
-                      cy="12"
-                      r="10"
-                      stroke="currentColor"
-                      strokeWidth="4"
-                    ></circle>
-                    <path
-                      className="opacity-75"
-                      fill="currentColor"
-                      d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"
-                    ></path>
-                  </svg>
-                  Đang xử lý...
-                </span>
+                <svg
+                  className="animate-spin -ml-1 mr-3 h-5 w-5 text-white"
+                  xmlns="http://www.w3.org/2000/svg"
+                  fill="none"
+                  viewBox="0 0 24 24"
+                >
+                  <circle
+                    className="opacity-25"
+                    cx="12"
+                    cy="12"
+                    r="10"
+                    stroke="currentColor"
+                    strokeWidth="4"
+                  />
+                  <path
+                    className="opacity-75"
+                    fill="currentColor"
+                    d="M4 12a8 8 0 018-8v16a8 8 0 01-8-8z"
+                  />
+                </svg>
               ) : (
-                "Gửi Yêu Cầu Xét Nghiệm"
+                "Đặt Lịch Xét Nghiệm"
               )}
             </button>
           </div>
-          {submitError && (
-            <div className="mt-4 p-3 bg-red-50 border border-red-200 text-red-700 rounded-md md:col-span-2">
-              {submitError}
-            </div>
-          )}
-        </form>{" "}
+        </form>
       </div>
     </div>
   );
