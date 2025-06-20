@@ -2,6 +2,10 @@ import React, { useState, useEffect } from "react";
 import { toast } from "react-toastify";
 import stiTestingService from "../../../services/stiTestingService";
 import { useAuth } from "../../../contexts/AuthContext";
+import {
+  STI_PACKAGES,
+  STI_TEST_TYPES,
+} from "../../sti/booking-components/constants";
 
 function STITestingHistory({ userId }) {
   const { currentUser } = useAuth();
@@ -44,7 +48,6 @@ function STITestingHistory({ userId }) {
       return dateString;
     }
   };
-
   // Fetch user's STI tests
   useEffect(() => {
     const fetchUserTests = async () => {
@@ -55,39 +58,15 @@ function STITestingHistory({ userId }) {
 
       setIsLoading(true);
       try {
-        // Lấy tất cả xét nghiệm STI, token JWT sẽ được tự động gửi kèm để xác thực người dùng
-        const response = await stiTestingService.getAll();
+        // Sử dụng API mới để lấy STI test của người dùng hiện tại
+        const response = await stiTestingService.getForCustomer();
         if (response?.data?.is_success) {
-          // Lấy ID của người dùng hiện tại từ props hoặc currentUser
-          const currentUserId =
-            userId ||
-            (currentUser &&
-              (currentUser.id || currentUser.userId || currentUser.customerId));
-          if (!currentUserId) {
-            console.error(
-              "Cannot determine current user ID. Current user object:",
-              currentUser
-            );
-            toast.error(
-              "Không thể xác định người dùng hiện tại. Vui lòng đăng nhập lại."
-            );
-            setIsLoading(false);
-            return;
-          }
-          console.log("Current user ID:", currentUserId);
-          console.log("All STI tests:", response.data.data);
+          console.log("Customer STI tests:", response.data.data);
 
-          // Lọc chỉ lấy xét nghiệm của người dùng hiện tại và loại bỏ null
-          const userTestsOnly = (response.data.data || [])
-            .filter((test) => test !== null) // Loại bỏ các phần tử null
-            .filter((test) => {
-              // Chỉ lọc theo customerId chính xác từ response API
-              const isMatch = test.customerId === currentUserId;
-              console.log(
-                `Test ID ${test.id}, customerId: ${test.customerId}, currentUserId: ${currentUserId}, match: ${isMatch}`
-              );
-              return isMatch;
-            });
+          // Chuẩn bị dữ liệu từ API và loại bỏ null
+          const userTestsOnly = (response.data.data || []).filter(
+            (test) => test !== null
+          ); // Loại bỏ các phần tử null
 
           // Convert dates to proper format and sort by collectedDate (newest first)
           const processedTests = userTestsOnly
@@ -159,6 +138,37 @@ function STITestingHistory({ userId }) {
 
     setFilteredTests(result);
   }, [userTests, filterStatus, searchText]);
+
+  // Tiện ích để lấy giá từ constants
+  const getTestPrice = (testId) => {
+    const test = STI_TEST_TYPES.find((test) => test.id === testId);
+    return test ? test.price : 0;
+  };
+
+  const getPackagePrice = (packageId) => {
+    const pkg = STI_PACKAGES.find((pkg) => pkg.id === packageId);
+    return pkg ? pkg.price : 0;
+  };
+
+  const getPackageInfo = (packageId) => {
+    return STI_PACKAGES.find((pkg) => pkg.id === packageId) || {};
+  };
+
+  const getTestInfo = (testId) => {
+    return STI_TEST_TYPES.find((test) => test.id === testId) || {};
+  };
+
+  // Hiển thị mô tả cho gói xét nghiệm
+  const renderPackageDescription = (packageId) => {
+    const packageInfo = getPackageInfo(packageId);
+    if (!packageInfo || !packageInfo.description) return null;
+
+    return (
+      <div className="text-sm text-gray-600 mt-1 italic">
+        {packageInfo.description}
+      </div>
+    );
+  };
 
   if (isLoading) {
     return (
@@ -309,22 +319,23 @@ function STITestingHistory({ userId }) {
               filteredTests.map((test) => {
                 // Định nghĩa các package xét nghiệm theo enum TestPackage
                 const testPackageLabels = {
-                  0: "Cơ bản", // Basic
-                  1: "Nâng cao", // Advanced
-                  2: "Tùy chỉnh", // Custom
+                  0: "Gói Cơ Bản", // Basic
+                  1: "Gói Tự Chọn", // Custom 3
+                  2: "Gói Toàn Diện", // Complete
                 };
 
                 // Định nghĩa các tham số xét nghiệm theo enum TestParameter
                 const testParamLabels = {
                   0: "Chlamydia",
-                  1: "Gonorrhoeae (Lậu)",
+                  1: "Gonorrhea (Lậu)",
                   2: "Syphilis (Giang mai)",
                   3: "HIV",
-                  4: "Herpes",
-                  5: "Viêm gan B",
-                  6: "Viêm gan C",
-                  7: "Trichomonas",
-                  8: "Mycoplasma Genitalium",
+                  4: "Hepatitis B (Viêm gan B)",
+                  5: "Hepatitis C (Viêm gan C)",
+                  6: "Herpes",
+                  7: "HPV",
+                  8: "Mycoplasma",
+                  9: "Trichomonas",
                 };
 
                 // Định nghĩa trạng thái xét nghiệm theo enum TestingStatus
@@ -510,11 +521,17 @@ function STITestingHistory({ userId }) {
                     {/* Chi phí */}
                     <td className="px-6 py-4 whitespace-nowrap">
                       <div className="text-sm font-bold text-gray-800">
+                        {" "}
                         {test.totalPrice
                           ? new Intl.NumberFormat("vi-VN", {
                               style: "currency",
                               currency: "VND",
                             }).format(test.totalPrice)
+                          : test.testPackage !== undefined
+                          ? new Intl.NumberFormat("vi-VN", {
+                              style: "currency",
+                              currency: "VND",
+                            }).format(getPackagePrice(test.testPackage))
                           : "N/A"}
                       </div>
                       {test.isPaid ? (
@@ -976,20 +993,21 @@ function STITestingHistory({ userId }) {
                       // Tạo object dữ liệu thanh toán đầy đủ
                       const testParamLabels = {
                         0: "Chlamydia",
-                        1: "Gonorrhoeae (Lậu)",
+                        1: "Gonorrhea (Lậu)",
                         2: "Syphilis (Giang mai)",
                         3: "HIV",
-                        4: "Herpes",
-                        5: "Viêm gan B",
-                        6: "Viêm gan C",
-                        7: "Trichomonas",
-                        8: "Mycoplasma Genitalium",
+                        4: "Hepatitis B (Viêm gan B)",
+                        5: "Hepatitis C (Viêm gan C)",
+                        6: "Herpes",
+                        7: "HPV",
+                        8: "Mycoplasma",
+                        9: "Trichomonas",
                       };
 
                       const testPackageLabels = {
-                        0: "Cơ bản",
-                        1: "Nâng cao",
-                        2: "Tùy chỉnh",
+                        0: "Gói Cơ Bản",
+                        1: "Gói Tự Chọn",
+                        2: "Gói Toàn Diện",
                       };
 
                       // Lấy danh sách tên các loại xét nghiệm
@@ -1013,10 +1031,12 @@ function STITestingHistory({ userId }) {
                           (param) => testParamLabels[param] || `Loại ${param}`
                         );
                       }
-
                       const paymentData = {
                         testId: selectedTest.id,
-                        amount: selectedTest.totalPrice,
+                        amount:
+                          selectedTest.totalPrice ||
+                          getPackagePrice(selectedTest.testPackage) ||
+                          0,
                         returnUrl: window.location.pathname,
                         testType:
                           testPackageLabels[selectedTest.testPackage] ||

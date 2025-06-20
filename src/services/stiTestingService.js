@@ -15,6 +15,14 @@ const stiTestingService = {
   },
 
   /**
+   * Get STI tests for the current authenticated customer
+   * @returns {Promise} - The STI tests for current customer response promise
+   */
+  getForCustomer: () => {
+    return apiService.get(config.api.stiTesting.getForCustomer);
+  },
+
+  /**
    * Get STI test by ID
    * @param {string|number} id - The STI test ID
    * @returns {Promise} - The STI test response promise
