@@ -40,7 +40,7 @@ const config = {
     auth: {
       login: "/api/v2.5/login",
       register: "/api/v2.5/register",
-      refreshToken: "/api/v2.5/refresh-token",
+      refreshToken: "/api/v2.5.5/refresh-token",
       logout: "/api/v2.5/logout",
       verifyEmail: "/api/v2.5/verify-email",
       forgotPassword: "/api/v2.5/send-reset-code",
@@ -74,13 +74,22 @@ const config = {
       getByCurrentUser: "/api/v2.5/appointment/getall",
       getByConsultant: (consultantId) =>
         `/api/v2.5/appointment/consultant/${consultantId}`,
-    }, // STI testing endpoints - add API prefix
+    }, // STI testing endpoints - add API prefix    
     stiTesting: {
       getAll: "/api/v2.5/stitesting/getall",
+      getForCustomer: "/api/v2.5/stitesting/customer", // Endpoint để lấy STI test của current user
       create: "/api/v2.5/stitesting/create",
       getById: (id) => `/api/v2.5/stitesting/${id}`,
-      update: (id) => `/api/v2.5/stitesting/update/${id}`,
+      update: (id) => `/api/v2.5/stitesting/update/${id}`, 
       delete: (id) => `/api/v2.5/stitesting/delete/${id}`,
+    },// Test Result endpoints
+    testResult: {
+      getAll: "/api/v2.5/testresult/getall",
+      create: "/api/v2.5/testresult/create",
+      getById: (id) => `/api/v2.5/testresult/${id}`,
+      update: (id) => `/api/v2.5/testresult/update/${id}`,
+      delete: (id) => `/api/v2.5/testresult/delete/${id}`,
+      getByTesting: (testingId) => `/api/v2.5/testresult/testing/${testingId}`,
     }, // Blog endpoints - add API prefix
     blog: {
       getAll: "/api/v2.5/blog/getall",
@@ -112,15 +121,7 @@ const config = {
       monthlyStats: (year, month) =>
         `/api/v2.5/dashboard/stats/monthly/${year}/${month}`,
     }, // TestResult endpoints - add API prefix
-    testResult: {
-      getAll: "/api/v2.5/testresult/getall",
-      getById: (id) => `/api/v2.5/testresult/${id}`,
-      create: "/api/v2.5/testresult/create",
-      update: (id) => `/api/v2.5/testresult/${id}`,
-      getByAppointment: (appointmentId) =>
-        `/api/v2.5/testresult/appointment/${appointmentId}`,
-      getByPatient: (patientId) => `/api/v2.5/testresult/patient/${patientId}`,
-    },
+ 
 
     // Menstrual cycle tracking endpoints - add API prefix
     menstrualCycle: {
@@ -138,6 +139,14 @@ const config = {
       setNotificationPreferences:
         "/api/menstrual-cycle-trackings/notification-preferences",
       getTrends: "/api/menstrual-cycle-trackings/trends",
+    },
+
+    // Payment endpoints - add API prefix
+    payment: {
+      createPayment: "/api/payment/create-payment",
+      vnpayCallback: "/api/payment/vnpay-callback",
+      vnpayIpn: "/api/payment/vnpay-ipn",
+      getTransaction: (id) => `/api/payment/transaction/${id}`,
     },
   },
 

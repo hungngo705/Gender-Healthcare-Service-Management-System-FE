@@ -55,6 +55,18 @@ const ForgotPasswordPage = lazy(() =>
 const ResetPasswordPage = lazy(() =>
   import(/* webpackChunkName: "reset-password" */ "./pages/ResetPasswordPage")
 );
+const Payment = lazy(() =>
+  import(/* webpackChunkName: "payment" */ "./pages/Payment")
+);
+const PaymentSuccess = lazy(() =>
+  import(/* webpackChunkName: "payment-success" */ "./pages/PaymentSuccess")
+);
+const PaymentFailed = lazy(() =>
+  import(/* webpackChunkName: "payment-failed" */ "./pages/PaymentFailed")
+);
+const VnpayCallback = lazy(() =>
+  import(/* webpackChunkName: "vnpay-callback" */ "./pages/VnpayCallback")
+);
 
 function App() {
   return (
@@ -78,6 +90,10 @@ function App() {
           <Route path="/unauthorized" element={<Unauthorized />} />
           <Route path="/forgot-password" element={<ForgotPasswordPage />} />
           <Route path="/reset-password" element={<ResetPasswordPage />} />
+
+          {/* VNPay callback - needs to be outside Layout for proper processing */}
+          <Route path="/vnpay-callback" element={<VnpayCallback />} />
+          <Route path="/payment-failed" element={<PaymentFailed />} />
 
           {/* Dashboard routes for staff and higher */}
           <Route
@@ -126,14 +142,9 @@ function App() {
                 </ProtectedRoute>
               }
             />
-            <Route
-              path="medical-records"
-              element={
-                <ProtectedRoute roleRequired="customer">
-                  <div>Medical Records</div>
-                </ProtectedRoute>
-              }
-            />
+            {/* Hệ thống thanh toán */}
+            <Route path="payment" element={<Payment />} />
+            <Route path="payment-success" element={<PaymentSuccess />} />
             {/* Trang hồ sơ khách hàng */}{" "}
             <Route
               path="profile"
