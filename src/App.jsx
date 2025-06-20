@@ -61,6 +61,12 @@ const Payment = lazy(() =>
 const PaymentSuccess = lazy(() =>
   import(/* webpackChunkName: "payment-success" */ "./pages/PaymentSuccess")
 );
+const PaymentFailed = lazy(() =>
+  import(/* webpackChunkName: "payment-failed" */ "./pages/PaymentFailed")
+);
+const VnpayCallback = lazy(() =>
+  import(/* webpackChunkName: "vnpay-callback" */ "./pages/VnpayCallback")
+);
 
 function App() {
   return (
@@ -84,6 +90,10 @@ function App() {
           <Route path="/unauthorized" element={<Unauthorized />} />
           <Route path="/forgot-password" element={<ForgotPasswordPage />} />
           <Route path="/reset-password" element={<ResetPasswordPage />} />
+
+          {/* VNPay callback - needs to be outside Layout for proper processing */}
+          <Route path="/vnpay-callback" element={<VnpayCallback />} />
+          <Route path="/payment-failed" element={<PaymentFailed />} />
 
           {/* Dashboard routes for staff and higher */}
           <Route

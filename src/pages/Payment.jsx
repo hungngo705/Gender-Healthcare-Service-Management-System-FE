@@ -2,14 +2,14 @@ import React, { useState, useEffect } from "react";
 import { useNavigate, useLocation } from "react-router-dom";
 import { toast } from "react-toastify";
 import { format } from "date-fns";
-import stiTestingService from "../services/stiTestingService";
+import paymentService from "../services/paymentService";
 
 const Payment = () => {
   const navigate = useNavigate();
   const location = useLocation();
   const [bookingData, setBookingData] = useState(null);
   const [totalAmount, setTotalAmount] = useState(0);
-  const [paymentMethod, setPaymentMethod] = useState("momo");
+  const [paymentMethod, setPaymentMethod] = useState("vnpay");
   const [isProcessing, setIsProcessing] = useState(false);
   const [cardInfo, setCardInfo] = useState({
     cardNumber: "",
@@ -17,26 +17,53 @@ const Payment = () => {
     expiryDate: "",
     cvv: "",
   });
+  const [cardErrors, setCardErrors] = useState({});
 
   useEffect(() => {
-    // Lấy dữ liệu từ location state khi chuyển trang
+    // Get data from location state when navigating
     if (location.state && location.state.bookingData) {
       setBookingData(location.state.bookingData);
       setTotalAmount(location.state.totalAmount || 0);
     } else {
-      // Nếu không có dữ liệu, quay lại trang trước
+      // If no data, go back to previous page
       toast.error("Không tìm thấy thông tin đặt lịch. Vui lòng thử lại.");
       navigate(-1);
     }
   }, [location, navigate]);
 
-  const handleChange = (e) => {
+  const handleCardChange = (e) => {
     const { name, value } = e.target;
-    setCardInfo((prev) => ({ ...prev, [name]: value }));
+    let formattedValue = value;
+
+    // Format card number with spaces
+    if (name === "cardNumber") {
+      formattedValue = value.replace(/\s/g, '').replace(/(.{4})/g, '$1 ').trim();
+      if (formattedValue.length > 19) formattedValue = formattedValue.substring(0, 19);
+    }
+
+    // Format expiry date
+    if (name === "expiryDate") {
+      formattedValue = value.replace(/\D/g, '').replace(/(\d{2})(\d{0,2})/, '$1/$2');
+      if (formattedValue.length > 5) formattedValue = formattedValue.substring(0, 5);
+    }
+
+    // Format CVV (numbers only)
+    if (name === "cvv") {
+      formattedValue = value.replace(/\D/g, '');
+      if (formattedValue.length > 4) formattedValue = formattedValue.substring(0, 4);
+    }
+
+    setCardInfo((prev) => ({ ...prev, [name]: formattedValue }));
+    
+    // Clear validation error when user starts typing
+    if (cardErrors[name]) {
+      setCardErrors(prev => ({ ...prev, [name]: '' }));
+    }
   };
 
   const handlePaymentMethodChange = (method) => {
     setPaymentMethod(method);
+    setCardErrors({}); // Clear card errors when switching payment methods
   };
 
   const formatDate = (dateString) => {
@@ -70,79 +97,97 @@ const Payment = () => {
     return bookingData.testTypes.map((type) => type.name).join(", ");
   };
 
-  const formatCurrency = (amount) => {
-    return new Intl.NumberFormat("vi-VN", {
-      style: "currency",
-      currency: "VND",
-      minimumFractionDigits: 0,
-      maximumFractionDigits: 0,
-    }).format(amount);
-  };
   const processPayment = async (e) => {
     e.preventDefault();
     setIsProcessing(true);
 
     try {
-      // Simulate payment processing
-      await new Promise((resolve) => setTimeout(resolve, 1500));
-      // Lấy dữ liệu API đã chuẩn bị từ bookingData
-      const apiData = bookingData.apiData || {
-        testPackage: bookingData.testPackage || 0,
-        customParameters: bookingData.customParameters || [],
-        status: 0, // Scheduled
-        scheduleDate:
-          bookingData.scheduleDate ||
-          bookingData.preferredDate ||
-          format(new Date(), "yyyy-MM-dd"),
-        slot: bookingData.slot || 0,
-        totalPrice: totalAmount,
-        notes: bookingData.notes || bookingData.note || "",
+      // Validate card info if using card payment method
+      if (paymentMethod === "card") {
+        const validation = paymentService.validateCardInfo(cardInfo);
+        if (!validation.isValid) {
+          setCardErrors(validation.errors);
+          toast.error("Vui lòng kiểm tra lại thông tin thẻ");
+          setIsProcessing(false);
+          return;
+        }
+      }
+
+      // Prepare complete booking data with payment method
+      const completeBookingData = {
+        ...bookingData,
+        paymentMethod,
+        totalAmount,
+        cardInfo: paymentMethod === "card" ? cardInfo : null
       };
 
-      console.log("Gửi dữ liệu API:", apiData);
+      console.log('Processing payment with data:', completeBookingData);
 
-      // Submit the booking data to the backend
-      const response = await stiTestingService.create(apiData);
-
-      if (response?.data?.is_success) {
-        toast.success("Thanh toán thành công!");
-        // Chuyển đến trang thành công với dữ liệu kết quả
-        navigate("/payment-success", {
-          state: {
-            bookingData: {
-              ...bookingData,
-              ...response.data.data,
-              paymentMethod,
-              paymentTime: new Date().toISOString(),
-              totalAmount,
-              // Tạo mã đặt lịch nếu API không trả về
-              bookingId:
-                response.data?.data?.id ||
-                `STI${Math.floor(Math.random() * 100000)}`,
-              // Tạo mã xét nghiệm ẩn danh nếu cần
-              anonymousCode: bookingData.isAnonymous
-                ? response.data?.data?.anonymousCode ||
-                  `ANO${Math.floor(Math.random() * 100000)}`
-                : undefined,
-            },
-          },
-        });
+      // Create booking and payment based on method
+      if (paymentMethod === "vnpay") {
+        // Use real VNPay integration
+        const result = await paymentService.createBookingAndPayment(completeBookingData);
+        
+        if (result.success) {
+          // Redirect to VNPay payment URL
+          toast.success("Chuyển hướng đến cổng thanh toán VNPay...");
+          window.location.href = result.data.paymentUrl;
+        } else {
+          throw new Error(result.error);
+        }
       } else {
-        throw new Error(
-          response?.data?.message || "Có lỗi xảy ra trong quá trình thanh toán"
-        );
+        // Use mock payment for other methods (demo purposes)
+        const result = await paymentService.createBookingAndPayment(completeBookingData);
+        
+        if (result.success) {
+          // For demo payments, simulate processing
+          const mockPaymentResult = await paymentService.processMockPayment({
+            paymentMethod,
+            amount: totalAmount,
+            bookingData: completeBookingData,
+            cardInfo: paymentMethod === "card" ? cardInfo : null
+          });
+
+          if (mockPaymentResult.success) {
+            toast.success("Thanh toán thành công!");
+            
+            // Navigate to success page with result data
+            navigate("/payment-success", {
+              state: {
+                bookingData: {
+                  ...completeBookingData,
+                  stiTestingId: result.data.stiTestingId,
+                  paymentId: result.data.paymentId,
+                  paymentTime: new Date().toISOString(),
+                  transactionId: mockPaymentResult.transactionId,
+                  bookingId: result.data.stiTestingId || `STI${Math.floor(Math.random() * 100000)}`,
+                  anonymousCode: completeBookingData.isAnonymous
+                    ? `ANO${Math.floor(Math.random() * 100000)}`
+                    : undefined,
+                },
+              },
+            });
+          } else {
+            throw new Error(mockPaymentResult.error);
+          }
+        } else {
+          throw new Error(result.error);
+        }
       }
     } catch (error) {
       console.error("Payment error:", error);
-      toast.error(
-        error.message || "Thanh toán thất bại. Vui lòng thử lại sau."
-      );
+      toast.error(error.message || "Thanh toán thất bại. Vui lòng thử lại sau.");
     } finally {
       setIsProcessing(false);
     }
   };
 
-  // Nếu không có dữ liệu, hiển thị trạng thái loading
+  // Get payment method config
+  const getPaymentMethodConfig = (method) => {
+    return paymentService.getPaymentMethodConfig(method);
+  };
+
+  // If no data, show loading state
   if (!bookingData) {
     return (
       <div className="flex items-center justify-center min-h-screen">
@@ -150,6 +195,8 @@ const Payment = () => {
       </div>
     );
   }
+
+  const paymentMethods = ['vnpay', 'momo', 'zalopay', 'card'];
 
   return (
     <div className="max-w-4xl mx-auto px-4 py-8">
@@ -190,88 +237,57 @@ const Payment = () => {
                 </h2>
 
                 <div className="grid grid-cols-2 md:grid-cols-4 gap-3 mb-6">
-                  <div
-                    className={`border rounded-lg p-3 flex flex-col items-center justify-center cursor-pointer transition-all ${
-                      paymentMethod === "momo"
-                        ? "border-purple-500 bg-purple-50 shadow-sm"
-                        : "border-gray-200 hover:border-gray-300"
-                    }`}
-                    onClick={() => handlePaymentMethodChange("momo")}
-                  >
-                    <div className="w-12 h-12 flex items-center justify-center mb-2">
-                      <img
-                        src="https://upload.wikimedia.org/wikipedia/vi/f/fe/MoMo_Logo.png"
-                        alt="MoMo"
-                        className="max-h-full"
-                      />
-                    </div>
-                    <span className="text-sm font-medium">MoMo</span>
-                  </div>
-
-                  <div
-                    className={`border rounded-lg p-3 flex flex-col items-center justify-center cursor-pointer transition-all ${
-                      paymentMethod === "vnpay"
-                        ? "border-blue-500 bg-blue-50 shadow-sm"
-                        : "border-gray-200 hover:border-gray-300"
-                    }`}
-                    onClick={() => handlePaymentMethodChange("vnpay")}
-                  >
-                    <div className="w-12 h-12 flex items-center justify-center mb-2">
-                      <img
-                        src="https://vnpay.vn/s1/statics.vnpay.vn/2023/9/06ncktiwd6dc1694418196384.png"
-                        alt="VNPay"
-                        className="max-h-full"
-                      />
-                    </div>
-                    <span className="text-sm font-medium">VNPay</span>
-                  </div>
-
-                  <div
-                    className={`border rounded-lg p-3 flex flex-col items-center justify-center cursor-pointer transition-all ${
-                      paymentMethod === "zalopay"
-                        ? "border-blue-500 bg-blue-50 shadow-sm"
-                        : "border-gray-200 hover:border-gray-300"
-                    }`}
-                    onClick={() => handlePaymentMethodChange("zalopay")}
-                  >
-                    <div className="w-12 h-12 flex items-center justify-center mb-2">
-                      <img
-                        src="https://play-lh.googleusercontent.com/MNO-bLIQjt_qGhVrP1Y03_GdYdaVRcX3v0MiIJ9j1J-NvBHwn02ZkrJ1SBK0VXdNSPw"
-                        alt="ZaloPay"
-                        className="max-h-full"
-                      />
-                    </div>
-                    <span className="text-sm font-medium">ZaloPay</span>
-                  </div>
-
-                  <div
-                    className={`border rounded-lg p-3 flex flex-col items-center justify-center cursor-pointer transition-all ${
-                      paymentMethod === "card"
-                        ? "border-green-500 bg-green-50 shadow-sm"
-                        : "border-gray-200 hover:border-gray-300"
-                    }`}
-                    onClick={() => handlePaymentMethodChange("card")}
-                  >
-                    <div className="w-12 h-12 flex items-center justify-center mb-2">
-                      <svg
-                        xmlns="http://www.w3.org/2000/svg"
-                        className="h-8 w-8 text-green-600"
-                        fill="none"
-                        viewBox="0 0 24 24"
-                        stroke="currentColor"
+                  {paymentMethods.map((method) => {
+                    const config = getPaymentMethodConfig(method);
+                    const isSelected = paymentMethod === method;
+                    
+                    return (
+                      <div
+                        key={method}
+                        className={`border rounded-lg p-3 flex flex-col items-center justify-center cursor-pointer transition-all ${
+                          isSelected
+                            ? `border-${config.color}-500 bg-${config.color}-50 shadow-sm`
+                            : "border-gray-200 hover:border-gray-300"
+                        }`}
+                        onClick={() => handlePaymentMethodChange(method)}
                       >
-                        <path
-                          strokeLinecap="round"
-                          strokeLinejoin="round"
-                          strokeWidth={2}
-                          d="M3 10h18M7 15h1m4 0h1m-7 4h12a3 3 0 003-3V8a3 3 0 00-3-3H6a3 3 0 00-3 3v8a3 3 0 003 3z"
-                        />
-                      </svg>
-                    </div>
-                    <span className="text-sm font-medium">Thẻ tín dụng</span>
-                  </div>
+                        <div className="w-12 h-12 flex items-center justify-center mb-2">
+                          {config.icon ? (
+                            <img
+                              src={config.icon}
+                              alt={config.name}
+                              className="max-h-full max-w-full object-contain"
+                            />
+                          ) : (
+                            <svg
+                              xmlns="http://www.w3.org/2000/svg"
+                              className={`h-8 w-8 text-${config.color}-600`}
+                              fill="none"
+                              viewBox="0 0 24 24"
+                              stroke="currentColor"
+                            >
+                              <path
+                                strokeLinecap="round"
+                                strokeLinejoin="round"
+                                strokeWidth={2}
+                                d="M3 10h18M7 15h1m4 0h1m-7 4h12a3 3 0 003-3V8a3 3 0 00-3-3H6a3 3 0 00-3 3v8a3 3 0 003 3z"
+                              />
+                            </svg>
+                          )}
+                        </div>
+                        <span className="text-sm font-medium">{config.name}</span>
+                        {config.recommended && (
+                          <span className="text-xs text-blue-600 mt-1">Khuyến nghị</span>
+                        )}
+                        {!config.realPayment && (
+                          <span className="text-xs text-gray-500 mt-1">Demo</span>
+                        )}
+                      </div>
+                    );
+                  })}
                 </div>
 
+                {/* Payment Method Details */}
                 {paymentMethod === "card" && (
                   <div className="border border-gray-200 rounded-lg p-4 bg-gray-50">
                     <form>
@@ -280,18 +296,23 @@ const Payment = () => {
                           htmlFor="cardNumber"
                           className="block text-sm font-medium text-gray-700 mb-1"
                         >
-                          Số thẻ
+                          Số thẻ *
                         </label>
                         <input
                           type="text"
                           id="cardNumber"
                           name="cardNumber"
                           value={cardInfo.cardNumber}
-                          onChange={handleChange}
+                          onChange={handleCardChange}
                           placeholder="1234 5678 9012 3456"
-                          className="w-full border border-gray-300 rounded-md px-3 py-2 focus:ring-indigo-500 focus:border-indigo-500"
+                          className={`w-full border rounded-md px-3 py-2 focus:ring-indigo-500 focus:border-indigo-500 ${
+                            cardErrors.cardNumber ? 'border-red-500' : 'border-gray-300'
+                          }`}
                           maxLength="19"
                         />
+                        {cardErrors.cardNumber && (
+                          <p className="text-red-500 text-xs mt-1">{cardErrors.cardNumber}</p>
+                        )}
                       </div>
 
                       <div className="mb-4">
@@ -299,17 +320,22 @@ const Payment = () => {
                           htmlFor="cardHolder"
                           className="block text-sm font-medium text-gray-700 mb-1"
                         >
-                          Tên chủ thẻ
+                          Tên chủ thẻ *
                         </label>
                         <input
                           type="text"
                           id="cardHolder"
                           name="cardHolder"
                           value={cardInfo.cardHolder}
-                          onChange={handleChange}
+                          onChange={handleCardChange}
                           placeholder="NGUYEN VAN A"
-                          className="w-full border border-gray-300 rounded-md px-3 py-2 focus:ring-indigo-500 focus:border-indigo-500"
+                          className={`w-full border rounded-md px-3 py-2 focus:ring-indigo-500 focus:border-indigo-500 ${
+                            cardErrors.cardHolder ? 'border-red-500' : 'border-gray-300'
+                          }`}
                         />
+                        {cardErrors.cardHolder && (
+                          <p className="text-red-500 text-xs mt-1">{cardErrors.cardHolder}</p>
+                        )}
                       </div>
 
                       <div className="grid grid-cols-2 gap-4">
@@ -318,18 +344,23 @@ const Payment = () => {
                             htmlFor="expiryDate"
                             className="block text-sm font-medium text-gray-700 mb-1"
                           >
-                            Ngày hết hạn
+                            Ngày hết hạn *
                           </label>
                           <input
                             type="text"
                             id="expiryDate"
                             name="expiryDate"
                             value={cardInfo.expiryDate}
-                            onChange={handleChange}
+                            onChange={handleCardChange}
                             placeholder="MM/YY"
-                            className="w-full border border-gray-300 rounded-md px-3 py-2 focus:ring-indigo-500 focus:border-indigo-500"
+                            className={`w-full border rounded-md px-3 py-2 focus:ring-indigo-500 focus:border-indigo-500 ${
+                              cardErrors.expiryDate ? 'border-red-500' : 'border-gray-300'
+                            }`}
                             maxLength="5"
                           />
+                          {cardErrors.expiryDate && (
+                            <p className="text-red-500 text-xs mt-1">{cardErrors.expiryDate}</p>
+                          )}
                         </div>
 
                         <div className="mb-4">
@@ -337,44 +368,26 @@ const Payment = () => {
                             htmlFor="cvv"
                             className="block text-sm font-medium text-gray-700 mb-1"
                           >
-                            CVV
+                            CVV *
                           </label>
                           <input
                             type="text"
                             id="cvv"
                             name="cvv"
                             value={cardInfo.cvv}
-                            onChange={handleChange}
+                            onChange={handleCardChange}
                             placeholder="123"
-                            className="w-full border border-gray-300 rounded-md px-3 py-2 focus:ring-indigo-500 focus:border-indigo-500"
-                            maxLength="3"
+                            className={`w-full border rounded-md px-3 py-2 focus:ring-indigo-500 focus:border-indigo-500 ${
+                              cardErrors.cvv ? 'border-red-500' : 'border-gray-300'
+                            }`}
+                            maxLength="4"
                           />
+                          {cardErrors.cvv && (
+                            <p className="text-red-500 text-xs mt-1">{cardErrors.cvv}</p>
+                          )}
                         </div>
                       </div>
                     </form>
-                  </div>
-                )}
-
-                {paymentMethod === "momo" && (
-                  <div className="border border-gray-200 rounded-lg p-4 bg-purple-50">
-                    <div className="flex items-center justify-between mb-3">
-                      <span className="text-sm font-medium">
-                        Số điện thoại MoMo
-                      </span>
-                      <span className="text-sm font-medium text-purple-700">
-                        097XXXXXXX
-                      </span>
-                    </div>
-                    <div className="p-4 bg-white rounded-lg border border-purple-100 text-center">
-                      <img
-                        src="https://api.qrserver.com/v1/create-qr-code/?size=150x150&data=MomoPaymentDemo"
-                        alt="MoMo QR Code"
-                        className="mx-auto h-32 w-32 mb-2"
-                      />
-                      <p className="text-sm text-gray-600">
-                        Quét mã QR bằng ứng dụng MoMo để thanh toán
-                      </p>
-                    </div>
                   </div>
                 )}
 
@@ -382,44 +395,53 @@ const Payment = () => {
                   <div className="border border-gray-200 rounded-lg p-4 bg-blue-50">
                     <div className="flex items-center justify-between mb-3">
                       <span className="text-sm font-medium">
-                        Tài khoản ngân hàng
+                        Thanh toán qua VNPay
                       </span>
                       <span className="text-sm font-medium text-blue-700">
-                        Liên kết với VNPay
+                        An toàn & Bảo mật
                       </span>
                     </div>
-                    <div className="p-4 bg-white rounded-lg border border-blue-100 text-center">
-                      <img
-                        src="https://api.qrserver.com/v1/create-qr-code/?size=150x150&data=VNPaymentDemo"
-                        alt="VNPay QR Code"
-                        className="mx-auto h-32 w-32 mb-2"
-                      />
-                      <p className="text-sm text-gray-600">
-                        Quét mã QR bằng ứng dụng ngân hàng hoặc VNPay để thanh
-                        toán
+                    <div className="p-4 bg-white rounded-lg border border-blue-100">
+                      <div className="flex items-center justify-center mb-2">
+                        <svg className="h-8 w-8 text-blue-600 mr-2" fill="currentColor" viewBox="0 0 20 20">
+                          <path fillRule="evenodd" d="M5 9V7a5 5 0 0110 0v2a2 2 0 012 2v5a2 2 0 01-2 2H5a2 2 0 01-2-2v-5a2 2 0 012-2zm8-2v2H7V7a3 3 0 016 0z" clipRule="evenodd" />
+                        </svg>
+                        <span className="text-sm font-medium">Kết nối an toàn với ngân hàng</span>
+                      </div>
+                      <p className="text-sm text-gray-600 text-center">
+                        Bạn sẽ được chuyển hướng đến cổng thanh toán VNPay để hoàn tất giao dịch một cách an toàn.
                       </p>
                     </div>
                   </div>
                 )}
 
-                {paymentMethod === "zalopay" && (
-                  <div className="border border-gray-200 rounded-lg p-4 bg-blue-50">
+                {(paymentMethod === "momo" || paymentMethod === "zalopay") && (
+                  <div className={`border border-gray-200 rounded-lg p-4 ${
+                    paymentMethod === "momo" ? "bg-purple-50" : "bg-blue-50"
+                  }`}>
                     <div className="flex items-center justify-between mb-3">
                       <span className="text-sm font-medium">
-                        Tài khoản ZaloPay
+                        {getPaymentMethodConfig(paymentMethod).name}
                       </span>
-                      <span className="text-sm font-medium text-blue-700">
-                        097XXXXXXX
+                      <span className={`text-sm font-medium ${
+                        paymentMethod === "momo" ? "text-purple-700" : "text-blue-700"
+                      }`}>
+                        Demo Mode
                       </span>
                     </div>
-                    <div className="p-4 bg-white rounded-lg border border-blue-100 text-center">
+                    <div className="p-4 bg-white rounded-lg border border-gray-100 text-center">
                       <img
-                        src="https://api.qrserver.com/v1/create-qr-code/?size=150x150&data=ZaloPaymentDemo"
-                        alt="ZaloPay QR Code"
+                        src={`https://api.qrserver.com/v1/create-qr-code/?size=150x150&data=${paymentMethod}PaymentDemo`}
+                        alt={`${getPaymentMethodConfig(paymentMethod).name} QR Code`}
                         className="mx-auto h-32 w-32 mb-2"
                       />
                       <p className="text-sm text-gray-600">
-                        Quét mã QR bằng ứng dụng ZaloPay để thanh toán
+                        Quét mã QR bằng ứng dụng {getPaymentMethodConfig(paymentMethod).name} để thanh toán
+                      </p>
+                      <p className={`text-xs mt-2 ${
+                        paymentMethod === "momo" ? "text-purple-600" : "text-blue-600"
+                      }`}>
+                        ⚠️ Đây là chế độ demo - thanh toán thật không được xử lý
                       </p>
                     </div>
                   </div>
@@ -466,7 +488,7 @@ const Payment = () => {
                   <div className="flex justify-between items-center">
                     <span className="font-medium">Tổng thanh toán</span>
                     <span className="text-lg font-bold text-indigo-600">
-                      {formatCurrency(totalAmount)}
+                      {paymentService.formatCurrency(totalAmount)}
                     </span>
                   </div>
                 </div>
@@ -474,7 +496,7 @@ const Payment = () => {
                 <button
                   onClick={processPayment}
                   disabled={isProcessing}
-                  className={`w-full py-3 px-4 bg-indigo-600 text-white rounded-md font-medium hover:bg-indigo-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-indigo-500 ${
+                  className={`w-full py-3 px-4 bg-indigo-600 text-white rounded-md font-medium hover:bg-indigo-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-indigo-500 transition-colors ${
                     isProcessing ? "opacity-70 cursor-not-allowed" : ""
                   }`}
                 >
@@ -503,7 +525,7 @@ const Payment = () => {
                       Đang xử lý...
                     </span>
                   ) : (
-                    `Thanh toán ${formatCurrency(totalAmount)}`
+                    `Thanh toán ${paymentService.formatCurrency(totalAmount)}`
                   )}
                 </button>
 

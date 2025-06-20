@@ -139,6 +139,14 @@ const config = {
         "/api/menstrual-cycle-trackings/notification-preferences",
       getTrends: "/api/menstrual-cycle-trackings/trends",
     },
+
+    // Payment endpoints - add API prefix
+    payment: {
+      createPayment: "/api/payment/create-payment",
+      vnpayCallback: "/api/payment/vnpay-callback",
+      vnpayIpn: "/api/payment/vnpay-ipn",
+      getTransaction: (id) => `/api/payment/transaction/${id}`,
+    },
   },
 
   // Feature flags
