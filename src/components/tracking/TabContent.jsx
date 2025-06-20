@@ -9,12 +9,12 @@ const TabContent = ({ activeTab }) => {
     switch (activeTab) {
       case "calendar":
         return <CalendarView />;
-      case "prediction":
-        return <OvulationPredictor />;
+      // case "prediction":
+      //   return <OvulationPredictor />;
       case "logCycle":
         return <LogCycleForm />;
       default:
-        return <CalendarView />;
+        return <LogCycleForm />;
     }
   };
 

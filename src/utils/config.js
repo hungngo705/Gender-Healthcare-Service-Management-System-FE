@@ -24,7 +24,7 @@ const getApiBaseURL = () => {
     console.warn(
       "Production API URL not configured! Please set VITE_API_URL environment variable."
     );
-    return "https://your-production-api-domain.com"; // Changed to remove /api/v2
+    return "https://your-production-api-domain.com"; // Changed to remove /api/v2.5
   }
 
   // Fallback for other hosts
@@ -38,88 +38,88 @@ const config = {
     timeout: 20000, // 20 seconds
     // Auth endpoints - add API prefix
     auth: {
-      login: "/api/v2/login",
-      register: "/api/v2/register",
-      refreshToken: "/api/v2/refresh-token",
-      logout: "/api/v2/logout",
-      verifyEmail: "/api/v2/verify-email",
-      forgotPassword: "/api/v2/send-reset-code",
-      resetPassword: "/api/v2/verify-code-and-reset",
+      login: "/api/v2.5/login",
+      register: "/api/v2.5/register",
+      refreshToken: "/api/v2.5/refresh-token",
+      logout: "/api/v2.5/logout",
+      verifyEmail: "/api/v2.5/verify-email",
+      forgotPassword: "/api/v2.5/send-reset-code",
+      resetPassword: "/api/v2.5/verify-code-and-reset",
     }, // User endpoints - add API prefix
     users: {
-      getAll: "/api/v2/user/getall",
-      create: "/api/v2/user/create",
-      getAllByRole: (role) => `/api/v2/user/getall/${role}`,
-      getById: (id) => `/api/v2/user/${id}`,
-      update: (id) => `/api/v2/user/update/${id}`,
-      delete: (id) => `/api/v2/user/delete/${id}`,
-      profile: "/api/v2/user/profile/me",
-      changePassword: "/api/v2/user/change-password",
+      getAll: "/api/v2.5/user/getall",
+      create: "/api/v2.5/user/create",
+      getAllByRole: (role) => `/api/v2.5/user/getall/${role}`,
+      getById: (id) => `/api/v2.5/user/${id}`,
+      update: (id) => `/api/v2.5/user/update/${id}`,
+      delete: (id) => `/api/v2.5/user/delete/${id}`,
+      profile: "/api/v2.5/user/profile/me",
+      changePassword: "/api/v2.5/user/change-password",
     }, // Consultant endpoints - add API prefix
     consultants: {
-      getAll: "/api/v2/consultant/getall",
-      getById: (id) => `/api/v2/consultant/${id}`,
-      create: "/api/v2/consultant/create",
-      update: (id) => `/api/v2/consultant/${id}`,
-      delete: (id) => `/api/v2/consultant/${id}`,
-      getAvailability: (id) => `/api/v2/consultant/${id}/availability`,
+      getAll: "/api/v2.5/consultant/getall",
+      getById: (id) => `/api/v2.5/consultant/${id}`,
+      create: "/api/v2.5/consultant/create",
+      update: (id) => `/api/v2.5/consultant/${id}`,
+      delete: (id) => `/api/v2.5/consultant/${id}`,
+      getAvailability: (id) => `/api/v2.5/consultant/${id}/availability`,
     }, // Appointment endpoints - add API prefix
     appointments: {
-      getAll: "/api/v2/appointment/getall",
-      create: "/api/v2/appointment/create",
-      getById: (id) => `/api/v2/appointment/${id}`,
-      update: (id) => `/api/v2/appointment/update/${id}`,
-      cancel: (id) => `/api/v2/appointment/${id}/cancel`,
-      getByUser: (userId) => `/api/v2/appointment/user/${userId}`,
-      getByCurrentUser: "/api/v2/appointment/getall",
+      getAll: "/api/v2.5/appointment/getall",
+      create: "/api/v2.5/appointment/create",
+      getById: (id) => `/api/v2.5/appointment/${id}`,
+      update: (id) => `/api/v2.5/appointment/update/${id}`,
+      cancel: (id) => `/api/v2.5/appointment/${id}/cancel`,
+      getByUser: (userId) => `/api/v2.5/appointment/user/${userId}`,
+      getByCurrentUser: "/api/v2.5/appointment/getall",
       getByConsultant: (consultantId) =>
-        `/api/v2/appointment/consultant/${consultantId}`,
+        `/api/v2.5/appointment/consultant/${consultantId}`,
     }, // STI testing endpoints - add API prefix
     stiTesting: {
-      getAll: "/api/v2/stitesting/getall",
-      create: "/api/v2/stitesting/create",
-      getById: (id) => `/api/v2/stitesting/${id}`,
-      update: (id) => `/api/v2/stitesting/update/${id}`,
-      delete: (id) => `/api/v2/stitesting/delete/${id}`,
+      getAll: "/api/v2.5/stitesting/getall",
+      create: "/api/v2.5/stitesting/create",
+      getById: (id) => `/api/v2.5/stitesting/${id}`,
+      update: (id) => `/api/v2.5/stitesting/update/${id}`,
+      delete: (id) => `/api/v2.5/stitesting/delete/${id}`,
     }, // Blog endpoints - add API prefix
     blog: {
-      getAll: "/api/v2/blog/getall",
-      create: "/api/v2/blog/create",
-      getById: (id) => `/api/v2/blog/${id}`,
-      update: (id) => `/api/v2/blog/${id}`,
-      delete: (id) => `/api/v2/blog/${id}`,
-      getComments: (blogId) => `/api/v2/blog/${blogId}/comments`,
-      addComment: (blogId) => `/api/v2/blog/${blogId}/comments`,
+      getAll: "/api/v2.5/blog/getall",
+      create: "/api/v2.5/blog/create",
+      getById: (id) => `/api/v2.5/blog/${id}`,
+      update: (id) => `/api/v2.5/blog/${id}`,
+      delete: (id) => `/api/v2.5/blog/${id}`,
+      getComments: (blogId) => `/api/v2.5/blog/${blogId}/comments`,
+      addComment: (blogId) => `/api/v2.5/blog/${blogId}/comments`,
     },
 
     // Service endpoints - add API prefix
     services: {
-      getAll: "/api/v2/service/getall",
-      create: "/api/v2/service/create",
-      getById: (id) => `/api/v2/service/${id}`,
-      update: (id) => `/api/v2/service/${id}`,
-      delete: (id) => `/api/v2/service/${id}`,
+      getAll: "/api/v2.5/service/getall",
+      create: "/api/v2.5/service/create",
+      getById: (id) => `/api/v2.5/service/${id}`,
+      update: (id) => `/api/v2.5/service/${id}`,
+      delete: (id) => `/api/v2.5/service/${id}`,
     },
 
     // Dashboard endpoints - add API prefix
     dashboard: {
-      stats: "/api/v2/dashboard/stats",
-      data: "/api/v2/dashboard/data",
-      usersByRole: "/api/v2/dashboard/users-by-role",
-      appointmentsByStatus: "/api/v2/dashboard/appointments-by-status",
-      statsByRole: (role) => `/api/v2/dashboard/stats/role/${role}`,
-      activities: "/api/v2/dashboard/activities",
+      stats: "/api/v2.5/dashboard/stats",
+      data: "/api/v2.5/dashboard/data",
+      usersByRole: "/api/v2.5/dashboard/users-by-role",
+      appointmentsByStatus: "/api/v2.5/dashboard/appointments-by-status",
+      statsByRole: (role) => `/api/v2.5/dashboard/stats/role/${role}`,
+      activities: "/api/v2.5/dashboard/activities",
       monthlyStats: (year, month) =>
-        `/api/v2/dashboard/stats/monthly/${year}/${month}`,
+        `/api/v2.5/dashboard/stats/monthly/${year}/${month}`,
     }, // TestResult endpoints - add API prefix
     testResult: {
-      getAll: "/api/v2/testresult/getall",
-      getById: (id) => `/api/v2/testresult/${id}`,
-      create: "/api/v2/testresult/create",
-      update: (id) => `/api/v2/testresult/${id}`,
+      getAll: "/api/v2.5/testresult/getall",
+      getById: (id) => `/api/v2.5/testresult/${id}`,
+      create: "/api/v2.5/testresult/create",
+      update: (id) => `/api/v2.5/testresult/${id}`,
       getByAppointment: (appointmentId) =>
-        `/api/v2/testresult/appointment/${appointmentId}`,
-      getByPatient: (patientId) => `/api/v2/testresult/patient/${patientId}`,
+        `/api/v2.5/testresult/appointment/${appointmentId}`,
+      getByPatient: (patientId) => `/api/v2.5/testresult/patient/${patientId}`,
     },
 
     // Menstrual cycle tracking endpoints - add API prefix

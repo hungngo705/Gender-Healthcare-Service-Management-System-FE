@@ -4,7 +4,7 @@ const TabNavigator = ({ activeTab, setActiveTab }) => {
   const tabs = [
     { id: "logCycle", label: "Ghi nhận chu kỳ" },
     { id: "calendar", label: "Xem Lịch Chu Kỳ" },
-    { id: "prediction", label: "Dự đoán thời gian thụ thai" },
+    // { id: "prediction", label: "Dự đoán thời gian thụ thai" },
   ];
 
   return (
