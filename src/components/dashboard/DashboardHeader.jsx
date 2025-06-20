@@ -4,7 +4,7 @@ import { Link, useNavigate } from "react-router-dom";
 import { Bell, Search, Menu, User, LogOut, Settings } from "lucide-react";
 import logo from "../../assets/logo2.svg";
 import UserAvatar from "../user/UserAvatar";
-import userUtils from "../../utils/userUtils";
+import userService from "../../services/userService"; // Changed from userUtils
 import { useAuth } from "../../contexts/AuthContext";
 
 function DashboardHeader({
@@ -17,23 +17,69 @@ function DashboardHeader({
   const [isProfileMenuOpen, setIsProfileMenuOpen] = useState(false);
   const [isLoggingOut, setIsLoggingOut] = useState(false);
   const [isFullScreenLoading, setIsFullScreenLoading] = useState(false);
+  const [userProfile, setUserProfile] = useState({
+    displayName: "",
+    formattedRole: "",
+    avatarInfo: { imageUrl: "", initial: "" },
+  });
   const profileMenuRef = useRef(null);
-  const { logout } = useAuth();
+  const { logout, isAuthenticated } = useAuth();
   const navigate = useNavigate();
-  const { displayName, formattedRole } = userUtils.useUserInfo();
+
+  // Fetch user profile data using userService
+  useEffect(() => {
+    const fetchUserProfile = async () => {
+      try {
+        const userData = await userService.getCurrentUserProfile();
+        console.log("User Data:", userData);
+
+        // Extract display name from user data
+        const displayName =
+          userData.name || userData.email?.split("@")[0] || "User";
+
+        // Format role information
+        let formattedRole = "Người dùng";
+        if (userData.role && userData.role.name) {
+          const roleName = userData.role.name.toString();
+          if (roleName === "0") formattedRole = "Người dùng";
+          else if (roleName === "1") formattedRole = "Tư vấn viên";
+          else if (roleName === "2") formattedRole = "Nhân viên";
+          else if (roleName === "3") formattedRole = "Quản lý";
+          else if (roleName === "4") formattedRole = "Quản trị viên";
+        }
+
+        // Create avatar info
+        const avatarInfo = {
+          imageUrl: userData.avatarUrl || "",
+          initial: displayName.charAt(0).toUpperCase(),
+        };
+
+        setUserProfile({ displayName, formattedRole, avatarInfo });
+      } catch (error) {
+        console.error("Failed to fetch user profile:", error);
+      }
+    };
+
+    if (isAuthenticated) {
+      fetchUserProfile();
+    }
+  }, [isAuthenticated]);
 
   // Handle clicks outside of the profile menu
   useEffect(() => {
     function handleClickOutside(event) {
-      if (profileMenuRef.current && !profileMenuRef.current.contains(event.target)) {
+      if (
+        profileMenuRef.current &&
+        !profileMenuRef.current.contains(event.target)
+      ) {
         setIsProfileMenuOpen(false);
       }
     }
-    
+
     if (isProfileMenuOpen) {
       document.addEventListener("mousedown", handleClickOutside);
     }
-    
+
     return () => {
       document.removeEventListener("mousedown", handleClickOutside);
     };
@@ -48,7 +94,7 @@ function DashboardHeader({
       setIsProfileMenuOpen(false);
 
       await logout();
-      
+
       setTimeout(() => {
         navigate("/login", { replace: true });
         setIsLoggingOut(false);
@@ -61,6 +107,9 @@ function DashboardHeader({
       navigate("/login", { replace: true });
     }
   };
+
+  // Destructure values from userProfile state
+  const { displayName, formattedRole, avatarInfo } = userProfile;
 
   return (
     <>
@@ -117,19 +166,34 @@ function DashboardHeader({
                 onClick={() => setIsProfileMenuOpen(!isProfileMenuOpen)}
                 aria-label="User profile"
               >
-                <UserAvatar size="sm" />
-                <span className="ml-2 text-sm font-medium text-gray-700 hidden md:inline-block">
-                  {formattedRole}
-                </span>
+                <UserAvatar
+                  size="sm"
+                  imageUrl={avatarInfo.imageUrl}
+                  initial={avatarInfo.initial}
+                />
+                <div className="ml-2 hidden md:block">
+                  <div className="text-sm font-medium text-gray-700">
+                    {displayName}
+                  </div>
+                  <div className="text-xs text-gray-500">{formattedRole}</div>
+                </div>
               </button>
-              
+
               {/* User Profile Dropdown Menu */}
               {isProfileMenuOpen && (
                 <div
                   ref={profileMenuRef}
                   className="absolute right-[-20px] mt-2 w-46 bg-white rounded-md shadow-lg py-1 z-50"
                 >
-                  
+                  <div className="px-4 py-2 border-b border-gray-100">
+                    <p className="text-sm font-medium text-gray-900">
+                      {displayName}
+                    </p>
+                    <p className="text-xs text-gray-500 mt-1">
+                      {formattedRole}
+                    </p>
+                  </div>
+
                   <Link
                     to="/profile"
                     className="block px-4 py-2 text-sm text-gray-700 hover:bg-gray-100 flex items-center"
@@ -138,7 +202,7 @@ function DashboardHeader({
                     <User size={16} className="mr-2" />
                     <span>Hồ Sơ</span>
                   </Link>
-                  
+
                   <button
                     onClick={handleLogout}
                     disabled={isLoggingOut}

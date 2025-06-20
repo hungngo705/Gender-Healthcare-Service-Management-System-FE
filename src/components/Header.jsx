@@ -1,21 +1,48 @@
-import React, { useState, useRef, useEffect } from "react"; // Added useRef and useEffect
+import React, { useState, useRef, useEffect } from "react";
 import { NavLink, useNavigate } from "react-router-dom";
 import logo from "../assets/logo2.svg";
 import { Menu, X, User, LogOut } from "lucide-react";
 import { useAuth } from "../contexts/AuthContext";
-import userUtils from "../utils/userUtils";
+import userService from "../services/userService"; // Changed from userUtils
 
 function Header() {
   const [isMenuOpen, setIsMenuOpen] = useState(false);
   const [isProfileMenuOpen, setIsProfileMenuOpen] = useState(false);
-  const [isLoggingOut, setIsLoggingOut] = useState(false); // New state for tracking logout in progress
+  const [isLoggingOut, setIsLoggingOut] = useState(false);
   const [isFullScreenLoading, setIsFullScreenLoading] = useState(false);
   const { logout, isAuthenticated, isStaffOrHigher } = useAuth();
-  const { displayName, avatarInfo } = userUtils.useUserInfo();
+  const [userProfile, setUserProfile] = useState({
+    displayName: "",
+    avatarInfo: { imageUrl: "", initial: "" },
+  });
   const navigate = useNavigate();
-
-  // Add ref for the profile menu dropdown
   const profileMenuRef = useRef(null);
+
+  // Fetch user profile data using userService
+  useEffect(() => {
+    const fetchUserProfile = async () => {
+      if (isAuthenticated) {
+        try {
+          const userData = await userService.getCurrentUserProfile();
+
+          // Extract display name from user data
+          const displayName = userData.name || "User";
+
+          // Create avatar info
+          const avatarInfo = {
+            imageUrl: userData.avatarUrl || "",
+            initial: displayName ? displayName.charAt(0).toUpperCase() : "U",
+          };
+
+          setUserProfile({ displayName, avatarInfo });
+        } catch (error) {
+          console.error("Failed to fetch user profile:", error);
+        }
+      }
+    };
+
+    fetchUserProfile();
+  }, [isAuthenticated]);
 
   // Handle clicks outside of the profile menu
   useEffect(() => {
@@ -40,25 +67,20 @@ function Header() {
   }, [isProfileMenuOpen]);
 
   const handleLogout = async (e) => {
-    e.preventDefault(); // Prevent any default button behaviors
+    e.preventDefault();
 
     try {
-      // Show both button loading and full-screen loading
       setIsLoggingOut(true);
       setIsFullScreenLoading(true);
 
-      // Close menus
       setIsProfileMenuOpen(false);
       setIsMenuOpen(false);
 
-      // Wait for logout to complete
       await logout();
 
-      // Small delay to ensure state updates have processed
       setTimeout(() => {
         navigate("/login", { replace: true });
 
-        // Reset loading states after navigation
         setIsLoggingOut(false);
         setIsFullScreenLoading(false);
       }, 300);
@@ -69,6 +91,9 @@ function Header() {
       navigate("/login", { replace: true });
     }
   };
+
+  // Use the values from userProfile state
+  const { displayName, avatarInfo } = userProfile;
 
   return (
     <header className="bg-white shadow-md sticky top-0 z-50">
