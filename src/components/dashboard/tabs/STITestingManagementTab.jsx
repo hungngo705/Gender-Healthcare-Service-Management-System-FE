@@ -46,7 +46,7 @@ const statusLabels = {
   4: { label: "Đã hủy", color: "bg-red-100 text-red-800" },
 };
 
-function STITestingManagementTab({ role }) {
+function STITestingManagementTab() {
   const [tests, setTests] = useState([]);
   const [filteredTests, setFilteredTests] = useState([]);
   const [loading, setLoading] = useState(true);

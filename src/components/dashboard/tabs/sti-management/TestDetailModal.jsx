@@ -3,7 +3,6 @@ import { format } from "date-fns";
 import { vi } from "date-fns/locale";
 import { X, CheckCircle, XCircle, AlertCircle } from "lucide-react";
 
-
 const slotLabels = {
   0: "Sáng (8:00 - 12:00)",
   1: "Chiều (13:00 - 17:00)",
@@ -88,10 +87,9 @@ function TestDetailModal({ test, onClose, onStatusChange }) {
       return parameterCount * parameterPrice;
     }
   };
-
   return (
-    <div className="fixed inset-0 bg-black bg-opacity-50 flex justify-center items-center p-4 z-50">
-      <div className="bg-white rounded-lg p-6 max-w-4xl w-full max-h-[90vh] overflow-y-auto">
+    <div className="fixed inset-0 bg-opacity-60 backdrop-blur-sm flex justify-center items-center p-4 z-50">
+      <div className="bg-white rounded-lg p-6 max-w-4xl w-full max-h-[90vh] overflow-y-auto shadow-xl">
         <div className="flex justify-between items-center mb-6">
           <h2 className="text-xl font-bold text-gray-900">
             Chi tiết xét nghiệm STI

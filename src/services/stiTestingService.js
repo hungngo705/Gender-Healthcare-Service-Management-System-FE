@@ -1,3 +1,4 @@
+// src\services\stiTestingService.js
 import { apiService } from "../utils/axiosConfig";
 import config from "../utils/config";
 
@@ -47,6 +48,49 @@ const stiTestingService = {
    */ update: (id, testData) => {
     return apiService.put(config.api.stiTesting.update(id), testData);
   },
+
+  /**
+   * Sets an STI testing record as paid.
+   * It fetches the current record to avoid overwriting existing data.
+   * @param {string} id The ID of the STI testing record.
+   * @returns {Promise} The update API call promise.
+   */
+  setAsPaid: async (id) => {
+    try {
+      // First, get the current test information to build a complete update payload
+      const currentTestResponse = await apiService.get(
+        config.api.stiTesting.getById(id)
+      );
+
+      if (!currentTestResponse?.data?.data) {
+        throw new Error("Could not retrieve the STI testing record to update.");
+      }
+
+      const testData = currentTestResponse.data.data;
+
+      // Construct the payload based on the pattern in `updateTestingStatus`
+      // This assumes the backend's PUT endpoint requires a full object.
+      const updatePayload = {
+        status: testData.status || 0,
+        notes: testData.notes || "",
+        totalPrice: testData.totalPrice || 0,
+        isPaid: true, // The main change
+        ScheduledDate:
+          testData.scheduleDate ||
+          testData.ScheduledDate ||
+          new Date().toISOString().split("T")[0],
+        slot: testData.slot || 0,
+      };
+
+      console.log(`Updating STI Testing ${id} with payload:`, updatePayload);
+
+      return apiService.put(config.api.stiTesting.update(id), updatePayload);
+    } catch (error) {
+      console.error(`Failed to set STI testing ${id} as paid:`, error);
+      throw error; // Rethrow to be handled by the caller
+    }
+  },
+
   /**
    * Update STI testing status
    * @param {string} id - The STI test ID
@@ -117,6 +161,7 @@ export const {
   getById,
   create,
   update,
+  setAsPaid,
   updateTestingStatus,
   delete: deleteTesting,
 } = stiTestingService;

@@ -31,7 +31,7 @@ const outcomeLabels = {
 // Test package mapping
 const testPackageParameters = {
   0: [0, 1, 2], // Basic: HIV, Syphilis, Gonorrhea
-  1: [0, 1, 2, 3, 4, 5], // Advanced: All parameters
+  1: [0, 1, 2, 3, 4, 5, 6, 7, 8, 9], // Advanced: All parameters
   // Custom: depends on user selection
 };
 
@@ -64,7 +64,6 @@ function TestResultModal({ test, onClose, onTestResultUpdated }) {
         }
       } catch (error) {
         console.error("Error fetching test results:", error);
-        toast.error("Không thể tải kết quả xét nghiệm");
         setResults([]);
         generateParameterOptions([]);
       } finally {
@@ -188,6 +187,7 @@ function TestResultModal({ test, onClose, onTestResultUpdated }) {
           formData.comments
         );
       }
+      console.log("form dataaaa:", formData); // For debugging
       if (response?.data?.is_success) {
         toast.success(
           editingResult ? "Cập nhật thành công" : "Thêm kết quả thành công"
