@@ -3,22 +3,75 @@ import { Link, useNavigate } from "react-router-dom";
 import { useAuth } from "../../contexts/AuthContext";
 import { format } from "date-fns";
 import { toast } from "react-toastify";
+import { STI_PACKAGES, STI_TEST_TYPES } from "./booking-components/constants";
+
+// Time slot component for STI testing booking
+const TimeSlotSelector = ({ selectedSlot, onChange }) => {
+  const timeSlots = [
+    { id: 0, time: "8:00 - 12:00", label: "Sáng" },
+    { id: 1, time: "13:00 - 17:00", label: "Chiều" },
+    { id: 2, time: "17:00 - 21:00", label: "Tối" },
+  ];
+
+  return (
+    <div>
+      <p className="text-sm font-medium text-gray-700 mb-2">
+        Chọn khung giờ xét nghiệm *
+      </p>
+      <div className="grid grid-cols-2 md:grid-cols-3 gap-2">
+        {timeSlots.map((slot) => (
+          <div
+            key={slot.id}
+            onClick={() => onChange(slot.id)}
+            className={`cursor-pointer border rounded-md p-3 transition-all duration-200 ${
+              selectedSlot === slot.id
+                ? "border-indigo-500 bg-indigo-50 shadow-sm"
+                : "border-gray-200 hover:border-gray-300 hover:bg-gray-50"
+            }`}
+          >
+            <div className="flex items-center space-x-2">
+              <div
+                className={`w-4 h-4 rounded-full border flex items-center justify-center ${
+                  selectedSlot === slot.id
+                    ? "border-indigo-500 bg-indigo-500"
+                    : "border-gray-300"
+                }`}
+              >
+                {selectedSlot === slot.id && (
+                  <div className="w-1.5 h-1.5 bg-white rounded-full"></div>
+                )}
+              </div>
+              <div>
+                <p className="font-medium text-sm">{slot.time}</p>
+                <p className="text-xs text-gray-500">{slot.label}</p>
+              </div>
+            </div>
+          </div>
+        ))}
+      </div>
+    </div>
+  );
+};
 
 function BookingForm() {
   const { currentUser } = useAuth();
-  const navigate = useNavigate(); // State for appointment form
+  const navigate = useNavigate();
+  // State for appointment form
   const [formData, setFormData] = useState({
     userId: currentUser?.id || "",
     testPackage: 0, // 0: Basic, 1: Advanced, 2: Custom
     customParameters: [], // Các tham số xét nghiệm tùy chỉnh
     status: 0, // 0: Scheduled, 1: SampleTaken, 2: Processing, 3: Completed, 4: Cancelled
-    scheduleDate: format(new Date(), "yyyy-MM-dd"), // ISO format cho input date
+    preferredDate: format(new Date(), "yyyy-MM-dd"), // ISO format cho input date
+    scheduleDate: format(new Date(), "yyyy-MM-dd"), // Field này sẽ sync với preferredDate
     slot: 0, // Khung giờ, sẽ được chọn sau
     totalPrice: 0, // Tổng giá tiền
     notes: "", // Ghi chú
     isAnonymous: false, // Thêm vào để duy trì tính năng hiện tại
     testTypes: [], // Giữ lại để tương thích với UI hiện tại
-  }); // State for form submission
+  });
+
+  // State for form submission
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [submitError, setSubmitError] = useState(null); // Handle form input changes
   const handleChange = (e) => {
@@ -30,10 +83,11 @@ function BookingForm() {
         [name]: checked,
       }));
     } else if (name === "preferredDate") {
-      // Đảm bảo ngày được lưu trong format đúng
+      // Đảm bảo ngày được lưu trong format đúng và cập nhật cả scheduleDate
       setFormData((prev) => ({
         ...prev,
         [name]: value, // Giữ nguyên format yyyy-MM-dd cho input date
+        scheduleDate: value, // Đồng bộ với scheduleDate để gửi đúng giá trị cho API
       }));
     } else {
       setFormData((prev) => ({
@@ -93,14 +147,12 @@ function BookingForm() {
           updatedCustomParams = updatedCustomParams.filter(
             (param) => param !== apiTestParam
           );
-        }
-
-        // Cập nhật testPackage nếu bỏ chọn một package
+        } // Cập nhật testPackage nếu bỏ chọn một package
         let newTestPackage = prev.testPackage;
         if (isPackage) {
           if (testTypeId === 100) newTestPackage = 0; // Basic
-          else if (testTypeId === 101) newTestPackage = 0; // Advanced
-          else if (testTypeId === 102) newTestPackage = 0; // Custom
+          else if (testTypeId === 101) newTestPackage = 2; // Advanced
+          else if (testTypeId === 102) newTestPackage = 1; // Custom
         }
 
         return {
@@ -116,7 +168,6 @@ function BookingForm() {
         let newTestTypes;
         let newCustomParams = [...prev.customParameters];
         let newTestPackage = prev.testPackage;
-
         if (isPackage) {
           // Xác định TestPackage từ API enum (0: Basic, 1: Advanced, 2: Custom)
           if (testTypeId === 100) newTestPackage = 0; // Basic
@@ -231,10 +282,13 @@ function BookingForm() {
     e.preventDefault();
     setIsSubmitting(true);
     setSubmitError(null);
-
     try {
       if (formData.testTypes.length === 0) {
         throw new Error("Vui lòng chọn ít nhất một loại xét nghiệm");
+      }
+
+      if (formData.slot === undefined) {
+        throw new Error("Vui lòng chọn khung giờ xét nghiệm");
       }
 
       // Convert selected test types from ids to full objects for UI display
@@ -246,16 +300,14 @@ function BookingForm() {
           price: test.price,
           isPackage: test.isPackage || false,
         };
-      });
-
-      // Prepare data for API - format theo cấu trúc API
+      }); // Prepare data for API - format theo cấu trúc API
       const apiRequestData = {
         testPackage: formData.testPackage,
         customParameters: formData.customParameters,
         status: 0, // Mặc định là Scheduled
-        scheduleDate: formData.scheduleDate,
+        scheduleDate: formData.preferredDate, // Sử dụng ngày mà người dùng đã chọn
         slot: formData.slot,
-        totalPrice: formData.totalPrice || calculateTotal(),
+        totalPrice: calculateTotal(), // Đảm bảo giá luôn được tính mới nhất
         notes: formData.notes || "",
       };
 
@@ -295,14 +347,26 @@ function BookingForm() {
     } finally {
       setIsSubmitting(false);
     }
-  }; // Define test types
+  }; // Get package prices from constants
+  const getPackagePrice = (packageId) => {
+    // Map internal package IDs to constants.js package IDs
+    const packageMapping = {
+      100: 0, // Basic package
+      101: 2, // Advanced package
+      102: 1, // Custom package
+    };
+
+    const pkg = STI_PACKAGES.find((p) => p.id === packageMapping[packageId]);
+    return pkg ? pkg.price : 0;
+  };
+
   const testTypes = [
     // Packages first - these are bundles of tests with special pricing
     {
       id: 100,
       label: "Xét Nghiệm Cơ Bản",
       description: "Gói xét nghiệm phù hợp cho việc kiểm tra định kỳ",
-      price: "79.000đ",
+      price: `${STI_PACKAGES[0].price.toLocaleString()}đ`,
       isPackage: true,
       includedTests: [4, 1, 2], // Chlamydia, Gonorrhea, Syphilis
       popular: false,
@@ -318,7 +382,7 @@ function BookingForm() {
       id: 101,
       label: "Xét Nghiệm Toàn Diện",
       description: "Gói xét nghiệm đầy đủ nhất cho sức khỏe tình dục",
-      price: "149.000đ",
+      price: `${STI_PACKAGES[2].price.toLocaleString()}đ`,
       isPackage: true,
       includedTests: [4, 1, 2, 0, 5, 6, 7, 8], // All basic + HIV, Herpes, Hepatitis B & C, Trichomonas
       popular: true,
@@ -336,7 +400,7 @@ function BookingForm() {
       id: 102,
       label: "Xét Nghiệm Mục Tiêu",
       description: "Gói xét nghiệm tập trung cho các nguy cơ cụ thể",
-      price: "99.000đ",
+      price: `${STI_PACKAGES[1].price.toLocaleString()}đ`,
       isPackage: true,
       includedTests: [], // User can choose 3 individual tests
       popular: false,
@@ -347,21 +411,24 @@ function BookingForm() {
         "Tư vấn sau xét nghiệm",
       ],
       maxSelection: 3,
+    }, // Individual tests
+    {
+      id: 0,
+      label: "HIV",
+      description: "Xét nghiệm HIV",
+      price: `${STI_TEST_TYPES[3].price.toLocaleString()}đ`,
     },
-
-    // Individual tests
-    { id: 0, label: "HIV", description: "Xét nghiệm HIV", price: "45.000đ" },
     {
       id: 1,
       label: "Gonorrhea (Lậu)",
       description: "Phát hiện vi khuẩn Neisseria gonorrhoeae",
-      price: "35.000đ",
+      price: `${STI_TEST_TYPES[1].price.toLocaleString()}đ`,
     },
     {
       id: 2,
       label: "Syphilis (Giang Mai)",
       description: "Phát hiện vi khuẩn Treponema pallidum",
-      price: "30.000đ",
+      price: `${STI_TEST_TYPES[2].price.toLocaleString()}đ`,
     },
     {
       id: 3,
@@ -407,11 +474,16 @@ function BookingForm() {
     },
   ];
   const calculateTotal = () => {
-    const isTargetedPackageSelected = formData.testTypes.includes(102);
-
-    if (isTargetedPackageSelected) {
-      // For targeted package, return the package price regardless of individual selections
-      return 99000; // 99.000đ
+    // First check if any package is selected
+    if (formData.testTypes.includes(100)) {
+      // Basic package
+      return STI_PACKAGES[0].price;
+    } else if (formData.testTypes.includes(101)) {
+      // Advanced package
+      return STI_PACKAGES[2].price;
+    } else if (formData.testTypes.includes(102)) {
+      // Custom package
+      return STI_PACKAGES[1].price;
     }
 
     return formData.testTypes.reduce((total, typeId) => {
@@ -453,7 +525,7 @@ function BookingForm() {
                   . Hoặc tiếp tục với xét nghiệm ẩn danh.
                 </p>
               </div>
-            )}
+            )}{" "}
             <div>
               <label
                 htmlFor="preferredDate"
@@ -491,6 +563,17 @@ function BookingForm() {
               <p className="text-xs text-gray-500 mt-1">
                 Vui lòng chọn ngày muốn thực hiện xét nghiệm (tối thiểu sau ngày
                 hiện tại)
+              </p>
+            </div>
+            <div>
+              <TimeSlotSelector
+                selectedSlot={formData.slot}
+                onChange={(slotId) =>
+                  setFormData((prev) => ({ ...prev, slot: slotId }))
+                }
+              />
+              <p className="text-xs text-gray-500 mt-1">
+                Vui lòng chọn khung giờ phù hợp để thực hiện xét nghiệm
               </p>
             </div>
             <div>
@@ -738,17 +821,18 @@ function BookingForm() {
               )}
             </div>
             <div className="md:col-span-2">
+              {" "}
               <label
-                htmlFor="note"
+                htmlFor="notes"
                 className="block text-sm font-medium text-gray-700 mb-2"
               >
                 Ghi Chú Bổ Sung
               </label>
               <textarea
-                id="note"
-                name="note"
+                id="notes"
+                name="notes"
                 rows={4}
-                value={formData.note}
+                value={formData.notes}
                 onChange={handleChange}
                 className="w-full px-4 py-2 border border-gray-300 rounded-md focus:ring-indigo-500 focus:border-indigo-500"
                 placeholder="Có triệu chứng bất thường hoặc thông tin cần lưu ý? Vui lòng chia sẻ tại đây."
@@ -780,7 +864,6 @@ function BookingForm() {
             <h3 className="text-lg font-medium text-gray-900 mb-3">
               Tóm tắt đơn hàng
             </h3>
-
             {/* Selected Test Types */}
             {formData.testTypes.length > 0 ? (
               <div className="border-b border-gray-200 py-2 mb-2">
@@ -897,8 +980,7 @@ function BookingForm() {
                 <p className="text-sm text-gray-600">Chưa chọn xét nghiệm</p>
                 <p className="text-sm font-medium">-</p>
               </div>
-            )}
-
+            )}{" "}
             {/* Preferred Date */}
             <div className="flex justify-between border-b border-gray-200 py-2">
               <div>
@@ -910,8 +992,24 @@ function BookingForm() {
                 </p>
               </div>
               <p className="text-sm font-medium">-</p>
+            </div>{" "}
+            {/* Time Slot */}
+            <div className="flex justify-between border-b border-gray-200 py-2">
+              <div>
+                <p className="text-sm font-medium">Khung giờ xét nghiệm</p>
+                <p className="text-sm text-gray-600">
+                  {(() => {
+                    const slots = [
+                      "8:00 - 12:00 (Sáng)",
+                      "13:00 - 17:00 (Chiều)",
+                      "17:00 - 21:00 (Tối)",
+                    ];
+                    return slots[formData.slot] || "Chưa chọn";
+                  })()}
+                </p>
+              </div>
+              <p className="text-sm font-medium">-</p>
             </div>
-
             {/* Anonymous Testing */}
             <div className="flex justify-between border-b border-gray-200 py-2">
               <div>
@@ -922,7 +1020,6 @@ function BookingForm() {
               </div>
               <p className="text-sm font-medium">-</p>
             </div>
-
             {/* Total */}
             <div className="flex justify-between pt-3">
               <p className="text-base font-medium">Tổng tiền</p>
@@ -942,12 +1039,18 @@ function BookingForm() {
                 chính sách bảo mật
               </Link>{" "}
               của chúng tôi.
-            </p>
+            </p>{" "}
             <button
               type="submit"
-              disabled={isSubmitting || formData.testTypes.length === 0}
+              disabled={
+                isSubmitting ||
+                formData.testTypes.length === 0 ||
+                formData.slot === undefined
+              }
               className={`w-full px-6 py-3 bg-indigo-600 text-white rounded-md font-medium hover:bg-indigo-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-indigo-500 ${
-                isSubmitting || formData.testTypes.length === 0
+                isSubmitting ||
+                formData.testTypes.length === 0 ||
+                formData.slot === undefined
                   ? "opacity-70 cursor-not-allowed"
                   : ""
               }`}
