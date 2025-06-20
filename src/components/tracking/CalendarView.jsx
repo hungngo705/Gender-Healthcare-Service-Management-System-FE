@@ -363,7 +363,7 @@ const CalendarView = () => {
                       }
                       ${
                         day.isOvulation
-                          ? "bg-indigo-600 text-white font-bold"
+                          ? "bg-green-600 text-white font-bold"
                           : ""
                       }
                       ${
@@ -385,7 +385,7 @@ const CalendarView = () => {
                         <span className="w-1.5 h-1.5 rounded-full bg-red-300"></span>
                       )}
                       {day.isOvulation && (
-                        <span className="w-1.5 h-1.5 rounded-full bg-indigo-600"></span>
+                        <span className="w-1.5 h-1.5 rounded-full bg-green-600"></span>
                       )}
                       {day.isFertileWindow && !day.isOvulation && (
                         <span className="w-1.5 h-1.5 rounded-full bg-indigo-300"></span>
@@ -416,7 +416,7 @@ const CalendarView = () => {
             </span>
           </div>
           <div className="flex items-center">
-            <span className="w-4 h-4 rounded-full bg-indigo-600 mr-2"></span>
+            <span className="w-4 h-4 rounded-full bg-green-600 mr-2"></span>
             <span className="text-sm text-gray-600">Ngày Rụng Trứng</span>
           </div>
           <div className="flex items-center">

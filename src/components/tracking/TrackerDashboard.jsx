@@ -5,7 +5,7 @@ import TabContent from "./TabContent";
 import CallToAction from "./CallToAction";
 
 const TrackerDashboard = () => {
-  const [activeTab, setActiveTab] = useState("calendar");
+  const [activeTab, setActiveTab] = useState("logCycle");
 
   return (
     <div className="min-h-screen bg-gradient-to-b from-gray-50 to-white">

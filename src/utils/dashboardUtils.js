@@ -6,7 +6,7 @@
 export function getDashboardConfig(userRole) {
   const roleConfig = {
     consultant: {
-      title: "Bảng điều khiển dành cho bác sĩ tư vấn",
+      title: "Bảng điều khiển dành cho tư vấn viên",
       menuItems: [
         {
           id: "consultantAppointments",
