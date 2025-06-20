@@ -176,7 +176,7 @@ const OvulationPredictor = () => {
 
               {fertilityWindow && (
                 <div className="mt-4">
-                  <p className="text-indigo-800">
+                  <p className="text-green-800">
                     <span className="font-medium">Ngày Rụng Trứng:</span>{" "}
                     {formatDateString(fertilityWindow.ovulationDate)}
                   </p>
