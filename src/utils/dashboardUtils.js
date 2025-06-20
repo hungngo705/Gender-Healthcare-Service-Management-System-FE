@@ -25,8 +25,11 @@ export function getDashboardConfig(userRole) {
           label: "Quản lý bài viết",
           icon: "document-text",
         },
-        { id: "appointments", label: "Lịch hẹn", icon: "calendar" },
-        { id: "sti-proccess", label: "Xử lí xét nghiệm", icon: "labs" },
+        {
+          id: "stiTestingManagement",
+          label: "Quản lý xét nghiệm STI",
+          icon: "labs",
+        },
         { id: "messages", label: "Tin nhắn", icon: "chat" },
       ],
       description: "Tạo các bài đăng và quản lý thông tin khách hàng",
@@ -39,7 +42,6 @@ export function getDashboardConfig(userRole) {
           label: "Quản lý dịch vụ",
           icon: "clipboard",
         },
-        { id: "appointments", label: "Theo dõi lịch hẹn", icon: "calendar" },
         { id: "messages", label: "Tin nhắn", icon: "chat" },
       ],
       description: "Thêm và quản lý các dịch vụ",
@@ -49,11 +51,6 @@ export function getDashboardConfig(userRole) {
       menuItems: [
         { id: "overview", label: "Tổng quan", icon: "chart-pie" },
         { id: "userManagement", label: "Quản lý người dùng", icon: "users" },
-        {
-          id: "servicesManagement",
-          label: "Quản lý dịch vụ",
-          icon: "clipboard",
-        },
         { id: "reports", label: "Báo cáo & Thống kê", icon: "chart-bar" },
         { id: "messages", label: "Tin nhắn", icon: "chat" },
       ],

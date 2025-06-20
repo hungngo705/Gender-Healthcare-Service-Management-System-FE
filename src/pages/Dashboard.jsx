@@ -22,6 +22,7 @@ import TestProcessingTab from "../components/dashboard/tabs/TestProcessingTab";
 import BlogManagementTab from "../components/dashboard/tabs/BlogManagementTab";
 import ServicesManagementTab from "../components/dashboard/tabs/ServicesManagementTab";
 import UserManagementTab from "../components/dashboard/tabs/UserManagementTab";
+import STITestingManagementTab from "../components/dashboard/tabs/STITestingManagementTab";
 
 // Lucide Icons
 import {
@@ -144,6 +145,7 @@ function Dashboard() {
         // Staff-specific tabs
         blogManagement: ["staff", "manager", "admin"],
         appointments: ["staff", "manager", "admin", "consultant"],
+        stiTestingManagement: ["staff", "manager", "admin"],
 
         // Manager-specific tabs
         servicesManagement: ["manager", "admin"],
@@ -174,7 +176,6 @@ function Dashboard() {
       handleSetActiveTab(firstAccessibleTab);
     }
   }, [userRole, menuItems, checkTabAccess, activeTab, handleSetActiveTab]);
-
   // Xác định tab nội dung hiện tại
   const renderTabContent = () => {
     // Check if user has access to this tab, if not redirect to overview
@@ -211,6 +212,9 @@ function Dashboard() {
       case "userManagement":
         console.log(`Rendering UserManagementTab with role: ${userRole}`);
         return <UserManagementTab role={userRole} />;
+      case "stiTestingManagement":
+        console.log(`Rendering STITestingManagementTab with role: ${userRole}`);
+        return <STITestingManagementTab role={userRole} />;
       case "customers":
         console.log(`Rendering CustomersTab with role: ${userRole}`);
         return <CustomersTab role={userRole} />;

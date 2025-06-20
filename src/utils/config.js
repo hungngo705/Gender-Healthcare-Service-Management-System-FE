@@ -74,22 +74,22 @@ const config = {
       getByCurrentUser: "/api/v2.5/appointment/getall",
       getByConsultant: (consultantId) =>
         `/api/v2.5/appointment/consultant/${consultantId}`,
-    }, // STI testing endpoints - add API prefix
+    }, // STI testing endpoints - add API prefix    
     stiTesting: {
       getAll: "/api/v2.5/stitesting/getall",
       getForCustomer: "/api/v2.5/stitesting/customer", // Endpoint để lấy STI test của current user
       create: "/api/v2.5/stitesting/create",
       getById: (id) => `/api/v2.5/stitesting/${id}`,
-      update: (id) => `/api/v2.5/stitesting/update/${id}`,
+      update: (id) => `/api/v2.5/stitesting/update/${id}`, 
       delete: (id) => `/api/v2.5/stitesting/delete/${id}`,
-    },
-    // Test Result endpoints
+    },// Test Result endpoints
     testResult: {
       getAll: "/api/v2.5/testresult/getall",
       create: "/api/v2.5/testresult/create",
       getById: (id) => `/api/v2.5/testresult/${id}`,
       update: (id) => `/api/v2.5/testresult/update/${id}`,
       delete: (id) => `/api/v2.5/testresult/delete/${id}`,
+      getByTesting: (testingId) => `/api/v2.5/testresult/testing/${testingId}`,
     }, // Blog endpoints - add API prefix
     blog: {
       getAll: "/api/v2.5/blog/getall",
