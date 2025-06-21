@@ -25,7 +25,9 @@ apiClient.interceptors.request.use(
     return reqConfig;
   },
   (error) => {
-    toastService.error("Yêu cầu không thể gửi đi. Vui lòng kiểm tra kết nối của bạn.");
+    toastService.error(
+      "Yêu cầu không thể gửi đi. Vui lòng kiểm tra kết nối của bạn."
+    );
     return Promise.reject(error);
   }
 );
@@ -39,7 +41,7 @@ apiClient.interceptors.response.use(
     // if (response.data?.message) {
     //   toastService.success(response.data.message);
     // }
-    
+
     return response;
   },
   async (error) => {
@@ -56,7 +58,9 @@ apiClient.interceptors.response.use(
 
       // Xử lý lỗi 401 Không được phép
       if (error.response.status === 401) {
-        console.log("401 Không được phép - Token có thể không hợp lệ hoặc đã hết hạn");
+        console.log(
+          "401 Không được phép - Token có thể không hợp lệ hoặc đã hết hạn"
+        );
 
         // Thử làm mới token nếu chúng ta có
         const refreshToken = localStorage.getItem(
@@ -96,7 +100,9 @@ apiClient.interceptors.response.use(
             localStorage.removeItem("user");
             localStorage.removeItem("token_expiration");
 
-            toastService.error("Phiên của bạn đã hết hạn. Vui lòng đăng nhập lại.");
+            toastService.error(
+              "Phiên của bạn đã hết hạn. Vui lòng đăng nhập lại."
+            );
 
             // Chỉ chuyển hướng nếu chưa ở trang đăng nhập
             if (!window.location.pathname.includes("/login")) {
@@ -111,7 +117,7 @@ apiClient.interceptors.response.use(
           localStorage.removeItem("user");
           localStorage.removeItem("token_expiration");
 
-          toastService.error("Vui lòng đăng nhập để tiếp tục");
+          toastService.error(errorMessage || "Vui lòng đăng nhập lại.");
 
           // Chỉ chuyển hướng nếu chưa ở trang đăng nhập
           if (!window.location.pathname.includes("/login")) {
@@ -125,7 +131,7 @@ apiClient.interceptors.response.use(
         toastService.error("Bạn không có quyền truy cập tài nguyên này");
       } // Xử lý lỗi 404 Không tìm thấy
       if (error.response.status === 404) {
-        toastService.error("Không tìm thấy tài nguyên yêu cầu");
+        toastService.error(errorMessage);
         // Bạn cũng có thể điều hướng đến trang 404 cho các tài nguyên quan trọng
         // if (error.config.url.includes('critical-endpoint')) {
         //   window.location.href = '/not-found';
@@ -155,9 +161,7 @@ apiClient.interceptors.response.use(
         if (error.response.data) {
           toastService.error(error.response.data);
         } else {
-          toastService.error(
-            "Đã xảy ra lỗi máy chủ. Vui lòng thử lại sau."
-          );
+          toastService.error("Đã xảy ra lỗi máy chủ. Vui lòng thử lại sau.");
         }
       }
     } else if (error.request) {
@@ -293,7 +297,7 @@ const apiService = {
    * @param {Function} onProgress - Hàm gọi lại tiến trình
    * @param {Object} params - Các tham số truy vấn
    * @returns {Promise} - Promise phản hồi
-   */ 
+   */
   download: (url, onProgress = null, params = {}) => {
     return apiClient.get(url, {
       params,

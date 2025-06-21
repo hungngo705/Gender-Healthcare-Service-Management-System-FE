@@ -49,6 +49,26 @@ const testResultService = {
       return handleApiError(error, "Failed to fetch test result");
     }
   },
+
+  /**
+   * Get all test results for a specific customer
+   * @param {string} customerId - The ID of the customer
+   * @returns {Promise<Object>} Response with list of test results
+   */
+  getByCustomerId: async (customerId) => {
+    try {
+      const response = await apiService.get(
+        config.api.testResult.getByCustomerId(customerId)
+      );
+      return response.data;
+    } catch (error) {
+      return handleApiError(
+        error,
+        "Failed to fetch test results for this customer"
+      );
+    }
+  },
+
   /**
    * Create a new test result
    * @param {string} stiTestingId - The ID of the STI testing

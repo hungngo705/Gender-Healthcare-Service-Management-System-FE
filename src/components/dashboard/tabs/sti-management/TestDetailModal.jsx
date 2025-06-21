@@ -1,7 +1,15 @@
 import React, { useState, useEffect } from "react";
 import { format } from "date-fns";
 import { vi } from "date-fns/locale";
-import { X, CheckCircle, XCircle, Clipboard, RefreshCw } from "lucide-react";
+import {
+  X,
+  CheckCircle,
+  XCircle,
+  Clipboard,
+  RefreshCw,
+  Loader2,
+  AlertCircle,
+} from "lucide-react";
 import { toast } from "react-toastify";
 import stiTestingService from "../../../../services/stiTestingService";
 
@@ -33,8 +41,12 @@ function TestDetailModal({
 }) {
   const [currentTest, setCurrentTest] = useState(initialTest);
   const [isRefreshing, setIsRefreshing] = useState(false);
+  const [loadingStatusUpdate, setLoadingStatusUpdate] = useState(null);
+  // Add state for cancel confirmation
+  const [showCancelConfirmation, setShowCancelConfirmation] = useState(false);
 
   useEffect(() => {
+    // Update local state when prop changes
     setCurrentTest(initialTest);
   }, [initialTest]);
 
@@ -109,35 +121,97 @@ function TestDetailModal({
   };
 
   // Hàm xử lý khi thay đổi trạng thái
+  const initiateStatusChange = (testId, newStatus) => {
+    // Special handling for cancellation (status code 4)
+    if (newStatus === 4) {
+      setShowCancelConfirmation(true); // Show confirmation dialog instead of proceeding
+      return;
+    }
+
+    // For other statuses, proceed normally
+    handleStatusChange(testId, newStatus);
+  };
+
+  // The actual status change handler (after confirmation for cancellation)
   const handleStatusChange = async (testId, newStatus) => {
+    // Close the confirmation dialog if it was open
+    setShowCancelConfirmation(false);
+
+    // Set loading state for this specific button
+    setLoadingStatusUpdate(newStatus);
+
     try {
-      const response = await stiTestingService.updateSTITestingStatus(
+      const response = await stiTestingService.updateTestingStatus(
         testId,
         newStatus
       );
 
-      if (response.is_success) {
-        // Cập nhật dữ liệu local nếu cần
-        // ...
+      // Check for success correctly based on response structure
+      const isSuccess =
+        response?.is_success === true ||
+        response?.data?.is_success === true ||
+        response?.status === 200 ||
+        (response?.status_code >= 200 && response?.status_code < 300);
 
-        toast.success("Cập nhật trạng thái thành công");
+      if (isSuccess) {
+        // Update current test with new status
+        setCurrentTest((prev) => ({
+          ...prev,
+          status: newStatus,
+        }));
+
+        // Notify parent component about the status change
+        if (typeof onStatusChange === "function") {
+          onStatusChange(testId, newStatus);
+        }
+
+        toast.success(
+          newStatus === 4
+            ? "Xét nghiệm đã được hủy thành công"
+            : "Cập nhật trạng thái thành công"
+        );
+
+        // Set timestamps based on status
+        if (newStatus === 1 && !currentTest.sampleTakenAt) {
+          setCurrentTest((prev) => ({
+            ...prev,
+            sampleTakenAt: new Date().toISOString(),
+          }));
+        }
+
+        if (newStatus === 3 && !currentTest.completedAt) {
+          setCurrentTest((prev) => ({
+            ...prev,
+            completedAt: new Date().toISOString(),
+          }));
+        }
+
         return { success: true, data: response.data };
       } else {
-        toast.error(
-          `Lỗi: ${response.message || "Không thể cập nhật trạng thái"}`
-        );
-        return { success: false, error: response.message };
+        const errorMessage =
+          response?.message ||
+          response?.data?.message ||
+          response?.reason ||
+          "Không thể cập nhật trạng thái";
+
+        toast.error(`Lỗi: ${errorMessage}`);
+        return { success: false, error: errorMessage };
       }
     } catch (error) {
       console.error("Error updating status:", error);
-      toast.error("Lỗi khi cập nhật trạng thái");
+      toast.error(
+        "Lỗi khi cập nhật trạng thái: " + (error.message || "Unknown error")
+      );
       return { success: false, error: error.message };
+    } finally {
+      // Clear loading state when done (success or error)
+      setLoadingStatusUpdate(null);
     }
   };
 
   return (
     <div className="fixed inset-0 bg-opacity-60 backdrop-blur-sm flex justify-center items-center p-4 z-50">
-      <div className="bg-white rounded-lg p-6 max-w-4xl w-full max-h-[90vh] overflow-y-auto shadow-xl">
+      <div className="bg-white rounded-lg shadow-xl max-w-4xl w-full max-h-[90vh] overflow-y-auto">
         <div className="flex justify-between items-center mb-6">
           <h2 className="text-xl font-bold text-gray-900">
             Chi tiết xét nghiệm STI
@@ -335,28 +409,41 @@ function TestDetailModal({
                       (statusValue !== 4 &&
                         statusValue > currentTest.status + 1) ||
                       // Can't move to completed without sample
-                      (statusValue === 3 && !currentTest.sampleTakenAt);
+                      (statusValue === 3 && !currentTest.sampleTakenAt) ||
+                      // Disable during any loading state
+                      loadingStatusUpdate !== null;
+
+                    // Check if this specific button is in loading state
+                    const isLoading = loadingStatusUpdate === statusValue;
 
                     return (
                       <button
                         key={value}
-                        onClick={() =>
-                          !isDisabled &&
-                          handleStatusChange(currentTest.id, statusValue)
+                        onClick={
+                          () =>
+                            !isDisabled &&
+                            !isLoading &&
+                            initiateStatusChange(currentTest.id, statusValue) // Changed to initiateStatusChange
                         }
-                        disabled={isDisabled}
+                        disabled={isDisabled || isLoading}
                         className={`flex items-center justify-between py-2 px-4 rounded-md ${
                           currentTest.status === statusValue
                             ? "bg-indigo-600 text-white"
                             : isDisabled
                             ? "bg-gray-100 text-gray-400 cursor-not-allowed"
+                            : statusValue === 4
+                            ? "bg-white border border-red-300 text-red-700 hover:bg-red-50" // Special styling for cancel button
                             : "bg-white border border-gray-300 text-gray-700 hover:bg-gray-50"
                         }`}
                       >
                         <span>{label}</span>
-                        {currentTest.status === statusValue && (
+
+                        {/* Show loading spinner when this button is updating */}
+                        {isLoading ? (
+                          <Loader2 size={18} className="animate-spin" />
+                        ) : currentTest.status === statusValue ? (
                           <CheckCircle size={18} className="text-white" />
-                        )}
+                        ) : null}
                       </button>
                     );
                   }
@@ -409,6 +496,65 @@ function TestDetailModal({
           </button>
         </div>
       </div>
+
+      {/* Cancel Confirmation Dialog */}
+      {showCancelConfirmation && (
+        <div className="fixed inset-0 bg-black bg-opacity-50 backdrop-blur-sm flex justify-center items-center p-4 z-[60]">
+          <div className="bg-white rounded-lg p-6 max-w-md w-full shadow-xl">
+            <div className="mb-5 text-center">
+              <div className="mx-auto flex items-center justify-center h-12 w-12 rounded-full bg-red-100">
+                <AlertCircle className="h-6 w-6 text-red-600" />
+              </div>
+              <h3 className="text-lg font-medium text-gray-900 mt-3">
+                Xác nhận hủy xét nghiệm
+              </h3>
+            </div>
+
+            <div className="mt-2 mb-5">
+              <p className="text-sm text-gray-500">
+                Bạn có chắc chắn muốn hủy xét nghiệm này không? Hành động này
+                không thể hoàn tác và có thể ảnh hưởng đến lịch hẹn của khách
+                hàng.
+              </p>
+
+              <div className="mt-4 bg-gray-50 p-3 rounded-md border border-gray-200">
+                <p className="text-sm font-medium text-gray-900">
+                  Thông tin xét nghiệm:
+                </p>
+                <p className="text-sm text-gray-500 mt-1">
+                  <span className="font-medium">Khách hàng:</span>{" "}
+                  {currentTest.customer?.name || "N/A"}
+                </p>
+                <p className="text-sm text-gray-500">
+                  <span className="font-medium">Ngày hẹn:</span>{" "}
+                  {formatDate(currentTest.scheduleDate)}
+                </p>
+                <p className="text-sm text-gray-500">
+                  <span className="font-medium">Trạng thái hiện tại:</span>{" "}
+                  {statusLabels[currentTest.status]?.label || "Không xác định"}
+                </p>
+              </div>
+            </div>
+
+            <div className="flex justify-end space-x-3">
+              <button
+                type="button"
+                className="px-3 py-2 bg-white text-gray-700 border border-gray-300 rounded-md shadow-sm hover:bg-gray-50 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-indigo-500"
+                onClick={() => setShowCancelConfirmation(false)}
+              >
+                Không hủy
+              </button>
+              <button
+                type="button"
+                className="px-3 py-2 bg-red-600 text-white rounded-md shadow-sm hover:bg-red-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-red-500"
+                onClick={() => handleStatusChange(currentTest.id, 4)}
+              >
+                Xác nhận hủy
+              </button>
+            </div>
+          </div>
+        </div>
+      )}
     </div>
   );
 }

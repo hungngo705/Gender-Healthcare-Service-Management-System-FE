@@ -213,7 +213,6 @@ function STITestingManagementTab() {
       console.log("API Response:", response);
 
       if (response?.data?.is_success) {
-        toast.success("Trạng thái đã được cập nhật thành công");
         fetchTests(); // Refresh the list
       } else {
         console.error("API returned error:", response?.data);
