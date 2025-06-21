@@ -1,7 +1,9 @@
-import React from "react";
+import React, { useState, useEffect } from "react";
 import { format } from "date-fns";
 import { vi } from "date-fns/locale";
-import { X, CheckCircle, XCircle, AlertCircle } from "lucide-react";
+import { X, CheckCircle, XCircle, Clipboard, RefreshCw } from "lucide-react";
+import { toast } from "react-toastify";
+import stiTestingService from "../../../../services/stiTestingService";
 
 const slotLabels = {
   0: "Sáng (8:00 - 12:00)",
@@ -23,24 +25,19 @@ const statusLabels = {
   4: { label: "Đã hủy", color: "bg-red-100 text-red-800" },
 };
 
-// Parameters for STI tests
-const parameterLabels = {
-  0: "HIV",
-  1: "Giang mai",
-  2: "Lậu",
-  3: "Chlamydia",
-  4: "Viêm gan B",
-  5: "Viêm gan C",
-};
+function TestDetailModal({
+  test: initialTest,
+  onClose,
+  onStatusChange,
+  onShowResults,
+}) {
+  const [currentTest, setCurrentTest] = useState(initialTest);
+  const [isRefreshing, setIsRefreshing] = useState(false);
 
-// Outcome for test results
-const outcomeLabels = {
-  0: { label: "Âm tính", color: "text-green-600" },
-  1: { label: "Dương tính", color: "text-red-600" },
-  2: { label: "Không xác định", color: "text-yellow-600" },
-};
+  useEffect(() => {
+    setCurrentTest(initialTest);
+  }, [initialTest]);
 
-function TestDetailModal({ test, onClose, onStatusChange }) {
   const formatDate = (dateString) => {
     if (!dateString) return "N/A";
     try {
@@ -87,6 +84,57 @@ function TestDetailModal({ test, onClose, onStatusChange }) {
       return parameterCount * parameterPrice;
     }
   };
+
+  // Hàm để tải lại dữ liệu xét nghiệm từ server
+  const refreshTestData = async () => {
+    if (!currentTest?.id) return;
+
+    setIsRefreshing(true);
+    try {
+      const response = await stiTestingService.getSTITestingById(
+        currentTest.id
+      );
+      if (response?.is_success) {
+        setCurrentTest(response.data);
+        toast.success("Đã cập nhật thông tin xét nghiệm");
+      } else {
+        toast.warning("Không thể tải lại thông tin xét nghiệm");
+      }
+    } catch (error) {
+      console.error("Error refreshing test data:", error);
+      toast.error("Lỗi khi tải lại thông tin xét nghiệm");
+    } finally {
+      setIsRefreshing(false);
+    }
+  };
+
+  // Hàm xử lý khi thay đổi trạng thái
+  const handleStatusChange = async (testId, newStatus) => {
+    try {
+      const response = await stiTestingService.updateSTITestingStatus(
+        testId,
+        newStatus
+      );
+
+      if (response.is_success) {
+        // Cập nhật dữ liệu local nếu cần
+        // ...
+
+        toast.success("Cập nhật trạng thái thành công");
+        return { success: true, data: response.data };
+      } else {
+        toast.error(
+          `Lỗi: ${response.message || "Không thể cập nhật trạng thái"}`
+        );
+        return { success: false, error: response.message };
+      }
+    } catch (error) {
+      console.error("Error updating status:", error);
+      toast.error("Lỗi khi cập nhật trạng thái");
+      return { success: false, error: error.message };
+    }
+  };
+
   return (
     <div className="fixed inset-0 bg-opacity-60 backdrop-blur-sm flex justify-center items-center p-4 z-50">
       <div className="bg-white rounded-lg p-6 max-w-4xl w-full max-h-[90vh] overflow-y-auto shadow-xl">
@@ -103,7 +151,34 @@ function TestDetailModal({ test, onClose, onStatusChange }) {
           </button>
         </div>
 
+        {/* Navigation buttons with refresh button */}
+        <div className="mb-6 flex justify-between items-center">
+          <div className="flex items-center">
+            <h3 className="text-lg font-medium">Thông tin chi tiết</h3>
+            <button
+              onClick={refreshTestData}
+              disabled={isRefreshing}
+              className="ml-2 text-indigo-600 hover:text-indigo-800 p-1 rounded-full hover:bg-indigo-50"
+              title="Tải lại thông tin"
+            >
+              <RefreshCw
+                size={18}
+                className={isRefreshing ? "animate-spin" : ""}
+              />
+            </button>
+          </div>
+          <button
+            onClick={() => onShowResults(currentTest)}
+            className="bg-indigo-600 hover:bg-indigo-700 text-white py-2 px-4 rounded-md flex items-center"
+          >
+            <Clipboard size={18} className="mr-2" />
+            Xem kết quả xét nghiệm
+          </button>
+        </div>
+
+        {/* Thông tin chi tiết - Sử dụng currentTest thay vì test */}
         <div className="grid grid-cols-1 md:grid-cols-2 gap-6 mb-6">
+          {/* Customer information */}
           <div className="space-y-4">
             <h3 className="text-lg font-medium text-gray-900">
               Thông tin khách hàng
@@ -112,13 +187,13 @@ function TestDetailModal({ test, onClose, onStatusChange }) {
               <div className="mb-3">
                 <span className="block text-sm text-gray-500">Họ tên</span>
                 <span className="block font-medium">
-                  {test.customer?.name || "N/A"}
+                  {currentTest.customer?.name || "N/A"}
                 </span>
               </div>
               <div className="mb-3">
                 <span className="block text-sm text-gray-500">Email</span>
                 <span className="block font-medium">
-                  {test.customer?.email || "N/A"}
+                  {currentTest.customer?.email || "N/A"}
                 </span>
               </div>
               <div className="mb-3">
@@ -126,18 +201,19 @@ function TestDetailModal({ test, onClose, onStatusChange }) {
                   Số điện thoại
                 </span>
                 <span className="block font-medium">
-                  {test.customer?.phoneNumber || "N/A"}
+                  {currentTest.customer?.phoneNumber || "N/A"}
                 </span>
               </div>
               <div>
                 <span className="block text-sm text-gray-500">Địa chỉ</span>
                 <span className="block font-medium">
-                  {test.customer?.address || "N/A"}
+                  {currentTest.customer?.address || "N/A"}
                 </span>
               </div>
             </div>
           </div>
 
+          {/* Appointment information */}
           <div className="space-y-4">
             <h3 className="text-lg font-medium text-gray-900">
               Thông tin lịch hẹn
@@ -146,30 +222,30 @@ function TestDetailModal({ test, onClose, onStatusChange }) {
               <div className="mb-3">
                 <span className="block text-sm text-gray-500">Ngày hẹn</span>
                 <span className="block font-medium">
-                  {formatDate(test.scheduleDate)}
+                  {formatDate(currentTest.scheduleDate)}
                 </span>
               </div>
               <div className="mb-3">
                 <span className="block text-sm text-gray-500">Khung giờ</span>
                 <span className="block font-medium">
-                  {slotLabels[test.slot] || "N/A"}
+                  {slotLabels[currentTest.slot] || "N/A"}
                 </span>
               </div>
               <div className="mb-3">
                 <span className="block text-sm text-gray-500">Ghi chú</span>
                 <span className="block font-medium">
-                  {test.notes || "Không có ghi chú"}
+                  {currentTest.notes || "Không có ghi chú"}
                 </span>
               </div>
               <div>
                 <span className="block text-sm text-gray-500">Trạng thái</span>
                 <span
                   className={`inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium ${
-                    statusLabels[test.status]?.color ||
+                    statusLabels[currentTest.status]?.color ||
                     "bg-gray-100 text-gray-800"
                   }`}
                 >
-                  {statusLabels[test.status]?.label || "Không xác định"}
+                  {statusLabels[currentTest.status]?.label || "Không xác định"}
                 </span>
               </div>
             </div>
@@ -177,6 +253,7 @@ function TestDetailModal({ test, onClose, onStatusChange }) {
         </div>
 
         <div className="grid grid-cols-1 md:grid-cols-2 gap-6 mb-6">
+          {/* Test information */}
           <div className="space-y-4">
             <h3 className="text-lg font-medium text-gray-900">
               Thông tin xét nghiệm
@@ -187,7 +264,7 @@ function TestDetailModal({ test, onClose, onStatusChange }) {
                   ID xét nghiệm
                 </span>
                 <span className="block font-medium break-all">
-                  {test.id || "N/A"}
+                  {currentTest.id || "N/A"}
                 </span>
               </div>
               <div className="mb-3">
@@ -195,7 +272,8 @@ function TestDetailModal({ test, onClose, onStatusChange }) {
                   Gói xét nghiệm
                 </span>
                 <span className="block font-medium">
-                  {testPackageLabels[test.testPackage] || "Không xác định"}
+                  {testPackageLabels[currentTest.testPackage] ||
+                    "Không xác định"}
                 </span>
               </div>
               <div className="mb-3">
@@ -203,7 +281,7 @@ function TestDetailModal({ test, onClose, onStatusChange }) {
                   Thời gian lấy mẫu
                 </span>
                 <span className="block font-medium">
-                  {formatDateTime(test.sampleTakenAt) || "Chưa lấy mẫu"}
+                  {formatDateTime(currentTest.sampleTakenAt) || "Chưa lấy mẫu"}
                 </span>
               </div>
               <div className="mb-3">
@@ -211,30 +289,31 @@ function TestDetailModal({ test, onClose, onStatusChange }) {
                   Thời gian hoàn thành
                 </span>
                 <span className="block font-medium">
-                  {formatDateTime(test.completedAt) || "Chưa hoàn thành"}
+                  {formatDateTime(currentTest.completedAt) || "Chưa hoàn thành"}
                 </span>
               </div>
               <div className="mb-3">
                 <span className="block text-sm text-gray-500">Giá tiền</span>
                 <span className="block font-medium">
-                  {formatCurrency(calculatePrice(test))}
+                  {formatCurrency(calculatePrice(currentTest))}
                 </span>
               </div>
               <div>
                 <span className="block text-sm text-gray-500">Thanh toán</span>
                 <span
                   className={`inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium ${
-                    test.isPaid
+                    currentTest.isPaid
                       ? "bg-green-100 text-green-800"
                       : "bg-red-100 text-red-800"
                   }`}
                 >
-                  {test.isPaid ? "Đã thanh toán" : "Chưa thanh toán"}
+                  {currentTest.isPaid ? "Đã thanh toán" : "Chưa thanh toán"}
                 </span>
               </div>
             </div>
           </div>
 
+          {/* Status management - Sử dụng handleStatusChange mới */}
           <div className="space-y-4">
             <h3 className="text-lg font-medium text-gray-900">
               Quản lý trạng thái
@@ -251,21 +330,23 @@ function TestDetailModal({ test, onClose, onStatusChange }) {
                     // Disable status if it's not a valid transition
                     const isDisabled =
                       // Can't go back to previous states
-                      test.status > statusValue ||
+                      currentTest.status > statusValue ||
                       // Can't skip steps (except cancellation)
-                      (statusValue !== 4 && statusValue > test.status + 1) ||
+                      (statusValue !== 4 &&
+                        statusValue > currentTest.status + 1) ||
                       // Can't move to completed without sample
-                      (statusValue === 3 && !test.sampleTakenAt);
+                      (statusValue === 3 && !currentTest.sampleTakenAt);
 
                     return (
                       <button
                         key={value}
                         onClick={() =>
-                          !isDisabled && onStatusChange(test.id, statusValue)
+                          !isDisabled &&
+                          handleStatusChange(currentTest.id, statusValue)
                         }
                         disabled={isDisabled}
                         className={`flex items-center justify-between py-2 px-4 rounded-md ${
-                          test.status === statusValue
+                          currentTest.status === statusValue
                             ? "bg-indigo-600 text-white"
                             : isDisabled
                             ? "bg-gray-100 text-gray-400 cursor-not-allowed"
@@ -273,7 +354,7 @@ function TestDetailModal({ test, onClose, onStatusChange }) {
                         }`}
                       >
                         <span>{label}</span>
-                        {test.status === statusValue && (
+                        {currentTest.status === statusValue && (
                           <CheckCircle size={18} className="text-white" />
                         )}
                       </button>
@@ -282,34 +363,35 @@ function TestDetailModal({ test, onClose, onStatusChange }) {
                 )}
               </div>
 
+              {/* Thông báo theo trạng thái - thay test bằng currentTest */}
               <div className="text-sm text-gray-500 pt-2">
-                {test.status === 0 && (
+                {currentTest.status === 0 && (
                   <p className="flex items-center">
-                    <AlertCircle size={16} className="mr-1 text-blue-500" />
+                    <span className="mr-1 text-blue-500">ℹ️</span>
                     Sau khi lấy mẫu, cập nhật trạng thái để bắt đầu xử lý
                   </p>
                 )}
-                {test.status === 1 && (
+                {currentTest.status === 1 && (
                   <p className="flex items-center">
-                    <AlertCircle size={16} className="mr-1 text-yellow-500" />
+                    <span className="mr-1 text-yellow-500">⚠️</span>
                     Tiếp tục quy trình xử lý mẫu
                   </p>
                 )}
-                {test.status === 2 && (
+                {currentTest.status === 2 && (
                   <p className="flex items-center">
-                    <AlertCircle size={16} className="mr-1 text-purple-500" />
+                    <span className="mr-1 text-purple-500">🔍</span>
                     Nhập kết quả xét nghiệm để hoàn thành
                   </p>
                 )}
-                {test.status === 3 && (
+                {currentTest.status === 3 && (
                   <p className="flex items-center">
-                    <CheckCircle size={16} className="mr-1 text-green-500" />
+                    <span className="mr-1 text-green-500">✓</span>
                     Xét nghiệm đã hoàn thành
                   </p>
                 )}
-                {test.status === 4 && (
+                {currentTest.status === 4 && (
                   <p className="flex items-center">
-                    <XCircle size={16} className="mr-1 text-red-500" />
+                    <span className="mr-1 text-red-500">✗</span>
                     Xét nghiệm đã bị hủy
                   </p>
                 )}
@@ -318,73 +400,7 @@ function TestDetailModal({ test, onClose, onStatusChange }) {
           </div>
         </div>
 
-        {/* Test Results Section */}
-        <div className="space-y-4 mb-6">
-          <h3 className="text-lg font-medium text-gray-900">
-            Kết quả xét nghiệm
-          </h3>
-
-          {test.testResult && test.testResult.length > 0 ? (
-            <div className="overflow-x-auto">
-              <table className="min-w-full divide-y divide-gray-200">
-                <thead className="bg-gray-50">
-                  <tr>
-                    <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
-                      Thông số
-                    </th>
-                    <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
-                      Kết quả
-                    </th>
-                    <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
-                      Ghi chú
-                    </th>
-                    <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
-                      Nhân viên xử lý
-                    </th>
-                    <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
-                      Thời gian
-                    </th>
-                  </tr>
-                </thead>
-                <tbody className="bg-white divide-y divide-gray-200">
-                  {test.testResult.map((result) => (
-                    <tr key={result.id}>
-                      <td className="px-6 py-4 whitespace-nowrap text-sm font-medium text-gray-900">
-                        {parameterLabels[result.parameter] || "Không xác định"}
-                      </td>
-                      <td className="px-6 py-4 whitespace-nowrap">
-                        <span
-                          className={`inline-block font-medium ${
-                            outcomeLabels[result.outcome]?.color ||
-                            "text-gray-700"
-                          }`}
-                        >
-                          {outcomeLabels[result.outcome]?.label ||
-                            "Không xác định"}
-                        </span>
-                      </td>
-                      <td className="px-6 py-4 text-sm text-gray-500">
-                        {result.comments || "Không có ghi chú"}
-                      </td>
-                      <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-500">
-                        {result.staff?.name || "N/A"}
-                      </td>
-                      <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-500">
-                        {formatDateTime(result.processedAt)}
-                      </td>
-                    </tr>
-                  ))}
-                </tbody>
-              </table>
-            </div>
-          ) : (
-            <div className="bg-gray-50 p-6 rounded-lg text-center">
-              <p className="text-gray-500">Chưa có kết quả xét nghiệm</p>
-            </div>
-          )}
-        </div>
-
-        <div className="flex justify-end">
+        <div className="flex justify-end mt-6">
           <button
             onClick={onClose}
             className="px-4 py-2 bg-gray-100 text-gray-700 rounded-md hover:bg-gray-200 transition"

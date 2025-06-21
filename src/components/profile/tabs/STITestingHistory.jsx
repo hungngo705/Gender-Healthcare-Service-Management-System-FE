@@ -1,11 +1,36 @@
 import { useState, useEffect } from "react";
 import { toast } from "react-toastify";
 import stiTestingService from "../../../services/stiTestingService";
+import paymentService from "../../../services/paymentService"; // Add this import
 import { useAuth } from "../../../contexts/AuthContext";
 import {
   STI_PACKAGES,
   STI_TEST_TYPES,
 } from "../../sti/booking-components/constants";
+
+// Correctly defined package labels - moved outside component for global access
+const testPackageLabels = {
+  0: "Gói Cơ Bản", // Basic = 0
+  1: "Gói Nâng Cao", // Advanced = 1
+  2: "Gói Tùy Chọn", // Custom = 2
+};
+
+// Time slot enum - synchronized with BookingForm
+const slotLabels = {
+  0: "Sáng sớm (7:00-10:00)",
+  1: "Trưa (10:00-13:00)",
+  2: "Chiều (13:00-16:00)",
+  3: "Tối (16:00-19:00)",
+};
+
+// Status labels for test status
+const statusLabels = {
+  0: "Đã lên lịch",
+  1: "Đã lấy mẫu",
+  2: "Đang xử lý",
+  3: "Hoàn thành",
+  4: "Đã hủy",
+};
 
 function STITestingHistory({ userId }) {
   const { currentUser } = useAuth();
@@ -14,8 +39,31 @@ function STITestingHistory({ userId }) {
   const [isLoading, setIsLoading] = useState(false);
   const [selectedTest, setSelectedTest] = useState(null);
   const [showModal, setShowModal] = useState(false);
-  const [filterStatus, setFilterStatus] = useState("all"); // 'all', '0' (pending), '1' (completed)  const [searchText, setSearchText] = useState("");
+  const [filterStatus, setFilterStatus] = useState("all");
   const [searchText, setSearchText] = useState("");
+  const [isRedirecting, setIsRedirecting] = useState(false);
+
+  // Add these state variables below your existing states
+  const [startDate, setStartDate] = useState("");
+  const [endDate, setEndDate] = useState("");
+  const [isDateFilterActive, setIsDateFilterActive] = useState(false);
+
+  // Thêm state cho bộ lọc slot
+  const [filterSlot, setFilterSlot] = useState("all");
+
+  // Define parameter labels for consistent naming
+  const testParamLabels = {
+    0: "Chlamydia", // Chlamydia = 0 in API
+    1: "Lậu", // Gonorrhoeae = 1 in API
+    2: "Giang mai", // Syphilis = 2 in API
+    3: "HIV", // HIV = 3 in API
+    4: "Herpes", // Herpes = 4 in API
+    5: "Viêm gan B", // HepatitisB = 5 in API
+    6: "Viêm gan C", // HepatitisC = 6 in API
+    7: "Trichomonas", // Trichomonas = 7 in API
+    8: "Mycoplasma Genitalium", // MycoplasmaGenitalium = 8 in API
+  };
+
   // Hàm tiện ích để lấy class màu sắc cho trạng thái
   const getStatusColorClass = (status) => {
     switch (status) {
@@ -116,6 +164,23 @@ function STITestingHistory({ userId }) {
       result = result.filter((test) => test.status === statusNum);
     }
 
+    // Filter by slot
+    if (filterSlot !== "all") {
+      const slotNum = parseInt(filterSlot, 10);
+      result = result.filter((test) => test.slot === slotNum);
+    }
+
+    // Filter by date range
+    if (isDateFilterActive && startDate && endDate) {
+      const startDateTime = new Date(startDate).setHours(0, 0, 0, 0);
+      const endDateTime = new Date(endDate).setHours(23, 59, 59, 999);
+
+      result = result.filter((test) => {
+        const testDate = new Date(test.scheduleDate || test.createdAt).getTime();
+        return testDate >= startDateTime && testDate <= endDateTime;
+      });
+    }
+
     // Filter by search text
     if (searchText.trim()) {
       const searchLower = searchText.toLowerCase().trim();
@@ -138,13 +203,77 @@ function STITestingHistory({ userId }) {
     }
 
     setFilteredTests(result);
-  }, [userTests, filterStatus, searchText]);
+  }, [
+    userTests,
+    filterStatus,
+    filterSlot, // Thêm filterSlot vào dependencies
+    searchText,
+    startDate,
+    endDate,
+    isDateFilterActive,
+  ]);
 
   const getPackagePrice = (packageId) => {
     const pkg = STI_PACKAGES.find((pkg) => pkg.id === packageId);
     return pkg ? pkg.price : 0;
   };
 
+  // Update the handlePaymentRedirect function
+  const handlePaymentRedirect = async (test) => {
+    setIsRedirecting(true);
+
+    try {
+      // Use the existing createPayment function
+      const paymentResult = await paymentService.createPayment(
+        test.id, // The ID of the existing test
+        "vnpay" // Default payment method
+      );
+
+      if (paymentResult.success && paymentResult.data?.paymentUrl) {
+        // Redirect to the payment URL
+        window.location.href = paymentResult.data.paymentUrl;
+      } else {
+        toast.error(
+          "Không thể tạo liên kết thanh toán: " +
+            (paymentResult.error || "Lỗi không xác định")
+        );
+        setIsRedirecting(false);
+      }
+    } catch (error) {
+      console.error("Payment redirect error:", error);
+      toast.error(
+        "Lỗi khi tạo liên kết thanh toán: " +
+          (error.message || "Lỗi không xác định")
+      );
+      setIsRedirecting(false);
+    }
+  };
+
+  // Add a function to handle resetting the date filter
+  const resetDateFilter = () => {
+    setStartDate("");
+    setEndDate("");
+    setIsDateFilterActive(false);
+  };
+
+  // Add a function to apply the date filter
+  const applyDateFilter = () => {
+    if (startDate && endDate) {
+      setIsDateFilterActive(true);
+    } else {
+      toast.warning("Vui lòng chọn cả ngày bắt đầu và ngày kết thúc");
+    }
+  };
+
+  // Hàm reset tất cả các bộ lọc
+  const resetAllFilters = () => {
+    setFilterStatus("all");
+    setFilterSlot("all");
+    setStartDate("");
+    setEndDate("");
+    setIsDateFilterActive(false);
+    setSearchText("");
+  };
 
   if (isLoading) {
     return (
@@ -204,51 +333,191 @@ function STITestingHistory({ userId }) {
       <h4 className="text-lg font-medium text-gray-900 mb-4">
         Lịch Sử Xét Nghiệm STI
       </h4>
-      {/* Search and Filter Bar */}
-      <div className="mb-6 flex flex-col sm:flex-row gap-4 items-center justify-between">
-        <div className="relative w-full sm:w-64">
-          <div className="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
-            <svg
-              className="h-5 w-5 text-gray-400"
-              fill="currentColor"
-              viewBox="0 0 20 20"
-            >
-              <path
-                fillRule="evenodd"
-                d="M8 4a4 4 0 100 8 4 4 0 000-8zM2 8a6 6 0 1110.89 3.476l4.817 4.817a1 1 0 01-1.414 1.414l-4.816-4.816A6 6 0 012 8z"
-                clipRule="evenodd"
-              />
-            </svg>
+      {/* Search and Filter Bar - Updated with date range */}
+      <div className="mb-6 space-y-4">
+        <div className="flex flex-col sm:flex-row gap-4 items-center justify-between">
+          <div className="relative w-full sm:w-64">
+            <div className="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
+              <svg
+                className="h-5 w-5 text-gray-400"
+                fill="currentColor"
+                viewBox="0 0 20 20"
+              >
+                <path
+                  fillRule="evenodd"
+                  d="M8 4a4 4 0 100 8 4 4 0 000-8zM2 8a6 6 0 1110.89 3.476l4.817 4.817a1 1 0 01-1.414 1.414l-4.816-4.816A6 6 0 012 8z"
+                  clipRule="evenodd"
+                />
+              </svg>
+            </div>
+            <input
+              type="text"
+              className="w-full pl-10 pr-4 py-2 border border-gray-300 rounded-md focus:ring-indigo-500 focus:border-indigo-500"
+              placeholder="Tìm kiếm xét nghiệm..."
+              value={searchText}
+              onChange={(e) => setSearchText(e.target.value)}
+            />
           </div>
-          <input
-            type="text"
-            className="w-full pl-10 pr-4 py-2 border border-gray-300 rounded-md focus:ring-indigo-500 focus:border-indigo-500"
-            placeholder="Tìm kiếm xét nghiệm..."
-            value={searchText}
-            onChange={(e) => setSearchText(e.target.value)}
-          />
+
+          <div className="flex flex-col sm:flex-row gap-2">
+            {/* Bộ lọc trạng thái */}
+            <div className="flex items-center space-x-2">
+              <label
+                htmlFor="filterStatus"
+                className="text-sm font-medium text-gray-700 whitespace-nowrap"
+              >
+                Trạng thái:
+              </label>
+              <select
+                id="filterStatus"
+                className="border border-gray-300 rounded-md px-3 py-2 focus:ring-indigo-500 focus:border-indigo-500"
+                value={filterStatus}
+                onChange={(e) => setFilterStatus(e.target.value)}
+              >
+                <option value="all">Tất cả</option>
+                <option value="0">Đã lên lịch</option>
+                <option value="1">Đã lấy mẫu</option>
+                <option value="2">Đang xử lý</option>
+                <option value="3">Hoàn thành</option>
+                <option value="4">Đã hủy</option>
+              </select>
+            </div>
+
+            {/* Bộ lọc khung giờ */}
+            <div className="flex items-center space-x-2">
+              <label
+                htmlFor="filterSlot"
+                className="text-sm font-medium text-gray-700 whitespace-nowrap"
+              >
+                Khung giờ:
+              </label>
+              <select
+                id="filterSlot"
+                className="border border-gray-300 rounded-md px-3 py-2 focus:ring-indigo-500 focus:border-indigo-500"
+                value={filterSlot}
+                onChange={(e) => setFilterSlot(e.target.value)}
+              >
+                <option value="all">Tất cả</option>
+                <option value="0">Sáng sớm (7:00 - 10:00)</option>
+                <option value="1">Trưa (10:00 - 13:00)</option>
+                <option value="2">Chiều (13:00 - 16:00)</option>
+                <option value="3">Tối (16:00 - 19:00)</option>
+              </select>
+            </div>
+          </div>
         </div>
 
-        <div className="flex items-center space-x-2">
-          <label
-            htmlFor="filterStatus"
-            className="text-sm font-medium text-gray-700"
-          >
-            Trạng thái:
-          </label>
-          <select
-            id="filterStatus"
-            className="border border-gray-300 rounded-md px-3 py-2 focus:ring-indigo-500 focus:border-indigo-500"
-            value={filterStatus}
-            onChange={(e) => setFilterStatus(e.target.value)}
-          >
-            <option value="all">Tất cả</option>
-            <option value="0">Đã lên lịch</option>
-            <option value="1">Đã lấy mẫu</option>
-            <option value="2">Đang xử lý</option>
-            <option value="3">Hoàn thành</option>
-            <option value="4">Đã hủy</option>
-          </select>
+        {/* Date Range Filter */}
+        <div className="flex flex-col sm:flex-row items-center gap-3 bg-gray-50 p-3 rounded-lg border border-gray-200">
+          <div className="flex items-center">
+            <svg
+              className="w-5 h-5 text-gray-500 mr-2"
+              fill="none"
+              stroke="currentColor"
+              viewBox="0 0 24 24"
+              xmlns="http://www.w3.org/2000/svg"
+            >
+              <path
+                strokeLinecap="round"
+                strokeLinejoin="round"
+                strokeWidth="2"
+                d="M8 7V3m8 4V3m-9 8h10M5 21h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z"
+              ></path>
+            </svg>
+            <span className="text-sm font-medium text-gray-700">
+              Khoảng thời gian:
+            </span>
+          </div>
+
+          <div className="flex flex-col sm:flex-row gap-3 flex-grow">
+            <div className="flex flex-col sm:flex-row items-center gap-2">
+              <label
+                htmlFor="startDate"
+                className="text-sm text-gray-500 whitespace-nowrap"
+              >
+                Từ ngày:
+              </label>
+              <input
+                type="date"
+                id="startDate"
+                className="border border-gray-300 rounded-md px-3 py-2 focus:ring-indigo-500 focus:border-indigo-500 text-sm"
+                value={startDate}
+                onChange={(e) => setStartDate(e.target.value)}
+                max={endDate || undefined}
+              />
+            </div>
+
+            <div className="flex flex-col sm:flex-row items-center gap-2">
+              <label
+                htmlFor="endDate"
+                className="text-sm text-gray-500 whitespace-nowrap"
+              >
+                Đến ngày:
+              </label>
+              <input
+                type="date"
+                id="endDate"
+                className="border border-gray-300 rounded-md px-3 py-2 focus:ring-indigo-500 focus:border-indigo-500 text-sm"
+                value={endDate}
+                onChange={(e) => setEndDate(e.target.value)}
+                min={startDate || undefined}
+              />
+            </div>
+
+            <div className="flex gap-2 ml-auto">
+              <button
+                type="button"
+                className="px-3 py-2 bg-indigo-600 text-white text-sm rounded-md hover:bg-indigo-700 focus:outline-none"
+                onClick={applyDateFilter}
+              >
+                Áp dụng
+              </button>
+              <button
+                type="button"
+                className="px-3 py-2 border border-gray-300 text-gray-700 text-sm rounded-md hover:bg-gray-100 focus:outline-none"
+                onClick={resetDateFilter}
+              >
+                Đặt lại
+              </button>
+            </div>
+          </div>
+        </div>
+
+        {/* Show active filters */}
+        <div className="flex flex-wrap gap-2">
+          {isDateFilterActive && startDate && endDate && (
+            <div className="flex items-center bg-blue-50 p-2 rounded-md">
+              <span className="text-xs text-blue-700 mr-2">Khoảng thời gian:</span>
+              <span className="text-xs bg-blue-100 text-blue-800 px-2 py-1 rounded flex items-center">
+                {`${formatDate(startDate)} - ${formatDate(endDate)}`}
+                <button
+                  onClick={resetDateFilter}
+                  className="ml-1 text-blue-600 hover:text-blue-800"
+                >
+                  <svg className="w-3 h-3" fill="currentColor" viewBox="0 0 20 20" xmlns="http://www.w3.org/2000/svg">
+                    <path fillRule="evenodd" d="M4.293 4.293a1 1 0 011.414 0L10 8.586l4.293-4.293a1 1 0 111.414 1.414L11.414 10l4.293 4.293a1 1 0 01-1.414 1.414L10 11.414l-4.293 4.293a1 1 0 01-1.414-1.414L8.586 10 4.293 5.707a1 1 0 010-1.414z" clipRule="evenodd"></path>
+                  </svg>
+                </button>
+              </span>
+            </div>
+          )}
+          
+          {filterSlot !== "all" && (
+            <div className="flex items-center bg-purple-50 p-2 rounded-md">
+              <span className="text-xs text-purple-700 mr-2">Khung giờ:</span>
+              <span className="text-xs bg-purple-100 text-purple-800 px-2 py-1 rounded flex items-center">
+                {slotLabels[parseInt(filterSlot, 10)]}
+                <button
+                  onClick={() => setFilterSlot("all")}
+                  className="ml-1 text-purple-600 hover:text-purple-800"
+                >
+                  <svg className="w-3 h-3" fill="currentColor" viewBox="0 0 20 20" xmlns="http://www.w3.org/2000/svg">
+                    <path fillRule="evenodd" d="M4.293 4.293a1 1 0 011.414 0L10 8.586l4.293-4.293a1 1 0 111.414 1.414L11.414 10l4.293 4.293a1 1 0 01-1.414 1.414L10 11.414l-4.293 4.293a1 1 0 01-1.414-1.414L8.586 10 4.293 5.707a1 1 0 010-1.414z" clipRule="evenodd"></path>
+                  </svg>
+                </button>
+              </span>
+            </div>
+          )}
         </div>
       </div>
       <div className="bg-white shadow-md rounded-lg overflow-auto">
@@ -290,35 +559,6 @@ function STITestingHistory({ userId }) {
           <tbody className="bg-white divide-y divide-gray-200">
             {filteredTests.length > 0 ? (
               filteredTests.map((test) => {
-                // Định nghĩa các package xét nghiệm theo enum TestPackage
-                const testPackageLabels = {
-                  0: "Gói Toàn diện", // Basic
-                  1: "Gói Cơ Bản", // Custom 3
-                  2: "Gói Tùy Chọn", // Complete
-                };
-
-                // Định nghĩa các tham số xét nghiệm theo enum TestParameter
-                const testParamLabels = {
-                  0: "Chlamydia",
-                  1: "Gonorrhea (Lậu)",
-                  2: "Syphilis (Giang mai)",
-                  3: "HIV",
-                  4: "Hepatitis B (Viêm gan B)",
-                  5: "Hepatitis C (Viêm gan C)",
-                  6: "Herpes",
-                  7: "HPV",
-                  8: "Mycoplasma",
-                  9: "Trichomonas",
-                };
-
-                // Định nghĩa trạng thái xét nghiệm theo enum TestingStatus
-                const statusLabels = {
-                  0: "Đã lên lịch", // Scheduled
-                  1: "Đã lấy mẫu", // SampleTaken
-                  2: "Đang xử lý", // Processing
-                  3: "Hoàn thành", // Completed
-                  4: "Đã hủy", // Cancelled                }; // Không cần format date ở đây nữa vì chúng ta có hàm formatDate
-                };
                 return (
                   <tr key={test.id}>
                     {/* Ngày xét nghiệm */}
@@ -558,32 +798,17 @@ function STITestingHistory({ userId }) {
                         {!test.isPaid && test.status === 0 && (
                           <button
                             className="text-white bg-green-600 hover:bg-green-700 focus:outline-none px-3 py-1 rounded-md text-xs"
-                            onClick={() => {
-                              // Tạo object dữ liệu thanh toán đầy đủ
-                              const paymentData = {
-                                testId: test.id,
-                                amount: test.totalPrice,
-                                returnUrl: window.location.pathname,
-                                testType:
-                                  testPackageLabels[test.testPackage] ||
-                                  "Xét nghiệm STI",
-                                testDate: formatDate(
-                                  test.scheduleDate || test.createdAt
-                                ),
-                                testParam: test.customParameters || [],
-                              };
-
-                              // Lưu vào localStorage để trang Payment có thể truy xuất
-                              localStorage.setItem(
-                                "paymentData",
-                                JSON.stringify(paymentData)
-                              );
-
-                              // Chuyển hướng đến trang thanh toán
-                              window.location.href = `/payment?testId=${test.id}`;
-                            }}
+                            onClick={() => handlePaymentRedirect(test)}
+                            disabled={isRedirecting}
                           >
-                            Thanh toán
+                            {isRedirecting ? (
+                              <>
+                                <span className="inline-block w-3 h-3 mr-1 border-2 border-white border-t-transparent rounded-full animate-spin"></span>
+                                Đang chuyển...
+                              </>
+                            ) : (
+                              "Thanh toán"
+                            )}
                           </button>
                         )}
                       </div>
@@ -606,6 +831,18 @@ function STITestingHistory({ userId }) {
           </tbody>
         </table>
       </div>
+      
+      {/* Nút reset tất cả các bộ lọc */}
+      <div className="mt-4 flex justify-end">
+        <button
+          type="button"
+          className="px-3 py-2 border border-gray-300 text-gray-700 text-sm rounded-md hover:bg-gray-100 focus:outline-none"
+          onClick={resetAllFilters}
+        >
+          Xóa tất cả bộ lọc
+        </button>
+      </div>
+      
       {/* Modal hiển thị chi tiết xét nghiệm */}
       {showModal && selectedTest && (
         <div className="fixed inset-0 z-50 flex items-center justify-center overflow-x-hidden overflow-y-auto outline-none focus:outline-none bg-black bg-opacity-50">
@@ -636,59 +873,26 @@ function STITestingHistory({ userId }) {
                       <p className="text-sm text-gray-500">Gói xét nghiệm</p>
                       <div className="mt-1">
                         <span className="inline-block font-semibold text-purple-700 bg-purple-50 px-3 py-1.5 rounded-md border border-purple-200">
-                          {(() => {
-                            const packageLabels = {
-                              0: "Cơ bản",
-                              1: "Nâng cao",
-                              2: "Tùy chỉnh",
-                            };
-                            return (
-                              packageLabels[selectedTest.testPackage] ||
-                              "Không xác định"
-                            );
-                          })()}
+                          {testPackageLabels[selectedTest.testPackage] || "Không xác định"}
                         </span>
                       </div>
                     </div>
                     <div>
                       <p className="text-sm text-gray-500">Ngày lấy mẫu</p>
                       <p className="text-base font-medium">
-                        {new Date(
-                          selectedTest.collectedDate
-                        ).toLocaleDateString("vi-VN")}
+                        {new Date(selectedTest.collectedDate).toLocaleDateString("vi-VN")}
                       </p>
-                    </div>{" "}
+                    </div>
+                    <div>
+                      <p className="text-sm text-gray-500">Khung giờ</p>
+                      <p className="text-base font-medium">
+                        {slotLabels[selectedTest.slot] || "Không xác định"}
+                      </p>
+                    </div>
                     <div>
                       <p className="text-sm text-gray-500">Trạng thái</p>
-                      <p
-                        className={`text-base font-medium ${(() => {
-                          switch (selectedTest.status) {
-                            case 3:
-                              return "text-green-600"; // Completed
-                            case 4:
-                              return "text-red-600"; // Cancelled
-                            case 2:
-                              return "text-blue-600"; // Processing
-                            case 1:
-                              return "text-purple-600"; // SampleTaken
-                            default:
-                              return "text-yellow-600"; // Scheduled
-                          }
-                        })()}`}
-                      >
-                        {(() => {
-                          const modalStatusLabels = {
-                            0: "Đã lên lịch",
-                            1: "Đã lấy mẫu",
-                            2: "Đang xử lý",
-                            3: "Hoàn thành",
-                            4: "Đã hủy",
-                          };
-                          return (
-                            modalStatusLabels[selectedTest.status] ||
-                            "Không xác định"
-                          );
-                        })()}
+                      <p className={`text-base font-medium ${getStatusColorClass(selectedTest.status).replace('bg-', 'text-')}`}>
+                        {statusLabels[selectedTest.status] || "Không xác định"}
                       </p>
                     </div>
                   </div>
@@ -774,7 +978,7 @@ function STITestingHistory({ userId }) {
                             <path
                               strokeLinecap="round"
                               strokeLinejoin="round"
-                              strokeWidth={2}
+                              strokeWidth="2"
                               d="M19.428 15.428a2 2 0 00-1.022-.547l-2.387-.477a6 6 0 00-3.86.517l-.318.158a6 6 0 01-3.86.517L6.05 15.21a2 2 0 00-1.806.547M8 4h8l-1 1v5.172a2 2 0 00.586 1.414l5 5c1.26 1.26.367 3.414-1.415 3.414H4.828c-1.782 0-2.674-2.154-1.414-3.414l5-5A2 2 0 009 10.172V5L8 4z"
                             />
                           </svg>
@@ -791,17 +995,6 @@ function STITestingHistory({ userId }) {
                         </h5>
                         <div className="grid grid-cols-1 md:grid-cols-2 gap-3">
                           {selectedTest.customParameters.map((paramId) => {
-                            const testParamLabels = {
-                              0: "Chlamydia",
-                              1: "Gonorrhoeae (Lậu)",
-                              2: "Syphilis (Giang mai)",
-                              3: "HIV",
-                              4: "Herpes",
-                              5: "Viêm gan B",
-                              6: "Viêm gan C",
-                              7: "Trichomonas",
-                              8: "Mycoplasma Genitalium",
-                            };
                             return (
                               <div
                                 key={paramId}
@@ -818,7 +1011,7 @@ function STITestingHistory({ userId }) {
                         </div>
                       </div>
                     </div>
-                  )}{" "}
+                  )}
                 {/* Kết quả xét nghiệm - Hiển thị kết quả từ API nếu có */}
                 {selectedTest.testResult &&
                   selectedTest.testResult.length > 0 && (
@@ -961,77 +1154,19 @@ function STITestingHistory({ userId }) {
                     className="px-6 py-2 bg-green-600 text-white font-medium rounded-md mr-2 hover:bg-green-700"
                     type="button"
                     onClick={() => {
-                      // Tạo object dữ liệu thanh toán đầy đủ
-                      const testParamLabels = {
-                        0: "Chlamydia",
-                        1: "Gonorrhea (Lậu)",
-                        2: "Syphilis (Giang mai)",
-                        3: "HIV",
-                        4: "Hepatitis B (Viêm gan B)",
-                        5: "Hepatitis C (Viêm gan C)",
-                        6: "Herpes",
-                        7: "HPV",
-                        8: "Mycoplasma",
-                        9: "Trichomonas",
-                      };
-
-                      const testPackageLabels = {
-                        0: "Gói Cơ Bản",
-                        1: "Gói Tự Chọn",
-                        2: "Gói Toàn Diện",
-                      };
-
-                      // Lấy danh sách tên các loại xét nghiệm
-                      let testParams = [];
-                      if (
-                        selectedTest.testResult &&
-                        selectedTest.testResult.length > 0
-                      ) {
-                        testParams = selectedTest.testResult
-                          .filter((r) => r !== null)
-                          .map(
-                            (result) =>
-                              testParamLabels[result.parameter] ||
-                              `Loại ${result.parameter}`
-                          );
-                      } else if (
-                        selectedTest.customParameters &&
-                        selectedTest.customParameters.length > 0
-                      ) {
-                        testParams = selectedTest.customParameters.map(
-                          (param) => testParamLabels[param] || `Loại ${param}`
-                        );
-                      }
-                      const paymentData = {
-                        testId: selectedTest.id,
-                        amount:
-                          selectedTest.totalPrice ||
-                          getPackagePrice(selectedTest.testPackage) ||
-                          0,
-                        returnUrl: window.location.pathname,
-                        testType:
-                          testPackageLabels[selectedTest.testPackage] ||
-                          "Xét nghiệm STI",
-                        testDate: formatDate(
-                          selectedTest.scheduleDate || selectedTest.createdAt
-                        ),
-                        testParams: testParams,
-                      };
-
-                      // Lưu vào localStorage để trang Payment có thể truy xuất
-                      localStorage.setItem(
-                        "paymentData",
-                        JSON.stringify(paymentData)
-                      );
-
-                      // Chuyển hướng đến trang thanh toán
-                      window.location.href = `/payment?testId=${selectedTest.id}`;
-
-                      // Đóng modal
+                      handlePaymentRedirect(selectedTest);
                       setShowModal(false);
                     }}
+                    disabled={isRedirecting}
                   >
-                    Thanh toán
+                    {isRedirecting ? (
+                      <>
+                        <span className="inline-block w-3 h-3 mr-1 border-2 border-white border-t-transparent rounded-full animate-spin"></span>
+                        Đang chuyển...
+                      </>
+                    ) : (
+                      "Thanh toán"
+                    )}
                   </button>
                 )}
                 {selectedTest.status === 0 && (
