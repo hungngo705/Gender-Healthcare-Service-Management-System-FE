@@ -69,19 +69,20 @@ const testResultService = {
         const token = localStorage.getItem("token");
         if (token) {
           try {
-            const base64Url = token.split('.')[1];
-            const base64 = base64Url.replace(/-/g, '+').replace(/_/g, '/');
+            const base64Url = token.split(".")[1];
+            const base64 = base64Url.replace(/-/g, "+").replace(/_/g, "/");
             const decodedToken = JSON.parse(window.atob(base64));
-            staffId = decodedToken.id || decodedToken.userId || decodedToken.sub;
+            staffId =
+              decodedToken.id || decodedToken.userId || decodedToken.sub;
           } catch (error) {
             console.error("Error decoding token:", error);
           }
         }
       }
-      
+
       // Fallback nếu không tìm thấy staffId
       staffId = staffId || "default-user-id";
-      
+
       // Tạo payload với đúng định dạng API yêu cầu
       const payload = {
         stiTestingId: stiTestingId,
@@ -89,10 +90,13 @@ const testResultService = {
         comments: comments || "",
         staffId: staffId,
         processedAt: new Date().toISOString(),
-        parameter: [parseInt(parameter)]
+        parameter: [parseInt(parameter)],
       };
 
-      console.log(`Creating test result for test ${stiTestingId} with payload:`, payload);
+      console.log(
+        `Creating test result for test ${stiTestingId} with payload:`,
+        payload
+      );
 
       const response = await apiService.post(
         config.api.testResult.create,
@@ -110,7 +114,13 @@ const testResultService = {
    * @param {number} outcome - The outcome of the test
    * @param {string} comments - Additional comments about the result
    * @returns {Promise<Object>} Response with updated test result
-   */ updateTestResult: async (resultId, outcome, comments = "", staffId = null, parameter = null) => {
+   */ updateTestResult: async (
+    resultId,
+    outcome,
+    comments = "",
+    staffId = null,
+    parameter = null
+  ) => {
     try {
       // Nếu không có staffId từ tham số, thử lấy từ token
       if (!staffId) {
@@ -119,54 +129,59 @@ const testResultService = {
           try {
             const tokenInfo = tokenHelper.decodeToken(token);
             // Microsoft JWT format - lấy nameidentifier là ID user
-            staffId = tokenInfo["http://schemas.xmlsoap.org/ws/2005/05/identity/claims/nameidentifier"] || 
-                     tokenInfo.nameid || 
-                     tokenInfo.sub;
+            staffId =
+              tokenInfo[
+                "http://schemas.xmlsoap.org/ws/2005/05/identity/claims/nameidentifier"
+              ] ||
+              tokenInfo.nameid ||
+              tokenInfo.sub;
           } catch (error) {
             console.error("Error decoding token:", error);
           }
         }
       }
-      
+
       // Sử dụng UUID mặc định khi không có staffId
       staffId = staffId || "00000000-0000-0000-0000-000000000000";
-      
-      // Nếu chưa có parameter, lấy từ API
+
+      // Đảm bảo parameter là một số nguyên
       let finalParameter = parameter;
-      
+
+      // Nếu parameter là null, gọi API để lấy giá trị
       if (finalParameter === null || finalParameter === undefined) {
         try {
-          console.log("Parameter is null/undefined, fetching from API");
-          const existingResult = await testResultService.getTestResultById(resultId);
-          
-          if (existingResult?.is_success && existingResult?.data?.parameter !== undefined) {
+          const existingResult = await testResultService.getTestResultById(
+            resultId
+          );
+          if (
+            existingResult?.is_success &&
+            existingResult?.data?.parameter !== undefined
+          ) {
             finalParameter = existingResult.data.parameter;
-            console.log(`Retrieved parameter value ${finalParameter} from existing result`);
           } else {
-            console.error("Could not retrieve parameter from API, result:", existingResult);
-            // Nếu không thể lấy được parameter từ API, throw lỗi để báo người dùng
-            throw new Error("Could not retrieve parameter value for test result");
+            throw new Error(
+              "Could not retrieve parameter value for test result"
+            );
           }
         } catch (fetchError) {
           console.error("Error fetching test result parameter:", fetchError);
           throw fetchError;
         }
       }
-      
-      // Đảm bảo parameter là một số nguyên
+
+      // Đảm bảo parameter là một số nguyên, không phải mảng
       const paramInt = parseInt(finalParameter);
       if (isNaN(paramInt)) {
-        console.error("Parameter is not a valid number:", finalParameter);
         throw new Error("Invalid parameter value");
       }
-      
-      // Tạo payload với parameter là mảng có đúng một phần tử
+
+      // Payload với parameter là số nguyên (không phải mảng)
       const payload = {
         outcome: parseInt(outcome),
         comments: comments || "",
         staffId: staffId,
         processedAt: new Date().toISOString(),
-        parameter: [paramInt] // Đảm bảo parameter là mảng có một phần tử
+        parameter: paramInt, // Số nguyên, không phải mảng [paramInt]
       };
 
       console.log(`Updating test result ${resultId} with payload:`, payload);

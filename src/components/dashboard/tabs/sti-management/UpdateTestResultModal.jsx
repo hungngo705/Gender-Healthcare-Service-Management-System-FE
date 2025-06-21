@@ -50,27 +50,41 @@ function UpdateTestResultModal({ test, onClose, onResultsUpdated }) {
     let userId = null;
     let fullNameFromToken = null;
     let roleFromToken = null;
-    
+
     if (tokenInfo) {
       console.log("Token info from tokenHelper:", tokenInfo);
-      
+
       // Lấy định danh người dùng từ claim Microsoft
-      userId = tokenInfo["http://schemas.xmlsoap.org/ws/2005/05/identity/claims/nameidentifier"];
-      
+      userId =
+        tokenInfo[
+          "http://schemas.xmlsoap.org/ws/2005/05/identity/claims/nameidentifier"
+        ];
+
       // Lấy tên người dùng từ claim Microsoft
-      fullNameFromToken = tokenInfo["http://schemas.xmlsoap.org/ws/2005/05/identity/claims/name"];
-      
+      fullNameFromToken =
+        tokenInfo["http://schemas.xmlsoap.org/ws/2005/05/identity/claims/name"];
+
       // Lấy vai trò từ claim Microsoft
-      roleFromToken = tokenInfo["http://schemas.microsoft.com/ws/2008/06/identity/claims/role"];
-      
-      console.log("Extracted from token - userId:", userId, "name:", fullNameFromToken, "role:", roleFromToken);
-      
+      roleFromToken =
+        tokenInfo[
+          "http://schemas.microsoft.com/ws/2008/06/identity/claims/role"
+        ];
+
+      console.log(
+        "Extracted from token - userId:",
+        userId,
+        "name:",
+        fullNameFromToken,
+        "role:",
+        roleFromToken
+      );
+
       // Nếu tìm thấy tên từ token, cập nhật state
       if (fullNameFromToken) {
-        setCurrentUser(prev => ({
+        setCurrentUser((prev) => ({
           ...prev,
           name: fullNameFromToken,
-          role: roleFromToken || prev.role
+          role: roleFromToken || prev.role,
         }));
       }
     }
@@ -89,7 +103,10 @@ function UpdateTestResultModal({ test, onClose, onResultsUpdated }) {
         }
       }
 
-      const fullName = localStorage.getItem("fullName") || userInfo?.fullName || "Nhân viên y tế";
+      const fullName =
+        localStorage.getItem("fullName") ||
+        userInfo?.fullName ||
+        "Nhân viên y tế";
       const email = localStorage.getItem("email") || userInfo?.email || "";
       const role = localStorage.getItem("role") || userInfo?.role || "Staff";
 
@@ -289,21 +306,24 @@ function UpdateTestResultModal({ test, onClose, onResultsUpdated }) {
     console.log("Submit button clicked!");
 
     // UUID mặc định nếu không tìm thấy
-    let staffId = "00000000-0000-0000-0000-000000000000"; 
-    
+    let staffId = "00000000-0000-0000-0000-000000000000";
+
     // Lấy thông tin từ token theo định dạng Microsoft claims
     const tokenInfo = tokenHelper.getCurrentTokenInfo();
     console.log("Current token info:", tokenInfo);
-    
+
     if (tokenInfo) {
       // Lấy nameidentifier (Microsoft format)
-      const nameIdentifier = tokenInfo["http://schemas.xmlsoap.org/ws/2005/05/identity/claims/nameidentifier"];
-      
+      const nameIdentifier =
+        tokenInfo[
+          "http://schemas.xmlsoap.org/ws/2005/05/identity/claims/nameidentifier"
+        ];
+
       // Nếu có nameidentifier, sử dụng nó làm staffId
       if (nameIdentifier) {
         staffId = nameIdentifier;
         console.log("Found staffId from nameidentifier claim:", staffId);
-      } 
+      }
       // Nếu không có nameidentifier, thử các trường khác
       else {
         const possibleIds = [
@@ -311,25 +331,27 @@ function UpdateTestResultModal({ test, onClose, onResultsUpdated }) {
           tokenInfo.nameidentifier,
           tokenInfo.sub,
           tokenInfo.id,
-          tokenInfo.userId
+          tokenInfo.userId,
         ].filter(Boolean);
-        
+
         console.log("Possible IDs from token:", possibleIds);
-        
+
         // Tìm ID đầu tiên là UUID hợp lệ
-        const validId = possibleIds.find(id => 
-          /^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$/i.test(id)
+        const validId = possibleIds.find((id) =>
+          /^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$/i.test(
+            id
+          )
         );
-        
+
         if (validId) {
           staffId = validId;
           console.log("Found valid UUID from token:", staffId);
         }
       }
     }
-    
+
     console.log("Final staffId to be used:", staffId);
-    
+
     if (!selectedResult) {
       toast.error("Vui lòng chọn kết quả xét nghiệm cần cập nhật");
       return;
@@ -372,8 +394,9 @@ function UpdateTestResultModal({ test, onClose, onResultsUpdated }) {
 
         // Kiểm tra nếu parameter là hợp lệ
         if (parameterValue === undefined || parameterValue === null) {
-          console.error("Parameter is undefined or null:", parameterValue);
-          // Thử gọi API để lấy parameter một lần nữa
+          console.error(
+            "Parameter is undefined or null, trying to fetch from API"
+          );
           try {
             const detailResponse = await testResultService.getTestResultById(
               selectedResult.id
@@ -382,16 +405,23 @@ function UpdateTestResultModal({ test, onClose, onResultsUpdated }) {
               detailResponse?.is_success &&
               detailResponse?.data?.parameter !== undefined
             ) {
+              const parameterFromAPI = parseInt(detailResponse.data.parameter);
               console.log(
                 "Retrieved parameter from API call:",
-                detailResponse.data.parameter
+                parameterFromAPI
               );
+
+              // Đảm bảo parameter là số nguyên
+              if (isNaN(parameterFromAPI)) {
+                throw new Error("Invalid parameter value from API");
+              }
+
               response = await testResultService.updateTestResult(
                 selectedResult.id,
                 parseInt(formData.outcome),
                 formData.comments,
                 staffId,
-                parseInt(detailResponse.data.parameter) // Sử dụng parameter từ API call
+                parameterFromAPI
               );
             } else {
               throw new Error("Could not retrieve parameter value");
