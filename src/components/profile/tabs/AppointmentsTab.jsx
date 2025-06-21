@@ -358,7 +358,7 @@ function AppointmentsTab({ navigate }) {
               <div className="hidden sm:flex sm:flex-1 sm:items-center sm:justify-between">
                 <div>
                   <p className="text-sm text-gray-700">
-                    Hiển thị{" "}
+                    Hiển thị từ{" "}
                     <span className="font-medium">{indexOfFirstItem + 1}</span>{" "}
                     đến{" "}
                     <span className="font-medium">
@@ -376,25 +376,16 @@ function AppointmentsTab({ navigate }) {
                     className="isolate inline-flex -space-x-px rounded-md shadow-sm"
                     aria-label="Pagination"
                   >
-                    <button
-                      onClick={prevPage}
-                      disabled={currentPage === 1}
-                      className={`relative inline-flex items-center rounded-l-md px-2 py-2 ${
-                        currentPage === 1
-                          ? "bg-gray-100 text-gray-400 cursor-not-allowed"
-                          : "bg-white text-gray-500 hover:bg-gray-50"
-                      }`}
-                    >
-                      <span className="sr-only">Trang trước</span>
-                      <ChevronLeft className="h-5 w-5" />
-                    </button>
-
                     {/* Improved pagination numbers */}
                     <div className="flex items-center space-x-1">
                       <button
                         onClick={prevPage}
                         disabled={currentPage === 1}
-                        className="relative inline-flex h-8 w-8 items-center justify-center rounded-md border border-gray-300 bg-white text-sm font-medium text-gray-500 hover:bg-gray-50 disabled:opacity-50 disabled:cursor-not-allowed"
+                        className={`relative inline-flex items-center rounded-l-md px-2 py-2 ${
+                          currentPage === 1
+                            ? "bg-gray-100 text-gray-400 cursor-not-allowed"
+                            : "bg-white text-gray-500 hover:bg-gray-50"
+                        }`}
                       >
                         <span className="sr-only">Trang trước</span>
                         <ChevronLeft className="h-4 w-4" />
@@ -430,11 +421,11 @@ function AppointmentsTab({ navigate }) {
                             key={pageNum}
                             onClick={() => paginate(pageNum)}
                             className={`relative inline-flex h-8 w-8 items-center justify-center rounded-md text-sm font-medium transition-all duration-200
-          ${
-            currentPage === pageNum
-              ? "z-10 bg-indigo-600 text-white shadow-sm"
-              : "border border-gray-300 bg-white text-gray-700 hover:bg-gray-50"
-          }`}
+                              ${
+                                currentPage === pageNum
+                                  ? "z-10 bg-indigo-600 text-white shadow-sm"
+                                  : "border border-gray-300 bg-white text-gray-700 hover:bg-gray-50"
+                              }`}
                             aria-current={
                               currentPage === pageNum ? "page" : undefined
                             }
@@ -447,7 +438,11 @@ function AppointmentsTab({ navigate }) {
                       <button
                         onClick={nextPage}
                         disabled={currentPage === totalPages}
-                        className="relative inline-flex h-8 w-8 items-center justify-center rounded-md border border-gray-300 bg-white text-sm font-medium text-gray-500 hover:bg-gray-50 disabled:opacity-50 disabled:cursor-not-allowed"
+                        className={`relative inline-flex items-center rounded-l-md px-2 py-2 ${
+                          currentPage === totalPages
+                            ? "bg-gray-100 text-gray-400 cursor-not-allowed"
+                            : "bg-white text-gray-500 hover:bg-gray-50"
+                        }`}
                       >
                         <span className="sr-only">Trang sau</span>
                         <ChevronRight className="h-4 w-4" />
