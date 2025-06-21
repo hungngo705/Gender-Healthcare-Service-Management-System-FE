@@ -77,7 +77,7 @@ const config = {
     }, // STI testing endpoints - add API prefix    
     stiTesting: {
       getAll: "/api/v2.5/stitesting/getall",
-      getForCustomer: "/api/v2.5/stitesting/customer", // Endpoint để lấy STI test của current user
+      getForCustomer: "/api/v2.5/stitesting/currentuser", // Endpoint để lấy STI test của current user
       create: "/api/v2.5/stitesting/create",
       getById: (id) => `/api/v2.5/stitesting/${id}`,
       update: (id) => `/api/v2.5/stitesting/update/${id}`, 
