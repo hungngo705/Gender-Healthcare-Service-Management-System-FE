@@ -1,7 +1,6 @@
 import { ToastContainer } from "react-toastify";
 import HeroSection from "../components/sti/HeroSection";
 import ServiceOverview from "../components/sti/ServiceOverview";
-import PricingTable from "../components/sti/PricingTable";
 import BookingForm from "../components/sti/BookingForm";
 import Faq from "../components/sti/Faq";
 import CallToAction from "../components/sti/CallToAction";
@@ -16,9 +15,6 @@ function STITesting() {
 
       {/* Main Content */}
       <div className="max-w-7xl mx-auto px-4 py-16">
-        {/* Pricing Table */}
-        <PricingTable />
-
         {/* Thông tin về quy trình đặt lịch */}
         <div className="mb-16 bg-blue-50 border-l-4 border-blue-500 p-6 rounded-lg">
           <h3 className="text-xl font-semibold text-gray-900 mb-2">

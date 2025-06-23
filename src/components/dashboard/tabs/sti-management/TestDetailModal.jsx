@@ -82,8 +82,8 @@ function TestDetailModal({
 
     // Default prices if not specified
     const packagePrices = {
-      0: 450000, // Basic
-      1: 950000, // Advanced
+      0: 300000, // Basic
+      1: 5500000, // Advanced
       2: 0, // Custom - calculated based on parameters
     };
 
@@ -210,8 +210,8 @@ function TestDetailModal({
   };
 
   return (
-    <div className="fixed inset-0 bg-opacity-60 backdrop-blur-sm flex justify-center items-center p-4 z-50">
-      <div className="bg-white rounded-lg shadow-xl max-w-4xl w-full max-h-[90vh] overflow-y-auto">
+    <div className="fixed inset-0 bg-opacity-60 backdrop-blur-sm flex justify-center items-center p-5 z-50">
+      <div className="bg-white rounded-lg shadow-xl max-w-4xl w-full max-h-[90vh] p-5 overflow-y-auto">
         <div className="flex justify-between items-center mb-6">
           <h2 className="text-xl font-bold text-gray-900">
             Chi tiết xét nghiệm STI
@@ -410,8 +410,18 @@ function TestDetailModal({
                         statusValue > currentTest.status + 1) ||
                       // Can't move to completed without sample
                       (statusValue === 3 && !currentTest.sampleTakenAt) ||
+                      // NEW CONDITION: Can't take sample (status 1) if not paid
+                      (statusValue === 1 && !currentTest.isPaid) ||
                       // Disable during any loading state
                       loadingStatusUpdate !== null;
+
+                    // Logic for tooltip/notification message
+                    const disabledReason =
+                      statusValue === 1 && !currentTest.isPaid
+                        ? "Không thể lấy mẫu khi chưa thanh toán"
+                        : statusValue === 3 && !currentTest.sampleTakenAt
+                        ? "Không thể hoàn thành khi chưa lấy mẫu"
+                        : "";
 
                     // Check if this specific button is in loading state
                     const isLoading = loadingStatusUpdate === statusValue;
@@ -419,20 +429,20 @@ function TestDetailModal({
                     return (
                       <button
                         key={value}
-                        onClick={
-                          () =>
-                            !isDisabled &&
-                            !isLoading &&
-                            initiateStatusChange(currentTest.id, statusValue) // Changed to initiateStatusChange
+                        onClick={() =>
+                          !isDisabled &&
+                          !isLoading &&
+                          initiateStatusChange(currentTest.id, statusValue)
                         }
                         disabled={isDisabled || isLoading}
+                        title={disabledReason || null} // Hiển thị lý do nút bị disable khi hover
                         className={`flex items-center justify-between py-2 px-4 rounded-md ${
                           currentTest.status === statusValue
                             ? "bg-indigo-600 text-white"
                             : isDisabled
                             ? "bg-gray-100 text-gray-400 cursor-not-allowed"
                             : statusValue === 4
-                            ? "bg-white border border-red-300 text-red-700 hover:bg-red-50" // Special styling for cancel button
+                            ? "bg-white border border-red-300 text-red-700 hover:bg-red-50"
                             : "bg-white border border-gray-300 text-gray-700 hover:bg-gray-50"
                         }`}
                       >
@@ -452,7 +462,14 @@ function TestDetailModal({
 
               {/* Thông báo theo trạng thái - thay test bằng currentTest */}
               <div className="text-sm text-gray-500 pt-2">
-                {currentTest.status === 0 && (
+                {currentTest.status === 0 && !currentTest.isPaid && (
+                  <p className="flex items-center text-amber-600">
+                    <AlertCircle size={14} className="mr-1" />
+                    Xét nghiệm chưa được thanh toán. Vui lòng thanh toán trước
+                    khi lấy mẫu.
+                  </p>
+                )}
+                {currentTest.status === 0 && currentTest.isPaid && (
                   <p className="flex items-center">
                     <span className="mr-1 text-blue-500">ℹ️</span>
                     Sau khi lấy mẫu, cập nhật trạng thái để bắt đầu xử lý
