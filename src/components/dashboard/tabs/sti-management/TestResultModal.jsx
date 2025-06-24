@@ -11,6 +11,7 @@ import {
 } from "lucide-react";
 import testResultService from "../../../../services/testResultService";
 import stiTestingService from "../../../../services/stiTestingService";
+import userService from "../../../../services/userService";
 import { toast } from "react-toastify";
 import UpdateTestResultModal from "./UpdateTestResultModal";
 // Import các enum chung
@@ -38,6 +39,8 @@ function TestResultModal({
   const [showUpdateResultModal, setShowUpdateResultModal] = useState(false);
   const [isLoading, setIsLoading] = useState(true);
   const [selectedResult, setSelectedResult] = useState(null);
+  // Thêm state để lưu cache tên nhân viên
+  const [staffNames, setStaffNames] = useState({});
 
   const formatDateTime = (dateString) => {
     if (!dateString) return "N/A";
@@ -70,31 +73,50 @@ function TestResultModal({
 
       setIsLoading(true);
       try {
-        // Sử dụng stiTestingService.getById thay vì testResultService
         const response = await stiTestingService.getById(test.id);
         console.log("STI Testing API response:", response);
 
         if (response && response.data && response.data.is_success) {
-          // Lấy đối tượng test từ response
           const testData = response.data.data;
           console.log("Test data from API:", testData);
 
-          // Kiểm tra và lấy testResult từ response
           if (testData && Array.isArray(testData.testResult)) {
             console.log("Test results from API:", testData.testResult);
 
-            // Xử lý dữ liệu để đảm bảo đủ các trường
-            const processedResults = testData.testResult.map((result) => ({
-              ...result,
-              comments: result.comments || "",
-              staff: result.staff || null,
-              processedAt: result.processedAt || null,
-              parameter: parseInt(result.parameter), // Đảm bảo parameter là số
-            }));
+            // Xử lý dữ liệu để đảm bảo đủ các trường và xử lý thông tin nhân viên
+            const processedResults = testData.testResult.map((result) => {
+              // Tạo đối tượng staff từ staffId
+              let staffInfo = null;
+              if (result.staffId) {
+                // Sử dụng tên thật nếu API trả về, hoặc dùng tên mặc định
+                staffInfo = {
+                  id: result.staffId,
+                  name:
+                    result.staffName ||
+                    getUserNameFromId(result.staffId) ||
+                    "Nhân viên xử lý",
+                };
+              } else if (result.staff) {
+                // Giữ nguyên nếu đã có
+                staffInfo = result.staff;
+              }
 
-            console.log("Processed test results:", processedResults);
+              return {
+                ...result,
+                comments: result.comments || "",
+                staff: staffInfo,
+                staffName:
+                  result.staffName || staffInfo?.name || "Nhân viên xử lý", // Đảm bảo có staffName
+                processedAt: result.processedAt || null,
+                parameter: parseInt(result.parameter),
+              };
+            });
 
-            // Cập nhật state với cả đối tượng test và testResult
+            console.log(
+              "Processed test results with staff info:",
+              processedResults
+            );
+
             setTest((prev) => ({
               ...prev,
               ...testData,
@@ -195,23 +217,66 @@ function TestResultModal({
       return;
     }
 
-    // Nếu kết quả cập nhật rỗng, tải lại dữ liệu từ API
-    if (updatedResults.length === 0) {
-      handleRefreshData();
-      return;
+    // Xử lý dữ liệu để đảm bảo thông tin nhân viên được giữ lại
+    const processedResults = updatedResults.map((result) => {
+      // Xử lý thông tin nhân viên
+      let staffInfo = result.staff;
+
+      // Nếu không có staff object nhưng có staffId/staffName
+      if (!staffInfo && (result.staffId || result.staffName)) {
+        staffInfo = {
+          id: result.staffId || "",
+          name:
+            result.staffName ||
+            localStorage.getItem("fullName") ||
+            "Nhân viên xử lý",
+        };
+      }
+
+      return {
+        ...result,
+        staff: staffInfo,
+      };
+    });
+
+    // Cập nhật state với kết quả mới
+    setTest((prev) => ({
+      ...prev,
+      testResult: processedResults,
+    }));
+
+    // Cập nhật cache tên nhân viên với thông tin mới
+    const newStaffIds = updatedResults
+      .filter((result) => result.staffId && !staffNames[result.staffId])
+      .map((result) => result.staffId);
+
+    if (newStaffIds.length > 0) {
+      // Tải thông tin nhân viên mới
+      const uniqueIds = [...new Set(newStaffIds)];
+
+      uniqueIds.forEach(async (id) => {
+        try {
+          const userData = await userService.getUserById(id);
+          if (userData && userData.name) {
+            setStaffNames((prev) => ({
+              ...prev,
+              [id]: userData.name,
+            }));
+          }
+        } catch (error) {
+          console.error(`Error fetching staff info for ID ${id}:`, error);
+        }
+      });
     }
 
-    const updatedTest = {
-      ...test,
-      testResult: updatedResults,
-    };
-
-    setTest(updatedTest);
     toast.success("Đã cập nhật kết quả xét nghiệm thành công!");
 
     // Update parent component if callback provided
     if (onTestUpdated) {
-      onTestUpdated(updatedTest);
+      onTestUpdated({
+        ...test,
+        testResult: updatedResults,
+      });
     }
   };
 
@@ -289,6 +354,11 @@ function TestResultModal({
       return;
     }
 
+    // Lấy thông tin nhân viên hiện tại
+    const currentUserName =
+      localStorage.getItem("fullName") || "Nhân viên xử lý";
+    const currentUserId = localStorage.getItem("userId");
+
     try {
       let updatedCount = 0;
       let errors = [];
@@ -348,21 +418,41 @@ function TestResultModal({
         const response = await testResultService.getTestResults(test.id);
         if (response && response.is_success) {
           const refreshedResults = response.data?.testResult || [];
-          setTest((prev) => ({
-            ...prev,
-            testResult: refreshedResults.map((result) => ({
+
+          // Xử lý lại dữ liệu để đảm bảo thông tin nhân viên
+          const processedResults = refreshedResults.map((result) => {
+            // Thêm thông tin nhân viên nếu chưa có
+            if (!result.staff && !result.staffName) {
+              return {
+                ...result,
+                comments: result.comments || "",
+                processedAt: result.processedAt || new Date().toISOString(),
+                staffName: currentUserName,
+                staffId: currentUserId,
+                staff: { id: currentUserId, name: currentUserName },
+              };
+            }
+            return {
               ...result,
               comments: result.comments || "",
-              staff: result.staff || null,
+              staff: result.staff || {
+                id: result.staffId || currentUserId,
+                name: result.staffName || currentUserName,
+              },
               processedAt: result.processedAt || null,
-            })),
+            };
+          });
+
+          setTest((prev) => ({
+            ...prev,
+            testResult: processedResults,
           }));
 
           // Thông báo cập nhật cho component cha
           if (onTestUpdated) {
             onTestUpdated({
               ...test,
-              testResult: refreshedResults,
+              testResult: processedResults,
             });
           }
         }
@@ -587,6 +677,62 @@ function TestResultModal({
     );
   };
 
+  // Thêm useEffect để tải thông tin nhân viên
+  useEffect(() => {
+    const fetchStaffNames = async () => {
+      if (!test.testResult || !Array.isArray(test.testResult)) return;
+
+      // Lọc các staffId chưa có trong cache
+      const staffIdsToFetch = test.testResult
+        .filter((result) => result.staffId && !staffNames[result.staffId])
+        .map((result) => result.staffId);
+
+      // Loại bỏ trùng lặp
+      const uniqueIds = [...new Set(staffIdsToFetch)];
+
+      if (uniqueIds.length === 0) return;
+
+      // Lấy và cập nhật tên từng nhân viên
+      const newStaffNames = { ...staffNames };
+
+      for (const id of uniqueIds) {
+        try {
+          const userData = await userService.getUserById(id);
+          if (userData && userData.name) {
+            newStaffNames[id] = userData.name;
+            console.log(`Loaded staff name: ${userData.name} for ID: ${id}`);
+          }
+        } catch (error) {
+          console.error(`Error fetching staff name for ID ${id}:`, error);
+        }
+      }
+
+      setStaffNames(newStaffNames);
+    };
+
+    fetchStaffNames();
+  }, [test.testResult]);
+
+  // Hàm lấy tên nhân viên từ ID
+  const getStaffName = (staffId) => {
+    if (!staffId) return "Chưa xác định";
+
+    // Trả về tên từ cache nếu có
+    if (staffNames[staffId]) {
+      return staffNames[staffId];
+    }
+
+    // Nếu là người dùng hiện tại
+    const currentUserId = localStorage.getItem("userId");
+    const currentName = localStorage.getItem("fullName");
+    if (staffId === currentUserId && currentName) {
+      return currentName;
+    }
+
+    // Trả về ID nếu chưa có tên
+    return `Nhân viên ID: ${staffId.substring(0, 8)}`;
+  };
+
   return (
     <div className="fixed inset-0 bg-opacity-60 backdrop-blur-sm flex justify-center items-center p-4 z-50">
       <div className="bg-white rounded-lg p-6 max-w-4xl w-full max-h-[90vh] overflow-y-auto shadow-xl">
@@ -695,22 +841,22 @@ function TestResultModal({
                   <table className="min-w-full divide-y divide-gray-200">
                     <thead className="bg-gray-50">
                       <tr>
-                        <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                        <th className="px-5 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
                           Thông số
                         </th>
-                        <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                        <th className="px-5 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
                           Kết quả
                         </th>
-                        <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                        <th className="px-5 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
                           Ghi chú
                         </th>
-                        <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                        <th className="px-5 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
                           Nhân viên xử lý
                         </th>
-                        <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                        <th className="px-5 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
                           Thời gian
                         </th>
-                        <th className="px-6 py-3 text-right text-xs font-medium text-gray-500 uppercase tracking-wider">
+                        <th className="px-5 py-3 text-right text-xs font-medium text-gray-500 uppercase tracking-wider">
                           Thao tác
                         </th>
                       </tr>
@@ -718,11 +864,11 @@ function TestResultModal({
                     <tbody className="bg-white divide-y divide-gray-200">
                       {test.testResult.map((result) => (
                         <tr key={result.id}>
-                          <td className="px-6 py-4 whitespace-nowrap text-sm font-medium text-gray-900">
+                          <td className="px-5 py-4 whitespace-nowrap text-sm font-medium text-gray-900">
                             {parameterLabels[result.parameter] ||
                               `Thông số ${result.parameter}`}
                           </td>
-                          <td className="px-6 py-4 whitespace-nowrap">
+                          <td className="px-5 py-4 whitespace-nowrap">
                             <span
                               className={`inline-block font-medium ${
                                 outcomeLabels[result.outcome]?.color ||
@@ -733,18 +879,18 @@ function TestResultModal({
                                 "Không xác định"}
                             </span>
                           </td>
-                          <td className="px-6 py-4 text-sm text-gray-500">
+                          <td className="px-5 py-4 text-sm text-gray-500">
                             {result.comments || "Không có ghi chú"}
                           </td>
-                          <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-500">
-                            {result.staff?.name || "N/A"}
+                          <td className="px-5 py-4 whitespace-nowrap text-sm text-gray-500">
+                            {getStaffName(result.staffId)}
                           </td>
-                          <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-500">
+                          <td className="px-5 py-4 whitespace-nowrap text-sm text-gray-500">
                             {result.processedAt
                               ? formatDateTime(result.processedAt)
                               : "N/A"}
                           </td>
-                          <td className="px-6 py-4 whitespace-nowrap text-right text-sm font-medium">
+                          <td className="px-5 py-4 whitespace-nowrap text-right text-sm font-medium">
                             <div className="flex space-x-2 justify-end">
                               <button
                                 onClick={() => {
@@ -912,5 +1058,20 @@ function TestResultModal({
     </div>
   );
 }
+
+// Thêm hàm để lấy tên nhân viên từ ID (có thể lưu trong localStorage hoặc context)
+const getUserNameFromId = (userId) => {
+  // Nếu userId là của người dùng hiện tại, sử dụng tên trong localStorage
+  const currentUserId = localStorage.getItem("userId");
+  const currentUserName = localStorage.getItem("fullName");
+
+  if (userId === currentUserId && currentUserName) {
+    return currentUserName;
+  }
+
+  // TODO: Có thể triển khai lấy tên từ cache hoặc API sau
+  // Trong trường hợp này, trả về tên dựa trên ID để dễ nhận diện hơn
+  return `Nhân viên ${userId.substring(0, 6)}`;
+};
 
 export default TestResultModal;
