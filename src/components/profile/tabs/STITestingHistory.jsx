@@ -1,36 +1,48 @@
+/* eslint-disable no-unused-vars */
 import { useState, useEffect } from "react";
 import { toast } from "react-toastify";
 import stiTestingService from "../../../services/stiTestingService";
-import paymentService from "../../../services/paymentService"; // Add this import
+import paymentService from "../../../services/paymentService";
 import { useAuth } from "../../../contexts/AuthContext";
+import { format } from "date-fns";
+import { vi } from "date-fns/locale";
+// Import các enum chung
 import {
-  STI_PACKAGES,
-  STI_TEST_TYPES,
-} from "../../sti/booking-components/constants";
+  PARAMETER_ENUM,
+  TIME_SLOT_ENUM,
+  TEST_PACKAGE_ENUM,
+  STATUS_ENUM,
+  OUTCOME_ENUM,
+} from "../../../constants/enums";
 
-// Correctly defined package labels - moved outside component for global access
-const testPackageLabels = {
-  0: "Gói Cơ Bản", // Basic = 0
-  1: "Gói Nâng Cao", // Advanced = 1
-  2: "Gói Tùy Chọn", // Custom = 2
-};
+// Sử dụng các enum từ file chung thay vì định nghĩa lại
+const testPackageLabels = Object.values(TEST_PACKAGE_ENUM).reduce(
+  (acc, pkg) => {
+    acc[pkg.id] = pkg.name;
+    return acc;
+  },
+  {}
+);
 
-// Time slot enum - synchronized with BookingForm
-const slotLabels = {
-  0: "Sáng sớm (7:00-10:00)",
-  1: "Trưa (10:00-13:00)",
-  2: "Chiều (13:00-16:00)",
-  3: "Tối (16:00-19:00)",
-};
+const slotLabels = Object.values(TIME_SLOT_ENUM).reduce((acc, slot) => {
+  acc[slot.id] = slot.display;
+  return acc;
+}, {});
 
-// Status labels for test status
-const statusLabels = {
-  0: "Đã lên lịch",
-  1: "Đã lấy mẫu",
-  2: "Đang xử lý",
-  3: "Hoàn thành",
-  4: "Đã hủy",
-};
+const statusLabels = Object.values(STATUS_ENUM).reduce((acc, status) => {
+  acc[status.id] = status.label;
+  return acc;
+}, {});
+
+const parameterLabels = Object.values(PARAMETER_ENUM).reduce((acc, param) => {
+  acc[param.id] = param.name;
+  return acc;
+}, {});
+
+const outcomeLabels = Object.values(OUTCOME_ENUM).reduce((acc, outcome) => {
+  acc[outcome.id] = outcome.label;
+  return acc;
+}, {});
 
 function STITestingHistory({ userId }) {
   const { currentUser } = useAuth();
@@ -42,60 +54,48 @@ function STITestingHistory({ userId }) {
   const [filterStatus, setFilterStatus] = useState("all");
   const [searchText, setSearchText] = useState("");
   const [isRedirecting, setIsRedirecting] = useState(false);
-
-  // Add these state variables below your existing states
   const [startDate, setStartDate] = useState("");
   const [endDate, setEndDate] = useState("");
   const [isDateFilterActive, setIsDateFilterActive] = useState(false);
-
-  // Thêm state cho bộ lọc slot
   const [filterSlot, setFilterSlot] = useState("all");
-
-  // Define parameter labels for consistent naming
-  const testParamLabels = {
-    0: "Chlamydia", // Chlamydia = 0 in API
-    1: "Lậu", // Gonorrhoeae = 1 in API
-    2: "Giang mai", // Syphilis = 2 in API
-    3: "HIV", // HIV = 3 in API
-    4: "Herpes", // Herpes = 4 in API
-    5: "Viêm gan B", // HepatitisB = 5 in API
-    6: "Viêm gan C", // HepatitisC = 6 in API
-    7: "Trichomonas", // Trichomonas = 7 in API
-    8: "Mycoplasma Genitalium", // MycoplasmaGenitalium = 8 in API
-  };
 
   // Hàm tiện ích để lấy class màu sắc cho trạng thái
   const getStatusColorClass = (status) => {
-    switch (status) {
-      case 0:
-        return "bg-yellow-100 text-yellow-800"; // Scheduled
-      case 1:
-        return "bg-purple-100 text-purple-800"; // SampleTaken
-      case 2:
-        return "bg-blue-100 text-blue-800"; // Processing
-      case 3:
-        return "bg-green-100 text-green-800"; // Completed
-      case 4:
-        return "bg-red-100 text-red-800"; // Cancelled
-      default:
-        return "bg-gray-100 text-gray-800"; // Unknown
-    }
+    return STATUS_ENUM[status]?.color || "bg-gray-100 text-gray-800";
   };
 
-  // Hàm tiện ích để định dạng ngày tháng
+  // Hàm tiện ích để định dạng ngày tháng - đồng bộ với các components khác
   const formatDate = (dateString) => {
     if (!dateString) return "N/A";
     try {
-      return new Date(dateString).toLocaleDateString("vi-VN", {
-        year: "numeric",
-        month: "2-digit",
-        day: "2-digit",
-      });
+      return format(new Date(dateString), "dd/MM/yyyy", { locale: vi });
     } catch (error) {
       console.error("Error formatting date:", error);
       return dateString;
     }
   };
+
+  // Hàm tiện ích định dạng ngày giờ - đồng bộ với các components khác
+  const formatDateTime = (dateString) => {
+    if (!dateString) return "N/A";
+    try {
+      return format(new Date(dateString), "HH:mm - dd/MM/yyyy", { locale: vi });
+      // eslint-disable-next-line no-unused-vars
+    } catch (error) {
+      return "N/A";
+    }
+  };
+
+  // Thêm hàm này sau hàm formatDateTime trong file STITestingHistory.jsx
+  const formatTimeOnly = (dateString) => {
+    if (!dateString) return "N/A";
+    try {
+      return format(new Date(dateString), "HH:mm", { locale: vi });
+    } catch (error) {
+      return "N/A";
+    }
+  };
+
   // Fetch user's STI tests
 
   useEffect(() => {
@@ -176,7 +176,9 @@ function STITestingHistory({ userId }) {
       const endDateTime = new Date(endDate).setHours(23, 59, 59, 999);
 
       result = result.filter((test) => {
-        const testDate = new Date(test.scheduleDate || test.createdAt).getTime();
+        const testDate = new Date(
+          test.scheduleDate || test.createdAt
+        ).getTime();
         return testDate >= startDateTime && testDate <= endDateTime;
       });
     }
@@ -213,9 +215,9 @@ function STITestingHistory({ userId }) {
     isDateFilterActive,
   ]);
 
+  // Sửa hàm getPackagePrice để sử dụng TEST_PACKAGE_ENUM
   const getPackagePrice = (packageId) => {
-    const pkg = STI_PACKAGES.find((pkg) => pkg.id === packageId);
-    return pkg ? pkg.price : 0;
+    return TEST_PACKAGE_ENUM[packageId]?.price || 0;
   };
 
   // Update the handlePaymentRedirect function
@@ -398,10 +400,11 @@ function STITestingHistory({ userId }) {
                 onChange={(e) => setFilterSlot(e.target.value)}
               >
                 <option value="all">Tất cả</option>
-                <option value="0">Sáng sớm (7:00 - 10:00)</option>
-                <option value="1">Trưa (10:00 - 13:00)</option>
-                <option value="2">Chiều (13:00 - 16:00)</option>
-                <option value="3">Tối (16:00 - 19:00)</option>
+                {Object.values(TIME_SLOT_ENUM).map((slot) => (
+                  <option key={slot.id} value={slot.id}>
+                    {slot.display}
+                  </option>
+                ))}
               </select>
             </div>
           </div>
@@ -421,7 +424,7 @@ function STITestingHistory({ userId }) {
                 strokeLinecap="round"
                 strokeLinejoin="round"
                 strokeWidth="2"
-                d="M8 7V3m8 4V3m-9 8h10M5 21h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z"
+                d="M8 7V3m8 4V3m-9 8h10M5 21h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 012 2z"
               ></path>
             </svg>
             <span className="text-sm font-medium text-gray-700">
@@ -487,21 +490,32 @@ function STITestingHistory({ userId }) {
         <div className="flex flex-wrap gap-2">
           {isDateFilterActive && startDate && endDate && (
             <div className="flex items-center bg-blue-50 p-2 rounded-md">
-              <span className="text-xs text-blue-700 mr-2">Khoảng thời gian:</span>
+              <span className="text-xs text-blue-700 mr-2">
+                Khoảng thời gian:
+              </span>
               <span className="text-xs bg-blue-100 text-blue-800 px-2 py-1 rounded flex items-center">
                 {`${formatDate(startDate)} - ${formatDate(endDate)}`}
                 <button
                   onClick={resetDateFilter}
                   className="ml-1 text-blue-600 hover:text-blue-800"
                 >
-                  <svg className="w-3 h-3" fill="currentColor" viewBox="0 0 20 20" xmlns="http://www.w3.org/2000/svg">
-                    <path fillRule="evenodd" d="M4.293 4.293a1 1 0 011.414 0L10 8.586l4.293-4.293a1 1 0 111.414 1.414L11.414 10l4.293 4.293a1 1 0 01-1.414 1.414L10 11.414l-4.293 4.293a1 1 0 01-1.414-1.414L8.586 10 4.293 5.707a1 1 0 010-1.414z" clipRule="evenodd"></path>
+                  <svg
+                    className="w-3 h-3"
+                    fill="currentColor"
+                    viewBox="0 0 20 20"
+                    xmlns="http://www.w3.org/2000/svg"
+                  >
+                    <path
+                      fillRule="evenodd"
+                      d="M4.293 4.293a1 1 0 011.414 0L10 8.586l4.293-4.293a1 1 0 111.414 1.414L11.414 10l4.293 4.293a1 1 0 01-1.414 1.414L10 11.414l-4.293 4.293a1 1 0 01-1.414-1.414L8.586 10 4.293 5.707a1 1 0 010-1.414z"
+                      clipRule="evenodd"
+                    ></path>
                   </svg>
                 </button>
               </span>
             </div>
           )}
-          
+
           {filterSlot !== "all" && (
             <div className="flex items-center bg-purple-50 p-2 rounded-md">
               <span className="text-xs text-purple-700 mr-2">Khung giờ:</span>
@@ -511,8 +525,17 @@ function STITestingHistory({ userId }) {
                   onClick={() => setFilterSlot("all")}
                   className="ml-1 text-purple-600 hover:text-purple-800"
                 >
-                  <svg className="w-3 h-3" fill="currentColor" viewBox="0 0 20 20" xmlns="http://www.w3.org/2000/svg">
-                    <path fillRule="evenodd" d="M4.293 4.293a1 1 0 011.414 0L10 8.586l4.293-4.293a1 1 0 111.414 1.414L11.414 10l4.293 4.293a1 1 0 01-1.414 1.414L10 11.414l-4.293 4.293a1 1 0 01-1.414-1.414L8.586 10 4.293 5.707a1 1 0 010-1.414z" clipRule="evenodd"></path>
+                  <svg
+                    className="w-3 h-3"
+                    fill="currentColor"
+                    viewBox="0 0 20 20"
+                    xmlns="http://www.w3.org/2000/svg"
+                  >
+                    <path
+                      fillRule="evenodd"
+                      d="M4.293 4.293a1 1 0 011.414 0L10 8.586l4.293-4.293a1 1 0 111.414 1.414L11.414 10l4.293 4.293a1 1 0 01-1.414 1.414L10 11.414l-4.293 4.293a1 1 0 01-1.414-1.414L8.586 10 4.293 5.707a1 1 0 010-1.414z"
+                      clipRule="evenodd"
+                    ></path>
                   </svg>
                 </button>
               </span>
@@ -568,23 +591,18 @@ function STITestingHistory({ userId }) {
                           {formatDate(test.scheduleDate || test.createdAt)}
                         </div>
                         <div className="text-xs text-gray-500">
-                          {new Date(
-                            test.scheduleDate || test.createdAt
-                          ).toLocaleTimeString("vi-VN", {
-                            hour: "2-digit",
-                            minute: "2-digit",
-                          })}
+                          {slotLabels[test.slot] || "Không xác định"}
                         </div>
                       </div>
                     </td>
                     {/* Loại xét nghiệm */}
-                    <td className="px-6 py-4 text-sm text-gray-900">
+                    <td className="px-3 py-4 text-sm text-gray-900">
                       <div className="mb-2 w-25">
                         <span className="font-semibold text-purple-700 bg-purple-50 py-1 px-1 rounded-md border border-purple-200">
                           {testPackageLabels[test.testPackage] || "N/A"}
                         </span>
                       </div>
-                      <div className="flex flex-col gap-1.5">
+                      <div className="flex flex-col gap-1.0">
                         {test.testResult &&
                         test.testResult.filter((r) => r !== null).length > 0 ? (
                           test.testResult
@@ -595,7 +613,7 @@ function STITestingHistory({ userId }) {
                                 className="flex items-center text-blue-600 text-xs"
                               >
                                 <span className="inline-block w-2 h-2 rounded-full bg-blue-400 mr-2"></span>
-                                {testParamLabels[result.parameter] ||
+                                {parameterLabels[result.parameter] ||
                                   `Loại ${result.parameter}`}
                               </span>
                             ))
@@ -607,7 +625,7 @@ function STITestingHistory({ userId }) {
                               className="flex items-center text-blue-600 text-xs"
                             >
                               <span className="inline-block w-2 h-2 rounded-full bg-blue-400 mr-2"></span>
-                              {testParamLabels[param] || `Loại ${param}`}
+                              {parameterLabels[param] || `Loại ${param}`}
                             </span>
                           ))
                         ) : (
@@ -618,7 +636,7 @@ function STITestingHistory({ userId }) {
                       </div>
                     </td>
                     {/* Trạng thái */}
-                    <td className="px-6 py-4 whitespace-nowrap">
+                    <td className="px-3 py-4 whitespace-nowrap">
                       <span
                         className={`px-3 py-1 inline-flex items-center text-xs leading-5 font-semibold rounded-full ${getStatusColorClass(
                           test.status
@@ -641,7 +659,7 @@ function STITestingHistory({ userId }) {
                                     strokeLinecap="round"
                                     strokeLinejoin="round"
                                     strokeWidth="2"
-                                    d="M8 7V3m8 4V3m-9 8h10M5 21h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z"
+                                    d="M8 7V3m8 4V3m-9 8h10M5 21h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 012 2z"
                                   />
                                 </svg>
                               );
@@ -831,7 +849,7 @@ function STITestingHistory({ userId }) {
           </tbody>
         </table>
       </div>
-      
+
       {/* Nút reset tất cả các bộ lọc */}
       <div className="mt-4 flex justify-end">
         <button
@@ -842,7 +860,7 @@ function STITestingHistory({ userId }) {
           Xóa tất cả bộ lọc
         </button>
       </div>
-      
+
       {/* Modal hiển thị chi tiết xét nghiệm */}
       {showModal && selectedTest && (
         <div className="fixed inset-0 z-50 flex items-center justify-center overflow-x-hidden overflow-y-auto outline-none focus:outline-none bg-black bg-opacity-50">
@@ -873,14 +891,17 @@ function STITestingHistory({ userId }) {
                       <p className="text-sm text-gray-500">Gói xét nghiệm</p>
                       <div className="mt-1">
                         <span className="inline-block font-semibold text-purple-700 bg-purple-50 px-3 py-1.5 rounded-md border border-purple-200">
-                          {testPackageLabels[selectedTest.testPackage] || "Không xác định"}
+                          {testPackageLabels[selectedTest.testPackage] ||
+                            "Không xác định"}
                         </span>
                       </div>
                     </div>
                     <div>
                       <p className="text-sm text-gray-500">Ngày lấy mẫu</p>
                       <p className="text-base font-medium">
-                        {new Date(selectedTest.collectedDate).toLocaleDateString("vi-VN")}
+                        {new Date(
+                          selectedTest.collectedDate
+                        ).toLocaleDateString("vi-VN")}
                       </p>
                     </div>
                     <div>
@@ -891,7 +912,11 @@ function STITestingHistory({ userId }) {
                     </div>
                     <div>
                       <p className="text-sm text-gray-500">Trạng thái</p>
-                      <p className={`text-base font-medium ${getStatusColorClass(selectedTest.status).replace('bg-', 'text-')}`}>
+                      <p
+                        className={`text-base font-medium ${getStatusColorClass(
+                          selectedTest.status
+                        ).replace("bg-", "text-")}`}
+                      >
                         {statusLabels[selectedTest.status] || "Không xác định"}
                       </p>
                     </div>
@@ -1002,7 +1027,7 @@ function STITestingHistory({ userId }) {
                               >
                                 <span className="inline-block w-2 h-2 rounded-full bg-blue-400 mr-2"></span>
                                 <span className="text-sm">
-                                  {testParamLabels[paramId] ||
+                                  {parameterLabels[paramId] ||
                                     `Loại xét nghiệm ${paramId}`}
                                 </span>
                               </div>
@@ -1054,39 +1079,18 @@ function STITestingHistory({ userId }) {
                             </thead>
                             <tbody className="bg-white divide-y divide-gray-200">
                               {selectedTest.testResult.map((result) => {
-                                // Enum mapping cho TestParameter
-                                const testParamLabels = {
-                                  0: "Chlamydia",
-                                  1: "Gonorrhoeae (Lậu)",
-                                  2: "Syphilis (Giang mai)",
-                                  3: "HIV",
-                                  4: "Herpes",
-                                  5: "Viêm gan B",
-                                  6: "Viêm gan C",
-                                  7: "Trichomonas",
-                                  8: "Mycoplasma Genitalium",
-                                };
-
-                                // Enum mapping cho ResultOutcome
-                                const resultOutcomeLabels = {
-                                  0: "Âm tính",
-                                  1: "Dương tính",
-                                  2: "Đang xử lý",
-                                };
+                                // Sử dụng enum từ constants thay vì định nghĩa lại
 
                                 // Màu sắc theo kết quả
                                 const resultColorClass =
-                                  result.outcome === 0
-                                    ? "text-green-600"
-                                    : result.outcome === 1
-                                    ? "text-red-600"
-                                    : "text-yellow-600";
+                                  OUTCOME_ENUM[result.outcome]?.color ||
+                                  "text-yellow-600";
 
                                 return (
                                   <tr key={result.id}>
                                     <td className="px-4 py-3 whitespace-nowrap">
                                       <span className="font-medium">
-                                        {testParamLabels[result.parameter] ||
+                                        {parameterLabels[result.parameter] ||
                                           `Loại ${result.parameter}`}
                                       </span>
                                     </td>
@@ -1094,7 +1098,7 @@ function STITestingHistory({ userId }) {
                                       <span
                                         className={`${resultColorClass} font-medium`}
                                       >
-                                        {resultOutcomeLabels[result.outcome] ||
+                                        {outcomeLabels[result.outcome] ||
                                           "Không xác định"}
                                       </span>
                                     </td>
