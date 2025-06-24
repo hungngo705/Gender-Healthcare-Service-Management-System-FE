@@ -5,6 +5,7 @@ import { format } from "date-fns";
 import { toast } from "react-toastify";
 import { STI_PACKAGES, STI_TEST_TYPES } from "./booking-components/constants";
 import { getForCustomer } from "../../services/stiTestingService";
+import { TIME_SLOT_ENUM } from "../../constants/enums";
 
 // Time slot component for STI testing booking
 const TimeSlotSelector = ({
@@ -13,12 +14,7 @@ const TimeSlotSelector = ({
   bookedSlots,
   selectedDate,
 }) => {
-  const timeSlots = [
-    { id: 0, time: "7:00 - 10:00", label: "Sáng sớm", endHour: 10 },
-    { id: 1, time: "10:00 - 13:00", label: "Trưa", endHour: 13 },
-    { id: 2, time: "13:00 - 16:00", label: "Chiều", endHour: 16 },
-    { id: 3, time: "16:00 - 19:00", label: "Tối", endHour: 19 },
-  ];
+  const timeSlots = Object.values(TIME_SLOT_ENUM);
 
   // Check if selected date is today
   const isToday =
@@ -109,7 +105,7 @@ function BookingForm() {
   // State for storing customer's existing bookings
   const [userBookings, setUserBookings] = useState([]);
   const [bookedSlots, setBookedSlots] = useState({});
-  const [isLoadingBookings, setIsLoadingBookings] = useState(false);
+  const [setIsLoadingBookings] = useState(false);
 
   // State for appointment form
   const [formData, setFormData] = useState({

@@ -12,26 +12,28 @@ import {
 } from "lucide-react";
 import { toast } from "react-toastify";
 import stiTestingService from "../../../../services/stiTestingService";
+// Import các enum chung
+import {
+  TIME_SLOT_ENUM,
+  TEST_PACKAGE_ENUM,
+  STATUS_ENUM,
+} from "../../../../constants/enums";
 
-const slotLabels = {
-  0: "Sáng (8:00 - 12:00)",
-  1: "Chiều (13:00 - 17:00)",
-  2: "Tối (17:00 - 21:00)",
-};
+// Sử dụng enum chung thay vì khai báo lại
+const slotLabels = Object.values(TIME_SLOT_ENUM).reduce((acc, slot) => {
+  acc[slot.id] = slot.display;
+  return acc;
+}, {});
 
-const testPackageLabels = {
-  0: "Gói Cơ Bản",
-  1: "Gói Nâng Cao",
-  2: "Gói Tùy Chọn",
-};
+const testPackageLabels = Object.values(TEST_PACKAGE_ENUM).reduce(
+  (acc, pkg) => {
+    acc[pkg.id] = pkg.name;
+    return acc;
+  },
+  {}
+);
 
-const statusLabels = {
-  0: { label: "Đã lên lịch", color: "bg-blue-100 text-blue-800" },
-  1: { label: "Đã lấy mẫu", color: "bg-yellow-100 text-yellow-800" },
-  2: { label: "Đang xử lý", color: "bg-purple-100 text-purple-800" },
-  3: { label: "Hoàn thành", color: "bg-green-100 text-green-800" },
-  4: { label: "Đã hủy", color: "bg-red-100 text-red-800" },
-};
+const statusLabels = STATUS_ENUM;
 
 function TestDetailModal({
   test: initialTest,

@@ -1,3 +1,4 @@
+/* eslint-disable no-unused-vars */
 import React, { useState, useEffect } from "react";
 import { toast } from "react-toastify";
 import stiTestingService from "../../../services/stiTestingService";
@@ -18,44 +19,14 @@ import {
 } from "lucide-react";
 import { format } from "date-fns";
 import { vi } from "date-fns/locale";
+// Import các enum chung
+import { PARAMETER_ENUM, OUTCOME_ENUM } from "../../../constants/enums";
 
-// Các constant cho tham số xét nghiệm STI
-const TEST_PARAMETERS = {
-  0: { name: "Chlamydia", shortName: "CLM", icon: "🔬" },
-  1: { name: "Lậu (Gonorrhoeae)", shortName: "GNR", icon: "🧫" },
-  2: { name: "Giang mai (Syphilis)", shortName: "SYP", icon: "🦠" },
-  3: { name: "HIV", shortName: "HIV", icon: "🧬" },
-  4: { name: "Herpes", shortName: "HSV", icon: "🧪" },
-  5: { name: "Viêm gan B", shortName: "HBV", icon: "💉" },
-  6: { name: "Viêm gan C", shortName: "HCV", icon: "💊" },
-  7: { name: "Trichomonas", shortName: "TCH", icon: "🔬" },
-  8: { name: "Mycoplasma Genitalium", shortName: "MPG", icon: "🦠" },
-};
+// Sử dụng enum chung
+const TEST_PARAMETERS = PARAMETER_ENUM;
 
-// Các constant cho kết quả xét nghiệm
-const OUTCOME_TYPES = {
-  0: {
-    label: "Âm tính",
-    color: "text-green-600",
-    bgColor: "bg-green-100",
-    borderColor: "border-green-200",
-    icon: <CheckCircle size={14} className="mr-1" />,
-  },
-  1: {
-    label: "Dương tính",
-    color: "text-red-600",
-    bgColor: "bg-red-100",
-    borderColor: "border-red-200",
-    icon: <AlertCircle size={14} className="mr-1" />,
-  },
-  2: {
-    label: "Chưa xác định",
-    color: "text-yellow-600",
-    bgColor: "bg-yellow-100",
-    borderColor: "border-yellow-200",
-    icon: <RefreshCw size={14} className="mr-1" />,
-  },
-};
+// Sử dụng enum chung
+const OUTCOME_TYPES = OUTCOME_ENUM;
 
 function STITestResults({ userId }) {
   const { currentUser } = useAuth();
