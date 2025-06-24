@@ -155,6 +155,35 @@ const tokenHelper = {
       return { error: error.message };
     }
   },
+
+  /**
+   * Trích xuất ID người dùng từ token JWT
+   * @returns {string} ID người dùng hoặc chuỗi rỗng nếu không tìm thấy
+   */
+  getUserIdFromToken: () => {
+    const tokenInfo = tokenHelper.getCurrentTokenInfo();
+    if (!tokenInfo) return "";
+
+    // Log toàn bộ cấu trúc token để debug
+    console.log("Full token structure:", tokenInfo);
+
+    // Tìm kiếm ID trong các trường thông dụng
+    const userId =
+      tokenInfo.sub ||
+      tokenInfo.id ||
+      tokenInfo.userId ||
+      tokenInfo.nameid ||
+      tokenInfo.oid ||
+      tokenInfo[
+        "http://schemas.xmlsoap.org/ws/2005/05/identity/claims/nameidentifier"
+      ] ||
+      tokenInfo[
+        "http://schemas.microsoft.com/identity/claims/objectidentifier"
+      ] ||
+      "";
+
+    return userId;
+  },
 };
 
 export default tokenHelper;

@@ -1,39 +1,132 @@
-import React, { useState } from "react";
+import React, { useState, useEffect } from "react";
 import { Link } from "react-router-dom";
-// eslint-disable-next-line no-unused-vars
-import { motion } from "framer-motion";
 import { Search } from "lucide-react";
-
-// Blog data should be moved to a separate file
-import { blogData } from "../data/blogData";
+import blogService from "../services/blogService";
+import LoadingSpinner from "../components/ui/LoadingSpinner";
 
 const categories = [
   { id: "all", name: "Tất cả bài viết" },
-  { id: "reproductive", name: "Sức khỏe sinh sản" },
-  { id: "sexual", name: "Sức khỏe tình dục" },
-  { id: "mental", name: "Sức khỏe tâm thần" },
-  { id: "education", name: "Giáo dục giới tính" },
+  { id: "0", name: "Sức khỏe sinh sản" },
+  { id: "1", name: "Sức khỏe tình dục" },
+  { id: "2", name: "Sức khỏe tâm thần" },
+  { id: "3", name: "Giáo dục giới tính" },
+  { id: "5", name: "Sức khỏe tinh thần" },
 ];
+
+// Helper function to format date
+const formatDate = (dateString) => {
+  const date = new Date(dateString);
+  return `${date.getDate()} tháng ${
+    date.getMonth() + 1
+  }, ${date.getFullYear()}`;
+};
+
+// Helper function to get category name
+const getCategoryName = (categoryId) => {
+  const category = categories.find((cat) => cat.id === categoryId.toString());
+  return category ? category.name : "Khác";
+};
+
+// Helper function to get status class and text
+const getStatusInfo = (status) => {
+  switch (status) {
+    case 0:
+      return { class: "bg-yellow-100 text-yellow-800", text: "Bản nháp" };
+    case 1:
+      return { class: "bg-green-100 text-green-800", text: "Đã xuất bản" };
+    case 2:
+      return { class: "bg-blue-100 text-blue-800", text: "Đang xét duyệt" };
+    case 3:
+      return { class: "bg-indigo-100 text-indigo-800", text: "Đã đăng" };
+    default:
+      return { class: "bg-gray-100 text-gray-800", text: "Không xác định" };
+  }
+};
 
 function Blog() {
   const [searchTerm, setSearchTerm] = useState("");
   const [activeCategory, setActiveCategory] = useState("all");
+  const [blogPosts, setBlogPosts] = useState([]);
+  const [loading, setLoading] = useState(true);
+  const [error, setError] = useState(null);
+
+  useEffect(() => {
+    const fetchBlogPosts = async () => {
+      try {
+        setLoading(true);
+        const data = await blogService.getAll();
+        console.log("Blog posts loaded:", data);
+
+        // CHỈ hiển thị bài viết đã được xuất bản (status = 1)
+        const publishedPosts = data.filter((post) => post.status === 1);
+        setBlogPosts(publishedPosts);
+      } catch (err) {
+        console.error("Failed to fetch blog posts:", err);
+
+        if (err.response?.status === 401) {
+          setError(
+            "Bạn cần đăng nhập để xem các bài viết. Vui lòng đăng nhập và thử lại."
+          );
+        } else {
+          setError(
+            `Không thể tải bài viết. Lỗi: ${err.message || "không xác định"}`
+          );
+        }
+      } finally {
+        setLoading(false);
+      }
+    };
+
+    fetchBlogPosts();
+  }, []);
 
   // Filter blog posts by category and search term
-  const filteredBlogs = blogData
-    .sort((a, b) => new Date(b.date) - new Date(a.date)) // Sort by newest date
-    .map((blog) => ({
-      ...blog,
-      categoryName: categories.find((cat) => cat.id === blog.category)?.name,
-    }))
+  const filteredBlogs = blogPosts
     .filter(
-      (blog) => activeCategory === "all" || blog.category === activeCategory
+      (blog) =>
+        activeCategory === "all" || blog.category.toString() === activeCategory
     )
     .filter(
       (blog) =>
         blog.title.toLowerCase().includes(searchTerm.toLowerCase()) ||
-        blog.excerpt.toLowerCase().includes(searchTerm.toLowerCase())
+        blog.content?.toLowerCase().includes(searchTerm.toLowerCase()) ||
+        getCategoryName(blog.category)
+          .toLowerCase()
+          .includes(searchTerm.toLowerCase())
     );
+
+  if (loading) {
+    return (
+      <div className="min-h-screen flex items-center justify-center">
+        <LoadingSpinner />
+      </div>
+    );
+  }
+
+  if (error) {
+    return (
+      <div className="min-h-screen bg-gray-50 flex flex-col items-center justify-center p-4">
+        <h1 className="text-2xl font-bold text-gray-800 mb-4">Có lỗi xảy ra</h1>
+        <p className="text-gray-600 mb-4">{error}</p>
+
+        {error.includes("đăng nhập") && (
+          <Link
+            to="/login"
+            className="px-6 py-2 bg-indigo-600 text-white rounded-md hover:bg-indigo-700 transition-colors"
+          >
+            Đăng nhập ngay
+          </Link>
+        )}
+
+        <button
+          onClick={() => window.location.reload()}
+          className="mt-4 px-4 py-2 bg-gray-200 text-gray-700 rounded-md hover:bg-gray-300 transition-colors"
+        >
+          Thử lại
+        </button>
+      </div>
+    );
+  }
 
   return (
     <div className="bg-gray-50 min-h-screen pb-20">
@@ -41,23 +134,13 @@ function Blog() {
       <div className="bg-gradient-to-r from-indigo-600 to-purple-600 text-white py-16">
         <div className="container mx-auto px-4 sm:px-6 lg:px-8">
           <div className="max-w-4xl mx-auto text-center">
-            <motion.h1
-              initial={{ opacity: 0, y: -20 }}
-              animate={{ opacity: 1, y: 0 }}
-              transition={{ duration: 0.5 }}
-              className="text-4xl font-extrabold tracking-tight sm:text-5xl"
-            >
+            <h1 className="text-4xl font-extrabold tracking-tight sm:text-5xl">
               Tin Tức Sức Khỏe Giới Tính
-            </motion.h1>
-            <motion.p
-              initial={{ opacity: 0, y: 20 }}
-              animate={{ opacity: 1, y: 0 }}
-              transition={{ duration: 0.5, delay: 0.2 }}
-              className="mt-4 text-lg"
-            >
-              Khám phá kiến thức, tin tức, và hướng dẫn về sức khỏe sinh sản, 
+            </h1>
+            <p className="mt-4 text-lg">
+              Khám phá kiến thức, tin tức, và hướng dẫn về sức khỏe sinh sản,
               sức khỏe tình dục, và các vấn đề giới tính từ các chuyên gia
-            </motion.p>
+            </p>
 
             {/* Search box */}
             <div className="mt-8 max-w-xl mx-auto">
@@ -68,13 +151,13 @@ function Blog() {
                   value={searchTerm}
                   onChange={(e) => setSearchTerm(e.target.value)}
                   className="w-full pl-5 pr-12 py-3.5 rounded-full text-gray-800 
-                bg-white/90 backdrop-filter backdrop-blur-md shadow-lg 
-                border border-white/30 hover:border-white/50
-                focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:border-transparent
-                transition-all duration-300"
+                  bg-white/90 backdrop-filter backdrop-blur-md shadow-lg 
+                  border border-white/30 hover:border-white/50
+                  focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:border-transparent
+                  transition-all duration-300"
                 />
                 <div className="absolute inset-y-0 right-0 flex items-center pr-4">
-                  <Search className="h-5 w-5 text-white" />
+                  <Search className="h-5 w-5 text-gray-500" />
                 </div>
               </div>
             </div>
@@ -100,64 +183,56 @@ function Blog() {
           ))}
         </div>
 
-        {/* Featured blog post */}
+        {/* Featured blog post - only show if we have posts */}
         {filteredBlogs.length > 0 && (
           <div className="mb-12">
             <Link to={`/blog/${filteredBlogs[0].id}`}>
-              <motion.div
-                initial={{ opacity: 0, y: 20 }}
-                animate={{ opacity: 1, y: 0 }}
-                transition={{ duration: 0.5 }}
-                className="bg-white rounded-xl overflow-hidden shadow-lg hover:shadow-xl transition-shadow"
-              >
+              <div className="bg-white rounded-xl overflow-hidden shadow-lg hover:shadow-xl transition-shadow">
                 <div className="md:flex">
                   <div className="md:w-1/2">
                     <img
-                      src={filteredBlogs[0].img}
+                      src={
+                        filteredBlogs[0].imageUrl ||
+                        "https://via.placeholder.com/800x400?text=No+Image"
+                      }
                       alt={filteredBlogs[0].title}
                       className="h-64 w-full object-cover md:h-full"
                     />
                   </div>
                   <div className="p-8 md:w-1/2 flex flex-col justify-center">
                     <div className="uppercase tracking-wide text-sm text-indigo-600 font-semibold">
-                      Bài Viết Nổi Bật
+                      BÀI VIẾT NỔI BẬT
                     </div>
                     <h2 className="mt-2 text-2xl font-bold text-gray-900 hover:text-indigo-600 transition-colors">
                       {filteredBlogs[0].title}
                     </h2>
                     <p className="mt-3 text-gray-500">
-                      {filteredBlogs[0].excerpt}
+                      {filteredBlogs[0].content.substring(0, 150)}...
                     </p>
                     <div className="mt-4 flex items-center">
                       <div className="flex-shrink-0">
                         <img
                           className="h-10 w-10 rounded-full"
                           src={
-                            filteredBlogs[0].authorImg ||
-                            "https://images.unsplash.com/photo-1494790108377-be9c29b29330?ixlib=rb-1.2.1&ixid=eyJhcHBfaWQiOjEyMDd9&auto=format&fit=facearea&facepad=2&w=256&h=256&q=80"
+                            filteredBlogs[0].staff?.avatarUrl ||
+                            "https://via.placeholder.com/100?text=User"
                           }
-                          alt={filteredBlogs[0].author || "Tác giả"}
+                          alt={filteredBlogs[0].staff?.name || "Tác giả"}
                         />
                       </div>
                       <div className="ml-3">
                         <p className="text-sm font-medium text-gray-900">
-                          {filteredBlogs[0].author || "Đội Chăm Sóc Sức Khỏe Giới Tính"}
+                          {filteredBlogs[0].staff?.name ||
+                            "Tác giả không xác định"}
                         </p>
                         <p className="text-sm text-gray-500">
-                          {new Date(filteredBlogs[0].date).toLocaleDateString(
-                            "vi-VN",
-                            {
-                              year: "numeric",
-                              month: "long",
-                              day: "numeric",
-                            }
-                          )}
+                          {formatDate(filteredBlogs[0].createdAt)}
                         </p>
                       </div>
                     </div>
                   </div>
                 </div>
-              </motion.div>
+              </div>
             </Link>
           </div>
         )}
@@ -181,89 +256,93 @@ function Blog() {
           </div>
         ) : (
           <div className="grid gap-8 md:grid-cols-2 lg:grid-cols-3">
-            {filteredBlogs.slice(1).map((blog, index) => (
-              <motion.div
+            {filteredBlogs.slice(1).map((blog) => (
+              <Link
                 key={blog.id}
-                initial={{ opacity: 0, y: 20 }}
-                animate={{ opacity: 1, y: 0 }}
-                transition={{ duration: 0.5, delay: index * 0.1 }}
+                to={`/blog/${blog.id}`}
+                className="block h-full"
               >
-                <Link to={`/blog/${blog.id}`} className="block h-full">
-                  <div className="h-full bg-white rounded-lg overflow-hidden shadow hover:shadow-md transition-shadow">
-                    <div className="h-48 overflow-hidden">
-                      <img
-                        src={blog.img}
-                        alt={blog.title}
-                        className="w-full h-full object-cover transition-transform duration-500 hover:scale-110"
-                      />
+                <div className="h-full bg-white rounded-lg overflow-hidden shadow hover:shadow-md transition-shadow">
+                  <div className="h-48 overflow-hidden">
+                    <img
+                      src={
+                        blog.imageUrl ||
+                        "https://via.placeholder.com/400x300?text=No+Image"
+                      }
+                      alt={blog.title}
+                      className="w-full h-full object-cover transition-transform duration-500 hover:scale-110"
+                    />
+                  </div>
+                  <div className="p-6">
+                    <div className="flex items-center space-x-2 mb-2">
+                      <span className="inline-block px-2 py-1 text-xs font-semibold bg-indigo-100 text-indigo-800 rounded-full">
+                        {getCategoryName(blog.category)}
+                      </span>
+                      {/* Status badge */}
+                      <span
+                        className={`inline-block px-2 py-1 text-xs font-semibold ${
+                          getStatusInfo(blog.status).class
+                        } rounded-full`}
+                      >
+                        {getStatusInfo(blog.status).text}
+                      </span>
                     </div>
-                    <div className="p-6">
-                      <div className="flex items-center space-x-2 mb-2">
-                        <span className="inline-block px-2 py-1 text-xs font-semibold bg-indigo-100 text-indigo-800 rounded-full">
-                          {blog.categoryName || "Sức khỏe"}
-                        </span>
-                        <span className="text-sm text-gray-500">
-                          {new Date(blog.date).toLocaleDateString("vi-VN", {
-                            year: "numeric",
-                            month: "long",
-                            day: "numeric",
-                          })}
-                        </span>
-                      </div>
-                      <h3 className="text-lg font-bold text-gray-900 mb-2 hover:text-indigo-600 transition-colors">
-                        {blog.title}
-                      </h3>
-                      <p className="text-gray-600 text-sm mb-4 line-clamp-3">
-                        {blog.excerpt}
-                      </p>
-                      <div className="mt-4 flex items-center">
+                    <h3 className="text-lg font-bold text-gray-900 mb-2 hover:text-indigo-600 transition-colors">
+                      {blog.title}
+                    </h3>
+                    <p className="text-gray-600 text-sm mb-4 line-clamp-3">
+                      {blog.content}
+                    </p>
+                    <div className="mt-4 flex items-center justify-between">
+                      <div className="flex items-center">
                         <img
                           className="h-8 w-8 rounded-full mr-2"
                           src={
-                            blog.authorImg ||
-                            "https://images.unsplash.com/photo-1494790108377-be9c29b29330?ixlib=rb-1.2.1&ixid=eyJhcHBfaWQiOjEyMDd9&auto=format&fit=facearea&facepad=2&w=256&h=256&q=80"
+                            blog.staff?.avatarUrl ||
+                            "https://via.placeholder.com/100?text=User"
                           }
-                          alt={blog.author || "Tác giả"}
+                          alt={blog.staff?.name || "Tác giả"}
                         />
                         <span className="text-sm font-medium text-gray-900">
-                          {blog.author || "Đội Chăm Sóc Sức Khỏe Giới Tính"}
+                          {blog.staff?.name || "Tác giả không xác định"}
                         </span>
                       </div>
+                      <span className="text-sm text-gray-500">
+                        {formatDate(blog.createdAt)}
+                      </span>
                     </div>
                   </div>
-                </Link>
-              </motion.div>
+                </div>
+              </Link>
             ))}
           </div>
         )}
 
-        {/* Newsletter subscription */}
-        <div className="mt-16 bg-white rounded-lg shadow-lg overflow-hidden">
-          <div className="md:flex">
-            <div className="md:w-1/2 bg-indigo-700 p-8 text-white flex flex-col justify-center">
-              <h3 className="text-2xl font-bold mb-4">Đăng ký nhận bản tin</h3>
-              <p className="mb-6">
-                Nhận thông tin mới nhất về sức khỏe giới tính qua email.
-                Chúng tôi sẽ không gửi thư rác hoặc chia sẻ thông tin của bạn.
-              </p>
-              <div className="flex flex-col sm:flex-row">
-                <input
-                  type="email"
-                  placeholder="Email của bạn"
-                  className="px-4 py-2 w-full sm:w-auto rounded-l text-white focus:outline-none border border-gray-300 focus:ring-2 focus:ring-indigo-500 focus:border-transparent transition-colors"
-                />
-                <button className="mt-2 sm:mt-0 bg-white text-indigo-700 font-medium px-4 py-2 rounded-r hover:bg-gray-100 transition-colors">
-                  Đăng ký
-                </button>
-              </div>
-            </div>
-            <div className="md:w-1/2">
-              <img
-                src="https://images.unsplash.com/photo-1573164713988-8665fc963095?ixlib=rb-1.2.1&auto=format&fit=crop&w=600&q=80"
-                alt="Bản tin"
-                className="w-full h-64 md:h-full object-cover"
+        {/* Newsletter section */}
+        <div className="mt-16 bg-indigo-50 rounded-2xl p-8 md:p-10">
+          <div className="max-w-2xl mx-auto text-center">
+            <h3 className="text-2xl font-bold text-gray-900 mb-4">
+              Đăng ký nhận bản tin
+            </h3>
+            <p className="text-gray-600 mb-6">
+              Nhận thông tin mới nhất về sức khỏe giới tính, các bài viết và lời
+              khuyên từ các chuyên gia của chúng tôi, được gửi trực tiếp đến hộp
+              thư của bạn.
+            </p>
+            <div className="flex flex-col sm:flex-row gap-2">
+              <input
+                type="email"
+                placeholder="Địa chỉ email của bạn"
+                className="px-4 py-3 w-full rounded-md border-gray-300 shadow-sm focus:border-indigo-500 focus:ring focus:ring-indigo-200 focus:ring-opacity-50"
               />
+              <button className="bg-indigo-600 text-white px-6 py-3 rounded-md hover:bg-indigo-700 transition-colors">
+                Đăng ký
+              </button>
             </div>
+            <p className="text-xs text-gray-500 mt-3">
+              Chúng tôi coi trọng quyền riêng tư của bạn. Bạn có thể hủy đăng ký
+              bất cứ lúc nào.
+            </p>
           </div>
         </div>
       </div>

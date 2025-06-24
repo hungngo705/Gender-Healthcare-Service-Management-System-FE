@@ -13,53 +13,66 @@ import {
   Mail,
   Link as LinkIcon,
 } from "lucide-react";
-import { blogData } from "../data/blogData";
+import blogService from "../services/blogService";
+import LoadingSpinner from "../components/ui/LoadingSpinner";
 
 function BlogDetail() {
   const { id } = useParams();
   const [blog, setBlog] = useState(null);
   const [relatedPosts, setRelatedPosts] = useState([]);
   const [loading, setLoading] = useState(true);
+  const [error, setError] = useState(null);
   const [showSharePopup, setShowSharePopup] = useState(false);
 
   useEffect(() => {
     // Scroll to top when component mounts
     window.scrollTo(0, 0);
 
-    // Find the blog with the matching ids
-    const foundBlog = blogData.find((post) => post.id === id);
+    const fetchBlogDetail = async () => {
+      try {
+        setLoading(true);
 
-    if (foundBlog) {
-      setBlog(foundBlog);
+        // Fetch the current blog post
+        const data = await blogService.getById(id);
+        setBlog(data);
 
-      // Find related posts (same category)
-      const related = blogData
-        .filter(
-          (post) => post.id !== id && post.category === foundBlog.category
-        )
-        .slice(0, 3);
-      setRelatedPosts(related);
-    }
+        // Fetch all posts to find related ones
+        const allPosts = await blogService.getAll();
 
-    setLoading(false);
+        // Find related posts (same category)
+        if (data && data.category) {
+          const related = allPosts
+            .filter((post) => post.id !== id && post.category === data.category)
+            .slice(0, 3);
+          setRelatedPosts(related);
+        }
+      } catch (err) {
+        console.error("Error fetching blog details:", err);
+        setError("Failed to load blog details. Please try again later.");
+      } finally {
+        setLoading(false);
+      }
+    };
+
+    fetchBlogDetail();
   }, [id]);
 
   if (loading) {
     return (
       <div className="min-h-screen flex items-center justify-center">
-        <div className="animate-spin rounded-full h-12 w-12 border-t-2 border-b-2 border-indigo-500"></div>
+        <LoadingSpinner />
       </div>
     );
   }
 
-  if (!blog) {
+  if (error || !blog) {
     return (
       <div className="min-h-screen bg-gray-50 flex flex-col items-center justify-center p-4">
         <h1 className="text-2xl font-bold text-gray-800 mb-4">
           Không tìm thấy bài viết
         </h1>
         <p className="text-gray-600 mb-8">
-          Bài viết bạn đang tìm kiếm không tồn tại hoặc đã bị xóa.
+          {error || "Bài viết bạn đang tìm kiếm không tồn tại hoặc đã bị xóa."}
         </p>
         <Link
           to="/blog"
@@ -123,24 +136,20 @@ function BlogDetail() {
 
   return (
     <div className="bg-gray-50 min-h-screen pb-20 pt-6">
-      {" "}
-      {/* Added pt-16 for top padding */}
       <div className="container mx-auto px-4 sm:px-6 lg:px-8 relative z-10">
-        {" "}
-        {/* Removed -mt-10 */}
         <div className="max-w-3xl mx-auto bg-white rounded-lg shadow-lg overflow-hidden">
           {/* Author info and metadata */}
           <div className="p-6 border-b border-gray-100">
             <div className="flex flex-wrap items-center justify-between">
               <div className="flex items-center mb-4 sm:mb-0">
                 <img
-                  src={blog.authorImg}
-                  alt={blog.author}
+                  src="https://images.unsplash.com/photo-1494790108377-be9c29b29330?ixlib=rb-1.2.1&ixid=eyJhcHBfaWQiOjEyMDd9&auto=format&fit=facearea&facepad=2&w=256&h=256&q=80"
+                  alt={blog.staffId}
                   className="w-12 h-12 rounded-full object-cover"
                 />
                 <div className="ml-4">
                   <h3 className="text-lg font-medium text-gray-900">
-                    {blog.author}
+                    {blog.staffId}
                   </h3>
                   <p className="text-sm text-gray-600">Bác sĩ Chuyên khoa</p>
                 </div>
@@ -150,7 +159,7 @@ function BlogDetail() {
                 <div className="flex items-center mr-6 text-gray-600">
                   <Calendar className="w-4 h-4 mr-1" />
                   <span className="text-sm">
-                    {new Date(blog.date).toLocaleDateString("vi-VN", {
+                    {new Date(blog.createdAt).toLocaleDateString("vi-VN", {
                       year: "numeric",
                       month: "long",
                       day: "numeric",
@@ -159,7 +168,9 @@ function BlogDetail() {
                 </div>
                 <div className="flex items-center text-gray-600">
                   <Clock className="w-4 h-4 mr-1" />
-                  <span className="text-sm">{blog.readingTime} phút đọc</span>
+                  <span className="text-sm">
+                    {Math.ceil(blog.content.length / 1000)} phút đọc
+                  </span>
                 </div>
               </div>
             </div>
@@ -171,7 +182,10 @@ function BlogDetail() {
               {/* Blog image */}
               <div className="mb-8 rounded-lg overflow-hidden">
                 <img
-                  src={blog.img}
+                  src={
+                    blog.imageUrl ||
+                    "https://via.placeholder.com/800x400?text=No+Image"
+                  }
                   alt={blog.title}
                   className="w-full h-auto object-cover"
                 />
@@ -181,10 +195,6 @@ function BlogDetail() {
               <h1 className="text-3xl sm:text-4xl font-bold text-gray-900 mb-4">
                 {blog.title}
               </h1>
-
-              <p className="font-medium text-xl text-gray-800 mb-6">
-                {blog.excerpt}
-              </p>
 
               {/* Display blog content */}
               <div className="mt-6">
@@ -276,7 +286,37 @@ function BlogDetail() {
               </button>
             </div>
           </div>
+
+          {/* Thêm vào phần hiển thị trạng thái */}
+          {/* Hiển thị thông báo nếu bài viết chưa được xuất bản */}
+          {blog.status !== 1 && (
+            <div className="px-6 py-4 bg-yellow-50 border-t border-yellow-100">
+              <div className="flex items-center">
+                <svg
+                  className="h-5 w-5 text-yellow-400 mr-2"
+                  xmlns="http://www.w3.org/2000/svg"
+                  fill="none"
+                  viewBox="0 0 24 24"
+                  stroke="currentColor"
+                >
+                  <path
+                    strokeLinecap="round"
+                    strokeLinejoin="round"
+                    strokeWidth={2}
+                    d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-3L13.732 4c-.77-1.333-2.694-1.333-3.464 0L3.34 16c-.77 1.333.192 3 1.732 3z"
+                  />
+                </svg>
+                <span className="text-yellow-700">
+                  {blog.status === 0 &&
+                    "Bài viết này vẫn đang ở trạng thái bản nháp."}
+                  {blog.status === 2 && "Bài viết này đang chờ xét duyệt."}
+                  {blog.status === 3 && "Bài viết này đã bị từ chối."}
+                </span>
+              </div>
+            </div>
+          )}
         </div>
+
         {/* Related posts */}
         {relatedPosts.length > 0 && (
           <div className="mt-16 max-w-5xl mx-auto">
@@ -289,29 +329,29 @@ function BlogDetail() {
                   <div className="bg-white rounded-lg overflow-hidden shadow transition-shadow hover:shadow-md">
                     <div className="h-48 overflow-hidden">
                       <img
-                        src={post.img}
+                        src={
+                          post.imageUrl ||
+                          "https://via.placeholder.com/400x300?text=No+Image"
+                        }
                         alt={post.title}
                         className="w-full h-full object-cover transition-transform hover:scale-105 duration-300"
                       />
                     </div>
                     <div className="p-4">
-                      <span className="inline-block px-2 py-1 text-xs font-semibold bg-indigo-100 text-indigo-800 rounded-full mb-2">
-                        {post.categoryName}
-                      </span>
                       <h3 className="text-lg font-bold text-gray-900 mb-2 line-clamp-2 hover:text-indigo-600 transition-colors">
                         {post.title}
                       </h3>
                       <p className="text-sm text-gray-600 mb-3 line-clamp-2">
-                        {post.excerpt}
+                        {post.content.substring(0, 100)}...
                       </p>
                       <div className="flex items-center">
                         <img
-                          src={post.authorImg}
-                          alt={post.author}
+                          src="https://images.unsplash.com/photo-1494790108377-be9c29b29330?ixlib=rb-1.2.1&ixid=eyJhcHBfaWQiOjEyMDd9&auto=format&fit=facearea&facepad=2&w=256&h=256&q=80"
+                          alt={post.staffId}
                           className="w-8 h-8 rounded-full object-cover mr-2"
                         />
                         <span className="text-sm text-gray-700">
-                          {post.author}
+                          {post.staffId}
                         </span>
                       </div>
                     </div>
@@ -321,7 +361,8 @@ function BlogDetail() {
             </div>
           </div>
         )}
-        {/* Newsletter subscription */}
+
+        {/* Newsletter subscription (keeping this as is from your original code) */}
         <div className="mt-16 max-w-5xl mx-auto bg-gradient-to-r from-indigo-600 to-purple-600 rounded-lg shadow-lg overflow-hidden">
           <div className="p-8 md:p-10 text-white">
             <h3 className="text-2xl font-bold mb-4">Đăng ký nhận bản tin</h3>
