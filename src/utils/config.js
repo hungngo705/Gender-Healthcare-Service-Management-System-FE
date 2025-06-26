@@ -18,13 +18,14 @@ const getApiBaseURL = () => {
   if (
     currentHost.includes("github.io") ||
     currentHost.includes("vercel.app") ||
-    currentHost.includes("netlify.app")
+    currentHost.includes("netlify.app") ||
+    currentHost.includes("azurewebsites.net") 
   ) {
     // Common hosting platforms - update with your actual production API URL
     console.warn(
       "Production API URL not configured! Please set VITE_API_URL environment variable."
     );
-    return "https://your-production-api-domain.com"; // Changed to remove /api/v2.5
+    return "https://everwell-1127.azurewebsites.net"; // Changed to remove /api/v2.5
   }
 
   // Fallback for other hosts
