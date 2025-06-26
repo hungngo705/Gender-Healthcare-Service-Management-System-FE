@@ -37,6 +37,12 @@ function AppointmentsTab({ navigate }) {
   const [cancelError, setCancelError] = useState(null);
   const [cancelSuccess, setCancelSuccess] = useState(false);
 
+  // New state variables for viewing feedback
+  const [appointmentsWithFeedback, setAppointmentsWithFeedback] = useState({});
+  const [viewingFeedback, setViewingFeedback] = useState(null);
+  const [showViewFeedbackModal, setShowViewFeedbackModal] = useState(false);
+  const [loadingFeedback, setLoadingFeedback] = useState(false);
+
   // Helper function to convert slot number to time string
   const getTimeBySlot = (slotNumber) => {
     const slotMap = {
@@ -119,6 +125,33 @@ function AppointmentsTab({ navigate }) {
 
         console.log("User appointments:", userAppointments);
         setAppointments(userAppointments);
+
+        // Step 4: Check completed appointments for feedback
+        const feedbackChecks = {};
+        const completedAppointments = userAppointments.filter(
+          (app) => app.status === 1 || app.status === "1"
+        );
+
+        // Check each completed appointment for feedback
+        await Promise.all(
+          completedAppointments.map(async (appointment) => {
+            try {
+              const feedbackResponse = await feedbackService.getByAppointment(
+                appointment.id
+              );
+              console.log(`Feedback for appointment ${appointment.id}:`, feedbackResponse);
+              // If feedback exists, mark this appointment
+              if (feedbackResponse && feedbackResponse.data) {
+                feedbackChecks[appointment.id] = feedbackResponse.data;
+              }
+            } catch (feedbackError) {
+              // No feedback exists, continue
+              console.log(`No feedback for appointment ${appointment.id}`);
+            }
+          })
+        );
+
+        setAppointmentsWithFeedback(feedbackChecks);
         setError(null);
       } catch (err) {
         console.error("Error fetching appointments:", err);
@@ -198,6 +231,9 @@ function AppointmentsTab({ navigate }) {
       await feedbackService.create(feedbackData);
       setFeedbackSuccess(true);
 
+      // Reload appointment data to reflect the new feedback
+      fetchData();
+
       // Close modal after short delay
       setTimeout(() => {
         setShowFeedbackModal(false);
@@ -258,6 +294,26 @@ function AppointmentsTab({ navigate }) {
     setCancelError(null);
     setCancelSuccess(false);
     setShowCancelModal(true);
+  };
+
+  // New function to view feedback
+  const handleViewFeedback = async (appointmentId) => {
+    try {
+      setLoadingFeedback(true);
+      const existingFeedback = appointmentsWithFeedback[appointmentId];
+      setViewingFeedback(existingFeedback);
+      setShowViewFeedbackModal(true);
+    } catch (error) {
+      console.error("Error loading feedback details:", error);
+    } finally {
+      setLoadingFeedback(false);
+    }
+  };
+
+  // Close the feedback view modal
+  const handleCloseFeedbackModal = () => {
+    setShowViewFeedbackModal(false);
+    setViewingFeedback(null);
   };
 
   if (isLoading) {
@@ -455,26 +511,33 @@ function AppointmentsTab({ navigate }) {
                           const isScheduled =
                             appointment.status === 0 ||
                             appointment.status === "0";
+                          const hasFeedback = appointmentsWithFeedback[appointment.id];
 
                           return (
                             <>
                               {isCompleted && (
-                                <button
-                                  onClick={() =>
-                                    handleOpenFeedbackModal(appointment)
-                                  }
-                                  className="inline-flex items-center px-3 py-1.5 border border-transparent text-xs font-medium rounded-full text-yellow-700 bg-yellow-100 hover:bg-yellow-200 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-yellow-500 transition-colors duration-200"
-                                >
-                                  <Star className="w-3 h-3 mr-1" />
-                                  Đánh giá
-                                </button>
+                                hasFeedback ? (
+                                  <button
+                                    onClick={() => handleViewFeedback(appointment.id)}
+                                    className="inline-flex items-center px-3 py-1.5 border border-transparent text-xs font-medium rounded-full text-indigo-700 bg-indigo-100 hover:bg-indigo-200 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-indigo-500 transition-colors duration-200"
+                                  >
+                                    <Star className="w-3 h-3 mr-1 fill-indigo-500" />
+                                    Xem đánh giá
+                                  </button>
+                                ) : (
+                                  <button
+                                    onClick={() => handleOpenFeedbackModal(appointment)}
+                                    className="inline-flex items-center px-3 py-1.5 border border-transparent text-xs font-medium rounded-full text-yellow-700 bg-yellow-100 hover:bg-yellow-200 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-yellow-500 transition-colors duration-200"
+                                  >
+                                    <Star className="w-3 h-3 mr-1" />
+                                    Đánh giá
+                                  </button>
+                                )
                               )}
 
                               {isScheduled && (
                                 <button
-                                  onClick={() =>
-                                    handleOpenCancelModal(appointment)
-                                  }
+                                  onClick={() => handleOpenCancelModal(appointment)}
                                   className="inline-flex items-center px-3 py-1.5 border border-transparent text-xs font-medium rounded-full text-red-700 bg-red-100 hover:bg-red-200 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-red-500 transition-colors duration-200"
                                 >
                                   <svg
@@ -968,6 +1031,112 @@ function AppointmentsTab({ navigate }) {
                       >
                         Hủy bỏ
                       </button>
+                    </div>
+                  </div>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+      )}
+
+      {/* View Feedback Modal */}
+      {showViewFeedbackModal && viewingFeedback && (
+        <div
+          className="fixed inset-0 overflow-y-auto z-50"
+          style={{ zIndex: 9999 }}
+          aria-labelledby="modal-title"
+          role="dialog"
+          aria-modal="true"
+        >
+          <div className="flex items-center justify-center min-h-screen pt-4 px-4 pb-20 text-center sm:block sm:p-0">
+            {/* Background overlay */}
+            <div
+              className="fixed inset-0 bg-white/1 bg-opacity-50 backdrop-blur-sm transition-opacity"
+              aria-hidden="true"
+              onClick={() => setShowViewFeedbackModal(false)}
+            ></div>
+
+            {/* Modal positioning */}
+            <span
+              className="hidden sm:inline-block sm:align-middle sm:h-screen"
+              aria-hidden="true"
+            >
+              &#8203;
+            </span>
+
+            {/* Modal content */}
+            <div className="relative inline-block align-bottom bg-white rounded-lg border-2 border-gray-300 text-left overflow-hidden shadow-xl transform transition-all duration-300 sm:my-8 sm:align-middle sm:max-w-lg sm:w-full">
+              {/* Modal header */}
+              <div className="bg-white px-4 pt-5 pb-4 sm:p-6">
+                <div className="sm:flex sm:items-start">
+                  <div className="mt-3 text-center sm:mt-0 sm:text-left w-full">
+                    <h3 className="text-lg leading-6 font-medium text-gray-900 border-b pb-3 mb-4">
+                      Đánh giá của bạn
+                    </h3>
+
+                    <div className="space-y-4">
+                      {/* Rating display */}
+                      <div className="mb-4">
+                        <label className="block text-sm font-medium text-gray-700 mb-2">
+                          Điểm đánh giá
+                        </label>
+                        <div className="flex items-center space-x-1">
+                          {[1, 2, 3, 4, 5].map((star) => (
+                            <Star
+                              key={star}
+                              className={`h-5 w-5 ${
+                                star <= viewingFeedback.rating
+                                  ? "text-yellow-400 fill-yellow-400"
+                                  : "text-gray-300"
+                              }`}
+                            />
+                          ))}
+                          <span className="ml-2 text-sm text-gray-600">
+                            {viewingFeedback.rating}/5
+                          </span>
+                        </div>
+                      </div>
+
+                      {/* Comment */}
+                      <div className="mb-4">
+                        <label className="block text-sm font-medium text-gray-700 mb-2">
+                          Nhận xét của bạn
+                        </label>
+                        <div className="bg-gray-50 rounded-md p-3 text-sm text-gray-800">
+                          {viewingFeedback.comment || "Không có nhận xét"}
+                        </div>
+                      </div>
+
+                      {/* Date */}
+                      <div className="mb-4">
+                        <label className="block text-sm font-medium text-gray-700 mb-2">
+                          Ngày đánh giá
+                        </label>
+                        <div className="text-sm text-gray-600">
+                          {new Date(viewingFeedback.createdAt).toLocaleDateString(
+                            "vi-VN",
+                            {
+                              year: "numeric",
+                              month: "long",
+                              day: "numeric",
+                              hour: "2-digit",
+                              minute: "2-digit",
+                            }
+                          )}
+                        </div>
+                      </div>
+
+                      {/* Close button */}
+                      <div className="mt-6 sm:mt-5 pt-3 border-t border-gray-200">
+                        <button
+                          type="button"
+                          onClick={() => setShowViewFeedbackModal(false)}
+                          className="w-full inline-flex justify-center rounded-md border border-gray-300 shadow-sm px-4 py-2 bg-white text-base font-medium text-gray-700 hover:bg-gray-50 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-indigo-500 transition-colors duration-200 sm:w-auto sm:text-sm"
+                        >
+                          Đóng
+                        </button>
+                      </div>
                     </div>
                   </div>
                 </div>
