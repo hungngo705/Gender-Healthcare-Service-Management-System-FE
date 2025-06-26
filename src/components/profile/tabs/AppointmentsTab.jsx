@@ -96,71 +96,73 @@ function AppointmentsTab({ navigate }) {
     return `${day}/${month}/${year}`;
   };
 
-  useEffect(() => {
-    const fetchData = async () => {
-      try {
-        setIsLoading(true);
+  // Extract fetchData function outside of useEffect to make it reusable
+  const fetchData = async () => {
+    try {
+      setIsLoading(true);
 
-        // Step 1: Get current user profile
-        const userResponse = await userService.getCurrentUserProfile();
-        console.log("User profile:", userResponse);
+      // Step 1: Get current user profile
+      const userResponse = await userService.getCurrentUserProfile();
+      console.log("User profile:", userResponse);
 
-        // Extract user ID from response
-        const currentUserId = userResponse.id || userResponse.data?.id;
-        setUserId(currentUserId);
+      // Extract user ID from response
+      const currentUserId = userResponse.id || userResponse.data?.id;
+      setUserId(currentUserId);
 
-        if (!currentUserId) {
-          throw new Error("Không thể xác định người dùng hiện tại");
-        }
-
-        // Step 2: Get all appointments
-        const appointmentsResponse = await appointmentService.getAll();
-        console.log("All appointments:", appointmentsResponse);
-
-        // Step 3: Filter appointments for this user
-        const allAppointments = appointmentsResponse.data?.data || [];
-        const userAppointments = allAppointments.filter(
-          (appointment) => appointment.customerId === currentUserId
-        );
-
-        console.log("User appointments:", userAppointments);
-        setAppointments(userAppointments);
-
-        // Step 4: Check completed appointments for feedback
-        const feedbackChecks = {};
-        const completedAppointments = userAppointments.filter(
-          (app) => app.status === 1 || app.status === "1"
-        );
-
-        // Check each completed appointment for feedback
-        await Promise.all(
-          completedAppointments.map(async (appointment) => {
-            try {
-              const feedbackResponse = await feedbackService.getByAppointment(
-                appointment.id
-              );
-              console.log(`Feedback for appointment ${appointment.id}:`, feedbackResponse);
-              // If feedback exists, mark this appointment
-              if (feedbackResponse && feedbackResponse.data) {
-                feedbackChecks[appointment.id] = feedbackResponse.data;
-              }
-            } catch (feedbackError) {
-              // No feedback exists, continue
-              console.log(`No feedback for appointment ${appointment.id}`);
-            }
-          })
-        );
-
-        setAppointmentsWithFeedback(feedbackChecks);
-        setError(null);
-      } catch (err) {
-        console.error("Error fetching appointments:", err);
-        setError("Không thể tải lịch hẹn. Vui lòng thử lại sau.");
-      } finally {
-        setIsLoading(false);
+      if (!currentUserId) {
+        throw new Error("Không thể xác định người dùng hiện tại");
       }
-    };
 
+      // Step 2: Get all appointments
+      const appointmentsResponse = await appointmentService.getAll();
+      console.log("All appointments:", appointmentsResponse);
+
+      // Step 3: Filter appointments for this user
+      const allAppointments = appointmentsResponse.data?.data || [];
+      const userAppointments = allAppointments.filter(
+        (appointment) => appointment.customerId === currentUserId
+      );
+
+      console.log("User appointments:", userAppointments);
+      setAppointments(userAppointments);
+
+      // Step 4: Check completed appointments for feedback
+      const feedbackChecks = {};
+      const completedAppointments = userAppointments.filter(
+        (app) => app.status === 1 || app.status === "1"
+      );
+
+      // Check each completed appointment for feedback
+      await Promise.all(
+        completedAppointments.map(async (appointment) => {
+          try {
+            const feedbackResponse = await feedbackService.getByAppointment(
+              appointment.id
+            );
+            console.log(`Feedback for appointment ${appointment.id}:`, feedbackResponse);
+            // If feedback exists, mark this appointment
+            if (feedbackResponse && feedbackResponse.data) {
+              feedbackChecks[appointment.id] = feedbackResponse.data;
+            }
+          } catch (feedbackError) {
+            // No feedback exists, continue
+            console.log(`No feedback for appointment ${appointment.id}`);
+          }
+        })
+      );
+
+      setAppointmentsWithFeedback(feedbackChecks);
+      setError(null);
+    } catch (err) {
+      console.error("Error fetching appointments:", err);
+      setError("Không thể tải lịch hẹn. Vui lòng thử lại sau.");
+    } finally {
+      setIsLoading(false);
+    }
+  };
+
+  // Use the extracted fetchData in useEffect for initial load
+  useEffect(() => {
     fetchData();
   }, []);
 
@@ -212,6 +214,7 @@ function AppointmentsTab({ navigate }) {
     console.log("showFeedbackModal state set to:", true); // Debug log
   };
 
+  // Update the handleSubmitFeedback function to use the extracted fetchData
   const handleSubmitFeedback = async (e) => {
     e.preventDefault();
 
@@ -228,11 +231,14 @@ function AppointmentsTab({ navigate }) {
         comment: comment,
       };
 
+      console.log("Submitting feedback:", feedbackData);
       await feedbackService.create(feedbackData);
+      console.log("Feedback submitted successfully");
       setFeedbackSuccess(true);
 
       // Reload appointment data to reflect the new feedback
-      fetchData();
+      await fetchData(); // Wait for data to reload
+      console.log("Appointments reloaded after feedback submission");
 
       // Close modal after short delay
       setTimeout(() => {
@@ -262,18 +268,15 @@ function AppointmentsTab({ navigate }) {
 
       // Call the cancel API with the appointment ID
       await appointmentService.cancel(appointmentToCancel.id);
-
+      
       // Show success message
       setCancelSuccess(true);
+      
+      // Reload all appointment data
+      await fetchData();
 
-      // Update the appointments list
+      // Close modal after short delay
       setTimeout(() => {
-        // Update the appointment status in the local state
-        setAppointments(
-          appointments.map((app) =>
-            app.id === appointmentToCancel.id ? { ...app, status: 2 } : app
-          )
-        );
         setShowCancelModal(false);
         setAppointmentToCancel(null);
         setCancelReason("");
