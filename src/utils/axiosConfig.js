@@ -22,6 +22,16 @@ apiClient.interceptors.request.use(
       reqConfig.headers.Authorization = `Bearer ${token}`;
     }
 
+    // Log request for debugging in development
+    if (import.meta.env.DEV) {
+      console.log("API Request:", {
+        method: reqConfig.method,
+        url: reqConfig.url,
+        baseURL: reqConfig.baseURL,
+        fullURL: `${reqConfig.baseURL}${reqConfig.url}`,
+      });
+    }
+
     return reqConfig;
   },
   (error) => {
@@ -35,16 +45,28 @@ apiClient.interceptors.request.use(
 // Bộ chặn phản hồi
 apiClient.interceptors.response.use(
   (response) => {
-    // Bất kỳ mã trạng thái nào nằm trong phạm vi 2xx
-    // Bạn có thể hiển thị thông báo thành công tại đây nếu API trả về thông báo thành công cụ thể
-
-    // if (response.data?.message) {
-    //   toastService.success(response.data.message);
-    // }
+    // Log successful responses in development
+    if (import.meta.env.DEV) {
+      console.log("API Response:", {
+        status: response.status,
+        url: response.config.url,
+        data: response.data,
+      });
+    }
 
     return response;
   },
   async (error) => {
+    // Log errors in development
+    if (import.meta.env.DEV) {
+      console.error("API Error:", {
+        status: error.response?.status,
+        url: error.config?.url,
+        message: error.message,
+        response: error.response?.data,
+      });
+    }
+
     // Bất kỳ mã trạng thái nào nằm ngoài phạm vi 2xx
     let errorMessage = "Đã xảy ra lỗi không mong muốn";
 
@@ -104,7 +126,7 @@ apiClient.interceptors.response.use(
               "Phiên của bạn đã hết hạn. Vui lòng đăng nhập lại."
             );
 
-            // Chỉ chuyển hướng nếu chưa ở trang đăng nhập
+            // Use modern navigation instead of window.location
             if (!window.location.pathname.includes("/login")) {
               window.location.href = "/login";
             }
@@ -129,17 +151,15 @@ apiClient.interceptors.response.use(
       // Xử lý lỗi 403 Cấm truy cập
       if (error.response.status === 403) {
         toastService.error("Bạn không có quyền truy cập tài nguyên này");
-      } // Xử lý lỗi 404 Không tìm thấy
+      }
+
+      // Xử lý lỗi 404 Không tìm thấy
       if (error.response.status === 404) {
-        if (error.message) {
+        if (error.response.data?.message) {
           toastService.error(errorMessage);
         } else {
           toastService.error("Không tìm thấy tài nguyên yêu cầu");
         }
-        // Bạn cũng có thể điều hướng đến trang 404 cho các tài nguyên quan trọng
-        // if (error.config.url.includes('critical-endpoint')) {
-        //   window.location.href = '/not-found';
-        // }
       }
 
       // Xử lý lỗi 422 Lỗi xác thực
@@ -173,13 +193,10 @@ apiClient.interceptors.response.use(
           "Lỗi mạng. Vui lòng kiểm tra kết nối internet và trạng thái máy chủ của bạn.";
 
         // Không hiển thị thông báo lỗi cho lỗi mạng trong quá trình xác minh token
-        // vì điều này có thể do máy chủ tạm thời ngừng hoạt động
         if (!error.config?.url?.includes("/profile")) {
           toastService.error("Đã có lỗi từ máy chủ. Vui lòng thử lại sau.");
         }
 
-        // Nếu đây là lỗi mạng và chúng ta có dữ liệu xác thực đã lưu,
-        // đừng xóa nó ngay lập tức vì máy chủ có thể tạm thời ngừng hoạt động
         console.log(
           "Máy chủ dường như đã ngừng hoạt động, tạm thời duy trì trạng thái xác thực"
         );
@@ -200,7 +217,7 @@ apiClient.interceptors.response.use(
       toastService.error(errorMessage);
     }
 
-    return Promise.reject("Đã xảy ra lỗi trong quá trình đăng nhập!");
+    return Promise.reject(error); // Return the actual error, not a string
   }
 );
 
@@ -259,6 +276,7 @@ const apiService = {
   delete: (url, config = {}) => {
     return apiClient.delete(url, config);
   },
+
   /**
    * Tải lên tệp với theo dõi tiến trình
    * @param {string} url - URL để gửi yêu cầu đến
@@ -281,6 +299,7 @@ const apiService = {
         : undefined,
     });
   },
+
   /**
    * Tải xuống tệp với theo dõi tiến trình
    * @param {string} url - URL để gửi yêu cầu đến
