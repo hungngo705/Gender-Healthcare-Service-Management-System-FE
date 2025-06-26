@@ -281,7 +281,7 @@ function CustomerProfile() {
   };
 
   return (
-    <div className="container mx-auto max-w-7xl px-4 py-8">
+    <div className="container mx-auto px-4 py-8">
       {/* Mobile Navigation - Clean tabs matching the mockup */}
       <div className="lg:hidden mb-6 overflow-x-auto sticky top-0 z-20 bg-white shadow-sm py-2 -mx-4 px-4">
         <div className="flex border-b border-gray-200">

@@ -131,7 +131,11 @@ apiClient.interceptors.response.use(
         toastService.error("Bạn không có quyền truy cập tài nguyên này");
       } // Xử lý lỗi 404 Không tìm thấy
       if (error.response.status === 404) {
-        toastService.error(errorMessage);
+        if (error.message) {
+          toastService.error(errorMessage);
+        } else {
+          toastService.error("Không tìm thấy tài nguyên yêu cầu");
+        }
         // Bạn cũng có thể điều hướng đến trang 404 cho các tài nguyên quan trọng
         // if (error.config.url.includes('critical-endpoint')) {
         //   window.location.href = '/not-found';
@@ -156,13 +160,7 @@ apiClient.interceptors.response.use(
 
       // Xử lý lỗi 500 Lỗi máy chủ nội bộ
       if (error.response.status >= 500) {
-        // In ra thông báo phản hồi nếu có
-        console.log("Alo:" + error.response.data);
-        if (error.response.data) {
-          toastService.error(error.response.data);
-        } else {
-          toastService.error("Đã xảy ra lỗi máy chủ. Vui lòng thử lại sau.");
-        }
+        toastService.error("Đã xảy ra lỗi máy chủ. Vui lòng thử lại sau.");
       }
     } else if (error.request) {
       // Yêu cầu đã được gửi nhưng không nhận được phản hồi
@@ -177,7 +175,7 @@ apiClient.interceptors.response.use(
         // Không hiển thị thông báo lỗi cho lỗi mạng trong quá trình xác minh token
         // vì điều này có thể do máy chủ tạm thời ngừng hoạt động
         if (!error.config?.url?.includes("/profile")) {
-          toastService.error(errorMessage);
+          toastService.error("Đã có lỗi từ máy chủ. Vui lòng thử lại sau.");
         }
 
         // Nếu đây là lỗi mạng và chúng ta có dữ liệu xác thực đã lưu,
@@ -202,15 +200,7 @@ apiClient.interceptors.response.use(
       toastService.error(errorMessage);
     }
 
-    // Hiển thị thông báo lỗi cho bất kỳ lỗi nào chưa được xử lý
-    if (
-      !error.response ||
-      ![401, 403, 404, 422, 500].includes(error.response.status)
-    ) {
-      toastService.error(errorMessage);
-    }
-
-    return Promise.reject(error);
+    return Promise.reject("Đã xảy ra lỗi trong quá trình đăng nhập!");
   }
 );
 

@@ -48,7 +48,7 @@ const appointmentService = {
    * @returns {Promise} - The cancel appointment response promise
    */
   cancel: (id) => {
-    return apiService.post(config.api.appointments.cancel(id));
+    return apiService.put(config.api.appointments.cancel(id));
   },
   /**
    * Get appointments by user ID

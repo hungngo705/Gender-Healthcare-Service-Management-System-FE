@@ -66,7 +66,6 @@ function Dashboard() {
   // Handle logout
   const handleLogout = () => {
     logout();
-    navigate("/login");
   }; // Get user role information using the useUserInfo hook from userUtils
   const { userRole: currentUserRole } = userUtils.useUserInfo();
   // Determine the user's role with proper prioritization
@@ -183,7 +182,7 @@ function Dashboard() {
       return (
         <div className="flex items-center justify-center h-64 bg-gray-50 rounded-lg">
           <p className="text-red-500">
-            Bạn không có quyền truy cập chức năng này
+            Chức năng đang được phát triển. Vui lòng quay lại sau.
           </p>
         </div>
       );
