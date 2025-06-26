@@ -192,11 +192,6 @@ export const tokenManager = {
    */
   handleLogout: () => {
     tokenManager.clearAuthData();
-
-    // Redirect to login if not already there
-    if (!window.location.pathname.includes("/login")) {
-      window.location.href = "/login";
-    }
   },
 };
 

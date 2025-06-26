@@ -406,14 +406,28 @@ function ConsultantAppointmentsTab({ role }) {
   // Add state to track open dropdown
   const [openDropdownId, setOpenDropdownId] = useState(null);
 
+  // Add this state to track dropdown positioning
+  const [dropdownPosition, setDropdownPosition] = useState({});
+
   // Toggle dropdown visibility
   const toggleDropdown = (appointmentId, event) => {
     // Stop event propagation to prevent document click handler from firing immediately
     if (event) {
       event.stopPropagation();
-    }
 
-    // Toggle the dropdown state
+      // Calculate if we should show dropdown above or below
+      if (openDropdownId !== appointmentId) {
+        const button = event.currentTarget;
+        const rect = button.getBoundingClientRect();
+        const spaceBelow = window.innerHeight - rect.bottom;
+        const shouldFlip = spaceBelow < 150; // If less than 150px below, flip to above
+
+        setDropdownPosition({
+          id: appointmentId,
+          flip: shouldFlip,
+        });
+      }
+    }
     setOpenDropdownId(openDropdownId === appointmentId ? null : appointmentId);
   };
 
@@ -754,14 +768,16 @@ function ConsultantAppointmentsTab({ role }) {
                             {openDropdownId === appointment.id && (
                               <div
                                 ref={dropdownRef}
-                                className="origin-top-right absolute right-0 mt-1 w-full rounded-md shadow-lg bg-white ring-1 ring-black ring-opacity-5 focus:outline-none z-10"
+                                className={`absolute ${
+                                  dropdownPosition.id === appointment.id &&
+                                  dropdownPosition.flip
+                                    ? "bottom-full mb-1" // Position above button
+                                    : "top-full mt-1" // Position below button
+                                } right-0 w-48 rounded-md shadow-lg bg-white ring-1 ring-black ring-opacity-5 focus:outline-none z-40`}
                                 role="menu"
                                 aria-orientation="vertical"
                               >
-                                <div
-                                  className="py-1 divide-y divide-gray-100"
-                                  role="none"
-                                >
+                                <div className="py-1 divide-y divide-gray-100">
                                   <button
                                     className="w-full text-left flex items-center px-4 py-2 text-sm text-green-600 hover:bg-green-50 hover:text-green-700 transition-colors"
                                     onClick={() => {

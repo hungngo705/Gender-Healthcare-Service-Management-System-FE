@@ -79,8 +79,6 @@ function Header() {
       await logout();
 
       setTimeout(() => {
-        navigate("/login", { replace: true });
-
         setIsLoggingOut(false);
         setIsFullScreenLoading(false);
       }, 300);
@@ -88,7 +86,6 @@ function Header() {
       console.error("Error during logout:", error);
       setIsLoggingOut(false);
       setIsFullScreenLoading(false);
-      navigate("/login", { replace: true });
     }
   };
 

@@ -66,7 +66,6 @@ function Dashboard() {
   // Handle logout
   const handleLogout = () => {
     logout();
-    navigate("/login");
   }; // Get user role information using the useUserInfo hook from userUtils
   const { userRole: currentUserRole } = userUtils.useUserInfo();
   // Determine the user's role with proper prioritization
