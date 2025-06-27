@@ -139,7 +139,10 @@ function AppointmentsTab({ navigate }) {
             const feedbackResponse = await feedbackService.getByAppointment(
               appointment.id
             );
-            console.log(`Feedback for appointment ${appointment.id}:`, feedbackResponse);
+            console.log(
+              `Feedback for appointment ${appointment.id}:`,
+              feedbackResponse
+            );
             // If feedback exists, mark this appointment
             if (feedbackResponse && feedbackResponse.data) {
               feedbackChecks[appointment.id] = feedbackResponse.data;
@@ -268,10 +271,10 @@ function AppointmentsTab({ navigate }) {
 
       // Call the cancel API with the appointment ID
       await appointmentService.cancel(appointmentToCancel.id);
-      
+
       // Show success message
       setCancelSuccess(true);
-      
+
       // Reload all appointment data
       await fetchData();
 
@@ -514,14 +517,17 @@ function AppointmentsTab({ navigate }) {
                           const isScheduled =
                             appointment.status === 0 ||
                             appointment.status === "0";
-                          const hasFeedback = appointmentsWithFeedback[appointment.id];
+                          const hasFeedback =
+                            appointmentsWithFeedback[appointment.id];
 
                           return (
                             <>
-                              {isCompleted && (
-                                hasFeedback ? (
+                              {isCompleted &&
+                                (hasFeedback ? (
                                   <button
-                                    onClick={() => handleViewFeedback(appointment.id)}
+                                    onClick={() =>
+                                      handleViewFeedback(appointment.id)
+                                    }
                                     className="inline-flex items-center px-3 py-1.5 border border-transparent text-xs font-medium rounded-full text-indigo-700 bg-indigo-100 hover:bg-indigo-200 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-indigo-500 transition-colors duration-200"
                                   >
                                     <Star className="w-3 h-3 mr-1 fill-indigo-500" />
@@ -529,18 +535,44 @@ function AppointmentsTab({ navigate }) {
                                   </button>
                                 ) : (
                                   <button
-                                    onClick={() => handleOpenFeedbackModal(appointment)}
+                                    onClick={() =>
+                                      handleOpenFeedbackModal(appointment)
+                                    }
                                     className="inline-flex items-center px-3 py-1.5 border border-transparent text-xs font-medium rounded-full text-yellow-700 bg-yellow-100 hover:bg-yellow-200 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-yellow-500 transition-colors duration-200"
                                   >
                                     <Star className="w-3 h-3 mr-1" />
                                     Đánh giá
                                   </button>
-                                )
+                                ))}
+
+                              {isScheduled && appointment.googleMeetLink && (
+                                <button
+                                  onClick={() =>
+                                    window.open(
+                                      appointment.googleMeetLink,
+                                      "_blank"
+                                    )
+                                  }
+                                  className="inline-flex items-center px-3 py-1.5 border border-transparent text-xs font-medium rounded-full text-emerald-700 bg-emerald-100 hover:bg-emerald-200 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-emerald-500 transition-colors duration-200 mr-2"
+                                >
+                                  <svg
+                                    xmlns="http://www.w3.org/2000/svg"
+                                    className="w-3 h-3 mr-1"
+                                    viewBox="0 0 20 20"
+                                    fill="currentColor"
+                                  >
+                                    <path d="M2 6a2 2 0 012-2h6a2 2 0 012 2v8a2 2 0 01-2 2H4a2 2 0 01-2-2V6z" />
+                                    <path d="M14 6a2 2 0 012-2h2a2 2 0 012 2v8a2 2 0 01-2 2h-2a2 2 0 01-2-2V6z" />
+                                  </svg>
+                                  Bắt đầu
+                                </button>
                               )}
 
                               {isScheduled && (
                                 <button
-                                  onClick={() => handleOpenCancelModal(appointment)}
+                                  onClick={() =>
+                                    handleOpenCancelModal(appointment)
+                                  }
                                   className="inline-flex items-center px-3 py-1.5 border border-transparent text-xs font-medium rounded-full text-red-700 bg-red-100 hover:bg-red-200 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-red-500 transition-colors duration-200"
                                 >
                                   <svg
@@ -1117,16 +1149,15 @@ function AppointmentsTab({ navigate }) {
                           Ngày đánh giá
                         </label>
                         <div className="text-sm text-gray-600">
-                          {new Date(viewingFeedback.createdAt).toLocaleDateString(
-                            "vi-VN",
-                            {
-                              year: "numeric",
-                              month: "long",
-                              day: "numeric",
-                              hour: "2-digit",
-                              minute: "2-digit",
-                            }
-                          )}
+                          {new Date(
+                            viewingFeedback.createdAt
+                          ).toLocaleDateString("vi-VN", {
+                            year: "numeric",
+                            month: "long",
+                            day: "numeric",
+                            hour: "2-digit",
+                            minute: "2-digit",
+                          })}
                         </div>
                       </div>
 

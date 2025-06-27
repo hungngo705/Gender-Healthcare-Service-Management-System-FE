@@ -56,6 +56,20 @@ const appointmentService = {
    * @param {Object} params - Query parameters for filtering, pagination, etc.
    * @returns {Promise} - The appointments response promise
    */
+
+  /**
+   * Update meeting link for an appointment
+   * @param {string|number} id - The appointment ID
+   * @param {Object} meetingLinkData - The meeting link data (e.g., {meetingLink: "https://zoom.us/j/123456"})
+   * @returns {Promise} - The update meeting link response promise
+   */
+  updateMeetingLink: (id, meetingLinkData) => {
+    return apiService.put(
+      config.api.appointments.updateMeetingLink(id),
+      meetingLinkData
+    );
+  },
+
   getByUser: (userId, params = {}) => {
     // Nếu không có userId cụ thể, sử dụng endpoint 'me' để lấy cuộc hẹn của người dùng hiện tại
     const endpoint = userId
