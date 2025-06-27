@@ -96,7 +96,6 @@ function DashboardHeader({
       await logout();
 
       setTimeout(() => {
-        navigate("/login", { replace: true });
         setIsLoggingOut(false);
         setIsFullScreenLoading(false);
       }, 300);

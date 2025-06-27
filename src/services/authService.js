@@ -89,7 +89,7 @@ export const authService = {
       return userData;
     } catch (error) {
       // Error handling is done by the axios interceptors
-      return Promise.reject(error);
+      return Promise.reject("Lỗi trong quá trình đăng nhập");
     }
   },
   /**

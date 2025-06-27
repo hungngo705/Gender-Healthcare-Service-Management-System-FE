@@ -4,6 +4,7 @@ import PropTypes from "prop-types";
 import appointmentService from "../../../services/appointmentService";
 import userService from "../../../services/userService";
 import testResultService from "../../../services/testResultService";
+import feedbackService from "../../../services/feedbackService";
 import {
   X,
   Check,
@@ -13,6 +14,7 @@ import {
   CheckCircle,
   ChevronLeft,
   ChevronRight,
+  Star,
 } from "lucide-react"; // Added pagination icons
 import { te } from "date-fns/locale";
 
@@ -117,6 +119,39 @@ function ConsultantAppointmentsTab({ role }) {
 
         setConsultantAppointments(transformedAppointments);
         console.log("Transformed appointments:", transformedAppointments);
+
+        // Check for feedback on completed appointments
+        const completedAppointments = transformedAppointments.filter(
+          (appointment) => appointment.status === "completed"
+        );
+
+        // Initialize feedback lookup object
+        const feedbackLookup = {};
+
+        // Check each completed appointment for feedback
+        await Promise.all(
+          completedAppointments.map(async (appointment) => {
+            try {
+              const feedbackResponse = await feedbackService.getByAppointment(
+                appointment.id
+              );
+
+              if (feedbackResponse && feedbackResponse.data) {
+                feedbackLookup[appointment.id] = feedbackResponse.data;
+                console.log(
+                  `Found feedback for appointment ${appointment.id}:`,
+                  feedbackResponse.data
+                );
+              }
+            } catch (error) {
+              console.log(
+                `No feedback found for appointment ${appointment.id}`
+              );
+            }
+          })
+        );
+
+        setAppointmentsWithFeedback(feedbackLookup);
       } catch (err) {
         console.error("Error fetching appointments:", err);
         setError("Không thể tải danh sách cuộc hẹn. Vui lòng thử lại sau.");
@@ -376,6 +411,20 @@ function ConsultantAppointmentsTab({ role }) {
     }
   };
 
+  // Function to handle viewing feedback
+  const handleViewFeedback = async (appointmentId) => {
+    setLoadingFeedback(true);
+    try {
+      const feedback = appointmentsWithFeedback[appointmentId];
+      setCurrentFeedback(feedback);
+      setShowFeedbackModal(true);
+    } catch (error) {
+      console.error("Error loading feedback details:", error);
+    } finally {
+      setLoadingFeedback(false);
+    }
+  };
+
   // Function to open update status confirmation
   const openStatusUpdateConfirmation = (appointment, newStatus) => {
     setSelectedAppointment(appointment);
@@ -406,14 +455,28 @@ function ConsultantAppointmentsTab({ role }) {
   // Add state to track open dropdown
   const [openDropdownId, setOpenDropdownId] = useState(null);
 
+  // Add this state to track dropdown positioning
+  const [dropdownPosition, setDropdownPosition] = useState({});
+
   // Toggle dropdown visibility
   const toggleDropdown = (appointmentId, event) => {
     // Stop event propagation to prevent document click handler from firing immediately
     if (event) {
       event.stopPropagation();
-    }
 
-    // Toggle the dropdown state
+      // Calculate if we should show dropdown above or below
+      if (openDropdownId !== appointmentId) {
+        const button = event.currentTarget;
+        const rect = button.getBoundingClientRect();
+        const spaceBelow = window.innerHeight - rect.bottom;
+        const shouldFlip = spaceBelow < 150; // If less than 150px below, flip to above
+
+        setDropdownPosition({
+          id: appointmentId,
+          flip: shouldFlip,
+        });
+      }
+    }
     setOpenDropdownId(openDropdownId === appointmentId ? null : appointmentId);
   };
 
@@ -498,6 +561,13 @@ function ConsultantAppointmentsTab({ role }) {
   useEffect(() => {
     setCurrentPage(1);
   }, [filter]);
+
+  // Add these state variable declarations with your other state variables (after line 41)
+  const [appointmentsWithFeedback, setAppointmentsWithFeedback] = useState({});
+  const [showFeedbackModal, setShowFeedbackModal] = useState(false);
+  const [currentFeedback, setCurrentFeedback] = useState(null);
+  const [loadingFeedback, setLoadingFeedback] = useState(false);
+  const feedbackModalRef = useRef(null);
 
   return (
     <div>
@@ -734,6 +804,18 @@ function ConsultantAppointmentsTab({ role }) {
                           Chi tiết
                         </button>
 
+                        {/* Add feedback button for completed appointments */}
+                        {appointment.status === "completed" &&
+                          appointmentsWithFeedback[appointment.id] && (
+                            <button
+                              className="inline-flex items-center px-3.5 py-1.5 rounded-md text-amber-600 hover:text-amber-900 hover:bg-amber-50 border border-transparent hover:border-amber-100 transition-all duration-200"
+                              onClick={() => handleViewFeedback(appointment.id)}
+                            >
+                              <Star className="mr-1 h-4 w-4" />
+                              Xem đánh giá
+                            </button>
+                          )}
+
                         {/* Status update dropdown - only show for scheduled appointments */}
                         {appointment.status === "scheduled" && (
                           <div className="relative w-50%">
@@ -754,14 +836,16 @@ function ConsultantAppointmentsTab({ role }) {
                             {openDropdownId === appointment.id && (
                               <div
                                 ref={dropdownRef}
-                                className="origin-top-right absolute right-0 mt-1 w-full rounded-md shadow-lg bg-white ring-1 ring-black ring-opacity-5 focus:outline-none z-10"
+                                className={`absolute ${
+                                  dropdownPosition.id === appointment.id &&
+                                  dropdownPosition.flip
+                                    ? "bottom-full mb-1" // Position above button
+                                    : "top-full mt-1" // Position below button
+                                } right-0 w-48 rounded-md shadow-lg bg-white ring-1 ring-black ring-opacity-5 focus:outline-none z-40`}
                                 role="menu"
                                 aria-orientation="vertical"
                               >
-                                <div
-                                  className="py-1 divide-y divide-gray-100"
-                                  role="none"
-                                >
+                                <div className="py-1 divide-y divide-gray-100">
                                   <button
                                     className="w-full text-left flex items-center px-4 py-2 text-sm text-green-600 hover:bg-green-50 hover:text-green-700 transition-colors"
                                     onClick={() => {
@@ -1215,6 +1299,99 @@ function ConsultantAppointmentsTab({ role }) {
                 ) : (
                   "Xác nhận hủy"
                 )}
+              </button>
+            </div>
+          </div>
+        </div>
+      )}
+
+      {/* Add Feedback Modal */}
+      {showFeedbackModal && currentFeedback && (
+        <div className="fixed inset-0 backdrop-blur-md bg-white/30 flex items-center justify-center z-50 p-4">
+          <div
+            ref={feedbackModalRef}
+            className="bg-white rounded-lg border border-gray-300 shadow-2xl max-w-lg w-full"
+          >
+            <div className="border-b border-gray-200 px-6 py-4 flex justify-between items-center">
+              <h3 className="text-lg font-medium text-gray-900">
+                Đánh giá từ khách hàng
+              </h3>
+              <button
+                onClick={() => setShowFeedbackModal(false)}
+                className="text-gray-400 hover:text-gray-500"
+              >
+                <X size={20} />
+              </button>
+            </div>
+
+            <div className="p-6">
+              {loadingFeedback ? (
+                <div className="text-center py-8">
+                  <div className="animate-spin rounded-full h-12 w-12 border-4 border-indigo-500 border-t-transparent mx-auto mb-4"></div>
+                  <p className="text-gray-500">Đang tải đánh giá...</p>
+                </div>
+              ) : (
+                <div className="space-y-6">
+                  {/* Rating */}
+                  <div>
+                    <h4 className="text-sm font-medium text-gray-500 mb-1">
+                      Đánh giá
+                    </h4>
+                    <div className="flex items-center">
+                      {[1, 2, 3, 4, 5].map((star) => (
+                        <Star
+                          key={star}
+                          className={`h-5 w-5 ${
+                            star <= currentFeedback.rating
+                              ? "text-yellow-400 fill-yellow-400"
+                              : "text-gray-300"
+                          }`}
+                        />
+                      ))}
+                      <span className="ml-2 text-sm text-gray-700">
+                        {currentFeedback.rating}/5
+                      </span>
+                    </div>
+                  </div>
+
+                  {/* Comment */}
+                  <div>
+                    <h4 className="text-sm font-medium text-gray-500 mb-1">
+                      Nhận xét
+                    </h4>
+                    <div className="bg-gray-50 p-4 rounded-md text-gray-700">
+                      {currentFeedback.comment || "Không có nhận xét"}
+                    </div>
+                  </div>
+
+                  {/* Date */}
+                  <div>
+                    <h4 className="text-sm font-medium text-gray-500 mb-1">
+                      Thời gian đánh giá
+                    </h4>
+                    <p className="text-gray-700">
+                      {new Date(currentFeedback.createdAt).toLocaleString(
+                        "vi-VN",
+                        {
+                          year: "numeric",
+                          month: "long",
+                          day: "numeric",
+                          hour: "2-digit",
+                          minute: "2-digit",
+                        }
+                      )}
+                    </p>
+                  </div>
+                </div>
+              )}
+            </div>
+
+            <div className="border-t border-gray-200 px-6 py-4 bg-gray-50">
+              <button
+                onClick={() => setShowFeedbackModal(false)}
+                className="w-full sm:w-auto px-4 py-2 bg-indigo-600 text-white rounded-md hover:bg-indigo-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-indigo-500"
+              >
+                Đóng
               </button>
             </div>
           </div>
