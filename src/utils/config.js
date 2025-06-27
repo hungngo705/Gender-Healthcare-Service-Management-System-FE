@@ -164,6 +164,13 @@ const config = {
       getConsultantPublicFeedbacks: (consultantId) =>
         `/api/v2.5/feedback/consultant/${consultantId}/public`,
     },
+
+    // Notification endpoints
+    notification: {
+      getForUser: (userId) => `/api/v2.5/notification/user/${userId}`,
+      markAsRead: (notificationId) =>
+        `/api/v2.5/notification/mark/${notificationId}`, // Assuming this endpoint exists
+    },
   },
 
   // Feature flags

@@ -4,6 +4,7 @@ import logo from "../assets/logo2.svg";
 import { Menu, X, User, LogOut } from "lucide-react";
 import { useAuth } from "../contexts/AuthContext";
 import userService from "../services/userService"; // Changed from userUtils
+import NotificationBell from "./ui/NotificationBell";
 
 function Header() {
   const [isMenuOpen, setIsMenuOpen] = useState(false);
@@ -187,86 +188,78 @@ function Header() {
 
               {/* User profile menu */}
               {isAuthenticated ? (
-                <li className="relative">
-                  <button
-                    onClick={() => setIsProfileMenuOpen(!isProfileMenuOpen)}
-                    className="flex items-center space-x-1 text-gray-600 hover:text-blue-600"
-                  >
-                    {" "}
-                    <div className="w-8 h-8 bg-indigo-600 rounded-full flex items-center justify-center text-white">
-                      {avatarInfo.imageUrl ? (
-                        <img
-                          src={avatarInfo.imageUrl}
-                          alt={displayName}
-                          className="w-8 h-8 rounded-full object-cover"
-                        />
-                      ) : avatarInfo.initial ? (
-                        <span className="font-semibold">
-                          {avatarInfo.initial}
-                        </span>
-                      ) : (
-                        <User size={18} />
-                      )}
-                    </div>{" "}
-                    <span className="font-medium">{displayName}</span>
-                  </button>
-
-                  {isProfileMenuOpen && (
-                    <div
-                      ref={profileMenuRef} // Add ref here
-                      className="absolute right-0 mt-2 w-48 bg-white rounded-md shadow-lg py-1 z-50"
+                <>
+                  <NotificationBell />
+                  <li className="relative">
+                    <button
+                      onClick={() => setIsProfileMenuOpen(!isProfileMenuOpen)}
+                      className="flex items-center space-x-1 text-gray-600 hover:text-blue-600"
                     >
                       {" "}
-                      {!isStaffOrHigher() && (
-                        <>
-                          <NavLink
-                            to="/profile"
-                            className="block px-4 py-2 text-sm text-gray-700 hover:bg-gray-100"
-                            onClick={() => setIsProfileMenuOpen(false)}
-                          >
-                            Hồ Sơ
-                          </NavLink>{" "}
-                          <NavLink
-                            to="/profile?tab=appointments"
-                            className="block px-4 py-2 text-sm text-gray-700 hover:bg-gray-100"
-                            onClick={() => setIsProfileMenuOpen(false)}
-                          >
-                            Lịch Hẹn
-                          </NavLink>
-                        </>
-                      )}
-                      {isStaffOrHigher() && (
-                        <NavLink
-                          to="/dashboard"
-                          className="block px-4 py-2 text-sm text-gray-700 hover:bg-gray-100"
-                          onClick={() => setIsProfileMenuOpen(false)}
-                        >
-                          Dashboard
-                        </NavLink>
-                      )}
-                      {/* Desktop logout button */}
-                      <button
-                        onClick={handleLogout}
-                        disabled={isLoggingOut}
-                        className="block w-full text-left px-4 py-2 text-sm text-red-600 hover:bg-gray-100"
+                      <div className="w-8 h-8 bg-indigo-600 rounded-full flex items-center justify-center text-white">
+                        {avatarInfo.imageUrl ? (
+                          <img
+                            src={avatarInfo.imageUrl}
+                            alt={displayName}
+                            className="w-8 h-8 rounded-full object-cover"
+                          />
+                        ) : avatarInfo.initial ? (
+                          <span className="font-semibold">
+                            {avatarInfo.initial}
+                          </span>
+                        ) : (
+                          <User size={18} />
+                        )}
+                      </div>{" "}
+                      <span className="font-medium">{displayName}</span>
+                    </button>
+
+                    {isProfileMenuOpen && (
+                      <div
+                        ref={profileMenuRef} // Add ref here
+                        className="absolute right-0 mt-2 w-48 bg-white rounded-md shadow-lg py-1 z-50"
                       >
-                        <div className="flex items-center">
-                          {isLoggingOut ? (
-                            <>
-                              <div className="animate-spin h-4 w-4 border-2 border-red-600 border-t-transparent rounded-full mr-2"></div>
-                              <span>Đang đăng xuất...</span>
-                            </>
-                          ) : (
-                            <>
-                              <LogOut size={16} className="mr-2" />
-                              <span>Đăng Xuất</span>
-                            </>
-                          )}
-                        </div>
-                      </button>
-                    </div>
-                  )}
-                </li>
+                        {" "}
+                        {!isStaffOrHigher() && (
+                          <>
+                            <NavLink
+                              to="/profile"
+                              className="block px-4 py-2 text-sm text-gray-700 hover:bg-gray-100"
+                              onClick={() => setIsProfileMenuOpen(false)}
+                            >
+                              Hồ Sơ
+                            </NavLink>{" "}
+                            <NavLink
+                              to="/profile?tab=appointments"
+                              className="block px-4 py-2 text-sm text-gray-700 hover:bg-gray-100"
+                              onClick={() => setIsProfileMenuOpen(false)}
+                            >
+                              Lịch Hẹn
+                            </NavLink>
+                          </>
+                        )}
+                        {isStaffOrHigher() && (
+                          <NavLink
+                            to="/dashboard"
+                            className="block px-4 py-2 text-sm text-gray-700 hover:bg-gray-100"
+                            onClick={() => setIsProfileMenuOpen(false)}
+                          >
+                            Dashboard
+                          </NavLink>
+                        )}
+                        {/* Desktop logout button */}
+                        <button
+                          onClick={handleLogout}
+                          disabled={isLoggingOut}
+                          className="w-full text-left px-4 py-2 text-sm text-red-600 hover:bg-red-50"
+                        >
+                          <LogOut className="inline-block w-4 h-4 mr-2" />
+                          {isLoggingOut ? "Đang đăng xuất..." : "Đăng xuất"}
+                        </button>
+                      </div>
+                    )}
+                  </li>
+                </>
               ) : (
                 <li>
                   <NavLink

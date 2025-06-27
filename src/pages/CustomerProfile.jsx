@@ -40,9 +40,8 @@ function CustomerProfile() {
   const [searchParams] = useSearchParams();
   const tabParam = searchParams.get("tab");
   const [activeTab, setActiveTab] = useState(tabParam || "profile");
-  const [notifications, setNotifications] = useState([]);
+  const [setNotifications] = useState([]);
   const [unreadCount, setUnreadCount] = useState(0);
-  const [notificationsVisible, setNotificationsVisible] = useState(true);
   const [profileData, setProfileData] = useState({
     name: "",
     email: "",
@@ -58,39 +57,6 @@ function CustomerProfile() {
     isActive: true,
     emergencyContact: "",
   });
-
-  // Mock notifications data for demo
-  useEffect(() => {
-    const mockNotifications = [
-      {
-        id: 1,
-        title: "Nhắc nhở cuộc hẹn",
-        message: "Cuộc hẹn với bác sĩ vào ngày mai, 10:00 AM",
-        date: "2025-06-04T10:00:00Z",
-        type: "appointment",
-        isRead: false,
-      },
-      {
-        id: 2,
-        title: "Kết quả xét nghiệm",
-        message: "Kết quả xét nghiệm máu của bạn đã sẵn sàng",
-        date: "2025-06-03T14:30:00Z",
-        type: "medical",
-        isRead: false,
-      },
-      {
-        id: 3,
-        title: "Thanh toán thành công",
-        message: "Thanh toán dịch vụ khám sức khỏe thành công",
-        date: "2025-06-01T09:15:00Z",
-        type: "payment",
-        isRead: true,
-      },
-    ];
-
-    setNotifications(mockNotifications);
-    setUnreadCount(mockNotifications.filter((n) => !n.isRead).length);
-  }, []);
 
   // Load user profile data from API
   const loadUserProfile = useCallback(async () => {
@@ -172,43 +138,6 @@ function CustomerProfile() {
       }))
     );
     setUnreadCount(0);
-  };
-
-  // Mark a single notification as read
-  const handleMarkAsRead = (id) => {
-    setNotifications((prevNotifications) =>
-      prevNotifications.map((notification) =>
-        notification.id === id
-          ? { ...notification, isRead: true }
-          : notification
-      )
-    );
-    setUnreadCount((prev) => Math.max(0, prev - 1));
-  };
-
-  // Format date for display
-  const formatDate = (dateString) => {
-    const date = new Date(dateString);
-    return new Intl.DateTimeFormat("vi-VN", {
-      day: "2-digit",
-      month: "2-digit",
-      hour: "2-digit",
-      minute: "2-digit",
-    }).format(date);
-  };
-
-  // Get notification icon based on type
-  const getNotificationIcon = (type) => {
-    switch (type) {
-      case "appointment":
-        return <Calendar className="h-5 w-5 text-blue-500" />;
-      case "medical":
-        return <FileText className="h-5 w-5 text-green-500" />;
-      case "payment":
-        return <CheckCircle className="h-5 w-5 text-purple-500" />;
-      default:
-        return <AlertCircle className="h-5 w-5 text-amber-500" />;
-    }
   };
 
   // Navigation tabs with icons
@@ -430,150 +359,6 @@ function CustomerProfile() {
                 })}
               </ul>
             </nav>
-          </div>
-
-          {/* Recent Notifications */}
-          <div className="bg-white rounded-lg shadow-sm overflow-hidden">
-            <div className="flex justify-between items-center p-5 border-b border-gray-200">
-              <div className="flex items-center">
-                <Bell className="h-5 w-5 mr-2 text-indigo-600" />
-                <h3 className="font-medium text-gray-900">Thông báo gần đây</h3>
-              </div>
-
-              <div className="flex items-center">
-                {unreadCount > 0 && (
-                  <span className="px-2 py-1 text-xs font-medium bg-red-100 text-red-800 rounded-full mr-3">
-                    {unreadCount}
-                  </span>
-                )}
-                <button
-                  className="text-gray-500 hover:text-gray-700 cursor-pointer"
-                  onClick={() => setNotificationsVisible(!notificationsVisible)}
-                  aria-label={
-                    notificationsVisible
-                      ? "Hide notifications"
-                      : "Show notifications"
-                  }
-                >
-                  {notificationsVisible ? (
-                    <svg
-                      xmlns="http://www.w3.org/2000/svg"
-                      width="20"
-                      height="20"
-                      viewBox="0 0 24 24"
-                      fill="none"
-                      stroke="currentColor"
-                      strokeWidth="2"
-                      strokeLinecap="round"
-                      strokeLinejoin="round"
-                    >
-                      <path d="m18 15-6-6-6 6" />
-                    </svg>
-                  ) : (
-                    <svg
-                      xmlns="http://www.w3.org/2000/svg"
-                      width="20"
-                      height="20"
-                      viewBox="0 0 24 24"
-                      fill="none"
-                      stroke="currentColor"
-                      strokeWidth="2"
-                      strokeLinecap="round"
-                      strokeLinejoin="round"
-                    >
-                      <path d="m6 9 6 6 6-6" />
-                    </svg>
-                  )}
-                </button>
-              </div>
-            </div>
-
-            {notificationsVisible && (
-              <div className="divide-y divide-gray-100">
-                {notifications.length === 0 ? (
-                  <div className="text-center py-8">
-                    <Bell size={36} className="mx-auto text-gray-300" />
-                    <p className="mt-2 text-sm text-gray-500">
-                      Không có thông báo nào
-                    </p>
-                  </div>
-                ) : (
-                  <>
-                    {notifications.slice(0, 3).map((notification) => (
-                      <div
-                        key={notification.id}
-                        className={`flex p-4 ${
-                          notification.isRead
-                            ? ""
-                            : "bg-blue-50 border-l-4 border-blue-500"
-                        }`}
-                      >
-                        <div className="mr-3 mt-0.5">
-                          {getNotificationIcon(notification.type)}
-                        </div>
-
-                        <div className="flex-1">
-                          <div className="flex justify-between items-start">
-                            <h4
-                              className={`text-sm font-medium ${
-                                notification.isRead
-                                  ? "text-gray-700"
-                                  : "text-gray-900"
-                              }`}
-                            >
-                              {notification.title}
-                            </h4>
-
-                            {!notification.isRead && (
-                              <button
-                                onClick={(e) => {
-                                  e.stopPropagation();
-                                  handleMarkAsRead(notification.id);
-                                }}
-                                className="ml-2 text-gray-400 hover:text-gray-600 focus:outline-none"
-                                aria-label="Mark as read"
-                              >
-                                <X size={14} />
-                              </button>
-                            )}
-                          </div>
-
-                          <p className="text-xs text-gray-600 mt-1">
-                            {notification.message}
-                          </p>
-
-                          <div className="mt-1 text-xs text-gray-500">
-                            {formatDate(notification.date)}
-                          </div>
-                        </div>
-                      </div>
-                    ))}
-
-                    <div className="px-4 py-3 flex justify-between items-center bg-gray-50">
-                      {unreadCount > 0 && (
-                        <button
-                          onClick={handleMarkAllAsRead}
-                          className="text-sm text-indigo-600 hover:text-indigo-800"
-                        >
-                          Đánh dấu tất cả đã đọc
-                        </button>
-                      )}
-
-                      {notifications.length > 3 && (
-                        <button
-                          onClick={() => setActiveTab("notifications")}
-                          className={`text-sm font-medium text-indigo-600 hover:text-indigo-800 ${
-                            unreadCount > 0 ? "ml-auto" : ""
-                          }`}
-                        >
-                          Xem tất cả thông báo
-                        </button>
-                      )}
-                    </div>
-                  </>
-                )}
-              </div>
-            )}
           </div>
         </div>
 
