@@ -14,11 +14,13 @@ import {
   Link as LinkIcon,
 } from "lucide-react";
 import blogService from "../services/blogService";
+import userService from "../services/userService";
 import LoadingSpinner from "../components/ui/LoadingSpinner";
 
 function BlogDetail() {
   const { id } = useParams();
   const [blog, setBlog] = useState(null);
+  const [author, setAuthor] = useState(null);
   const [relatedPosts, setRelatedPosts] = useState([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
@@ -35,6 +37,18 @@ function BlogDetail() {
         // Fetch the current blog post
         const data = await blogService.getById(id);
         setBlog(data);
+
+        // Fetch author details if staffId exists
+        if (data && data.staffId) {
+          try {
+            const authorData = await userService.getUserById(data.staffId);
+            setAuthor(authorData);
+          } catch (authorError) {
+            console.error("Failed to fetch author details:", authorError);
+            // Fallback to show staffId if author fetch fails
+            setAuthor({ name: data.staffId });
+          }
+        }
 
         // Fetch all posts to find related ones
         const allPosts = await blogService.getAll();
@@ -143,13 +157,16 @@ function BlogDetail() {
             <div className="flex flex-wrap items-center justify-between">
               <div className="flex items-center mb-4 sm:mb-0">
                 <img
-                  src="https://images.unsplash.com/photo-1494790108377-be9c29b29330?ixlib=rb-1.2.1&ixid=eyJhcHBfaWQiOjEyMDd9&auto=format&fit=facearea&facepad=2&w=256&h=256&q=80"
-                  alt={blog.staffId}
+                  src={
+                    author?.avatarUrl ||
+                    "https://images.unsplash.com/photo-1494790108377-be9c29b29330?ixlib=rb-1.2.1&ixid=eyJhcHBfaWQiOjEyMDd9&auto=format&fit=facearea&facepad=2&w=256&h=256&q=80"
+                  }
+                  alt={author?.name || blog.staffId}
                   className="w-12 h-12 rounded-full object-cover"
                 />
                 <div className="ml-4">
                   <h3 className="text-lg font-medium text-gray-900">
-                    {blog.staffId}
+                    {author?.name || blog.staffId}
                   </h3>
                   <p className="text-sm text-gray-600">Bác sĩ Chuyên khoa</p>
                 </div>
@@ -289,7 +306,7 @@ function BlogDetail() {
 
           {/* Thêm vào phần hiển thị trạng thái */}
           {/* Hiển thị thông báo nếu bài viết chưa được xuất bản */}
-          {blog.status !== 1 && (
+          {blog.status !== 3 && (
             <div className="px-6 py-4 bg-yellow-50 border-t border-yellow-100">
               <div className="flex items-center">
                 <svg
@@ -309,8 +326,8 @@ function BlogDetail() {
                 <span className="text-yellow-700">
                   {blog.status === 0 &&
                     "Bài viết này vẫn đang ở trạng thái bản nháp."}
-                  {blog.status === 2 && "Bài viết này đang chờ xét duyệt."}
-                  {blog.status === 3 && "Bài viết này đã bị từ chối."}
+                  {blog.status === 1 && "Bài viết này đang chờ xét duyệt."}
+                  {blog.status === 2 && "Bài viết này đã bị từ chối."}
                 </span>
               </div>
             </div>
@@ -330,7 +347,7 @@ function BlogDetail() {
                     <div className="h-48 overflow-hidden">
                       <img
                         src={
-                          post.imageUrl ||
+                          post.staff?.avatarUrl ||
                           "https://via.placeholder.com/400x300?text=No+Image"
                         }
                         alt={post.title}
@@ -346,12 +363,15 @@ function BlogDetail() {
                       </p>
                       <div className="flex items-center">
                         <img
-                          src="https://images.unsplash.com/photo-1494790108377-be9c29b29330?ixlib=rb-1.2.1&ixid=eyJhcHBfaWQiOjEyMDd9&auto=format&fit=facearea&facepad=2&w=256&h=256&q=80"
-                          alt={post.staffId}
+                          src={
+                            post.staff?.avatarUrl ||
+                            "https://images.unsplash.com/photo-1494790108377-be9c29b29330?ixlib=rb-1.2.1&ixid=eyJhcHBfaWQiOjEyMDd9&auto=format&fit=facearea&facepad=2&w=256&h=256&q=80"
+                          }
+                          alt={post.staff?.name || post.staffId}
                           className="w-8 h-8 rounded-full object-cover mr-2"
                         />
                         <span className="text-sm text-gray-700">
-                          {post.staffId}
+                          {post.staff?.name || post.staffId}
                         </span>
                       </div>
                     </div>

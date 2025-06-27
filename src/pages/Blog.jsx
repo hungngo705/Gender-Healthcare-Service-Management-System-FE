@@ -33,11 +33,11 @@ const getStatusInfo = (status) => {
     case 0:
       return { class: "bg-yellow-100 text-yellow-800", text: "Bản nháp" };
     case 1:
-      return { class: "bg-green-100 text-green-800", text: "Đã xuất bản" };
-    case 2:
       return { class: "bg-blue-100 text-blue-800", text: "Đang xét duyệt" };
+    case 2:
+      return { class: "bg-red-100 text-red-800", text: "Đã từ chối" };
     case 3:
-      return { class: "bg-indigo-100 text-indigo-800", text: "Đã đăng" };
+      return { class: "bg-green-100 text-green-800", text: "Đã xuất bản" };
     default:
       return { class: "bg-gray-100 text-gray-800", text: "Không xác định" };
   }
@@ -57,8 +57,8 @@ function Blog() {
         const data = await blogService.getAll();
         console.log("Blog posts loaded:", data);
 
-        // CHỈ hiển thị bài viết đã được xuất bản (status = 1)
-        const publishedPosts = data.filter((post) => post.status === 1);
+        // CHỈ hiển thị bài viết đã được xuất bản (status = 3)
+        const publishedPosts = data.filter((post) => post.status === 3);
         setBlogPosts(publishedPosts);
       } catch (err) {
         console.error("Failed to fetch blog posts:", err);

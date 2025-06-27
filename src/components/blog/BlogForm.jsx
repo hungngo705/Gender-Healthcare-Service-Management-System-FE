@@ -2,6 +2,7 @@ import React, { useState, useEffect } from "react";
 import PropTypes from "prop-types";
 import tokenHelper from "../../utils/tokenHelper";
 import blogService from "../../services/blogService";
+import { BLOG_CATEGORIES } from "../../constants/blog";
 
 const POST_STATUS = {
   DRAFT: 0, // Bản nháp
@@ -15,25 +16,12 @@ const BlogForm = ({ initialData, onSubmitSuccess }) => {
   const [content, setContent] = useState(initialData?.content || "");
   const [imageUrl, setImageUrl] = useState(initialData?.imageUrl || "");
   const [category, setCategory] = useState(initialData?.category || 0);
-  const [status, setStatus] = useState(initialData?.status || 0);
+  // Loại bỏ trường status, sẽ tự động là DRAFT khi tạo mới hoặc giữ nguyên khi sửa
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState("");
 
-  // Danh mục bài viết
-  const categories = [
-    { id: 0, name: "Sức khỏe sinh sản" },
-    { id: 1, name: "Sức khỏe tình dục" },
-    { id: 2, name: "Sức khỏe tâm thần" },
-    { id: 3, name: "Giáo dục giới tính" },
-    { id: 5, name: "Sức khỏe tinh thần" },
-  ];
-
-  // Trạng thái bài viết
-  const statuses = [
-    { id: POST_STATUS.DRAFT, name: "Bản nháp" },
-    // Staff không thể trực tiếp đặt trạng thái xuất bản
-    { id: POST_STATUS.PENDING, name: "Gửi xét duyệt" },
-  ];
+  // Danh mục bài viết - Lấy từ file constants
+  const categories = BLOG_CATEGORIES;
 
   // Sửa lại hàm handleSubmit
   const handleSubmit = async (e) => {
@@ -42,42 +30,53 @@ const BlogForm = ({ initialData, onSubmitSuccess }) => {
     setLoading(true);
 
     try {
-      // Lấy thông tin từ token thay vì từ object user
-      let staffId = tokenHelper.getUserIdFromToken(); // Sử dụng hàm mới
+      // Lấy staffId từ token
+      const staffId = tokenHelper.getUserIdFromToken();
 
-      // Kiểm tra nếu không có ID thì thông báo lỗi
       if (!staffId) {
-        console.error("Không tìm thấy ID người dùng trong token");
         setError("Không thể xác định ID người dùng. Vui lòng đăng nhập lại.");
         setLoading(false);
         return;
       }
 
-      // Log ID để xác nhận
-      console.log("Sending with staffId:", staffId);
-
-      // Cấu trúc dữ liệu - sửa cách bạn bọc request
-      const requestData = {
-        title: title.trim(),
-        content: content.trim(),
-        imageUrl: imageUrl.trim() || "string",
-        status: Number(status),
-        category: Number(category),
-        staffId: staffId,
-        createdAt: new Date().toISOString(),
-      };
-
-      // Hiển thị dữ liệu gửi đi để debug
-      console.log("Sending data:", JSON.stringify(requestData));
+      // Log ID của bài viết nếu đang cập nhật
+      if (initialData?.id) {
+        console.log("UPDATING POST WITH ID:", initialData.id);
+      } else {
+        console.log("CREATING NEW POST");
+      }
 
       let result;
       if (initialData?.id) {
-        result = await blogService.update(initialData.id, requestData);
+        // Dữ liệu cập nhật theo yêu cầu API
+        const updateData = {
+          title: title.trim(),
+          content: content.trim(),
+          imageUrl: imageUrl.trim() || "string",
+          category: Number(category),
+        };
+
+        console.log("Update data:", updateData);
+        // Gọi API update với ID và dữ liệu chuẩn
+        result = await blogService.update(initialData.id, updateData);
+        console.log("Update API response:", result);
       } else {
-        result = await blogService.create(requestData);
+        // Dữ liệu tạo mới theo yêu cầu API
+        const createData = {
+          title: title.trim(),
+          content: content.trim(),
+          imageUrl: imageUrl.trim() || "string",
+          category: Number(category),
+          staffId: staffId,
+          createdAt: new Date().toISOString(),
+        };
+
+        console.log("Create data:", createData);
+        // Gọi API create
+        result = await blogService.create(createData);
+        console.log("Create API response:", result);
       }
 
-      console.log("API response:", result);
       onSubmitSuccess();
     } catch (err) {
       console.error("Error details:", err);
@@ -93,6 +92,8 @@ const BlogForm = ({ initialData, onSubmitSuccess }) => {
           errorMessage = errors.join(", ");
         } else if (err.response.data?.title) {
           errorMessage = err.response.data.title;
+        } else if (err.response.data?.message) {
+          errorMessage = err.response.data.message;
         }
 
         setError(errorMessage);
@@ -101,18 +102,6 @@ const BlogForm = ({ initialData, onSubmitSuccess }) => {
       }
     } finally {
       setLoading(false);
-    }
-  };
-
-  // Cập nhật hàm getStatusDescription
-  const getStatusDescription = (status) => {
-    switch (parseInt(status)) {
-      case POST_STATUS.DRAFT:
-        return "Bản nháp chỉ bạn mới nhìn thấy, chưa gửi đi xét duyệt";
-      case POST_STATUS.PENDING:
-        return "Gửi cho quản trị viên xét duyệt và xuất bản";
-      default:
-        return "";
     }
   };
 
@@ -179,31 +168,6 @@ const BlogForm = ({ initialData, onSubmitSuccess }) => {
             </option>
           ))}
         </select>
-      </div>
-
-      <div>
-        <label
-          htmlFor="status"
-          className="block text-sm font-medium text-gray-700"
-        >
-          Trạng thái <span className="text-red-600">*</span>
-        </label>
-        <select
-          id="status"
-          value={status}
-          onChange={(e) => setStatus(e.target.value)}
-          className="mt-1 block w-full border border-gray-300 rounded-md shadow-sm py-2 px-3 focus:outline-none focus:ring-indigo-500 focus:border-indigo-500"
-          required
-        >
-          {statuses.map((s) => (
-            <option key={s.id} value={s.id}>
-              {s.name}
-            </option>
-          ))}
-        </select>
-        <p className="mt-1 text-xs text-gray-500">
-          {getStatusDescription(status)}
-        </p>
       </div>
 
       <div>

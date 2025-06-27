@@ -71,16 +71,57 @@ const blogService = {
   // Update an existing blog post
   update: async (id, blogData) => {
     try {
+      console.log(`Calling update API for post ID ${id}:`, blogData);
+
+      // Đảm bảo id là hợp lệ
+      if (!id) {
+        throw new Error("Missing post ID for update");
+      }
+
+      // Đảm bảo gửi đúng định dạng dữ liệu cho API update
+      const updateData = {
+        title: blogData.title,
+        content: blogData.content,
+        imageUrl: blogData.imageUrl,
+        category: Number(blogData.category),
+      };
+
       const response = await axios.put(
         `${API_URL}${config.api.blog.update(id)}`,
-        blogData,
+        updateData,
         {
           headers: getAuthHeader(),
         }
       );
+
+      console.log("Update response:", response.data);
       return response.data;
     } catch (error) {
       console.error(`Error updating blog post with id ${id}:`, error);
+      throw error;
+    }
+  },
+
+  // API mới cho manager phê duyệt bài viết
+  approve: async (id, statusValue) => {
+    try {
+      // API yêu cầu gửi status qua query parameter, không phải body
+      const response = await axios.put(
+        `${API_URL}/api/v2.5/post/approve/${id}`,
+        null, // Body rỗng
+        {
+          headers: getAuthHeader(),
+          params: {
+            status: statusValue,
+          },
+        }
+      );
+      return response.data;
+    } catch (error) {
+      console.error(
+        `Error approving/rejecting blog post with id ${id}:`,
+        error
+      );
       throw error;
     }
   },

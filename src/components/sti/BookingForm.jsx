@@ -6,6 +6,7 @@ import { toast } from "react-toastify";
 import { STI_PACKAGES, STI_TEST_TYPES } from "./booking-components/constants";
 import { getForCustomer } from "../../services/stiTestingService";
 import { TIME_SLOT_ENUM } from "../../constants/enums";
+import LoadingSpinner from "../ui/LoadingSpinner";
 
 // Time slot component for STI testing booking
 const TimeSlotSelector = ({
@@ -105,7 +106,7 @@ function BookingForm() {
   // State for storing customer's existing bookings
   const [userBookings, setUserBookings] = useState([]);
   const [bookedSlots, setBookedSlots] = useState({});
-  const [setIsLoadingBookings] = useState(false);
+  const [isLoadingBookings, setIsLoadingBookings] = useState(true);
 
   // State for appointment form
   const [formData, setFormData] = useState({
@@ -594,9 +595,11 @@ function BookingForm() {
   // Fetch customer's existing bookings on component mount
   useEffect(() => {
     async function fetchUserBookings() {
-      if (!currentUser) return;
+      if (!currentUser) {
+        setIsLoadingBookings(false);
+        return;
+      }
 
-      setIsLoadingBookings(true);
       try {
         const response = await getForCustomer();
         if (response?.data?.is_success) {
@@ -711,14 +714,20 @@ function BookingForm() {
               </p>
             </div>
             <div>
-              <TimeSlotSelector
-                selectedSlot={formData.slot}
-                selectedDate={formData.preferredDate}
-                bookedSlots={bookedSlots}
-                onChange={(slotId) =>
-                  setFormData((prev) => ({ ...prev, slot: slotId }))
-                }
-              />
+              {isLoadingBookings ? (
+                <div className="flex h-32 items-center justify-center rounded-lg bg-gray-50">
+                  <LoadingSpinner />
+                </div>
+              ) : (
+                <TimeSlotSelector
+                  selectedSlot={formData.slot}
+                  selectedDate={formData.preferredDate}
+                  bookedSlots={bookedSlots}
+                  onChange={(slotId) =>
+                    setFormData((prev) => ({ ...prev, slot: slotId }))
+                  }
+                />
+              )}
               <p className="text-xs text-gray-500 mt-1">
                 Vui lòng chọn khung giờ phù hợp để thực hiện xét nghiệm
               </p>
@@ -1141,7 +1150,7 @@ function BookingForm() {
                   Khung giờ:{" "}
                   <span className="font-semibold text-gray-900">
                     {formData.slot !== undefined
-                      ? testTypes[formData.slot]?.time
+                      ? TIME_SLOT_ENUM[formData.slot]?.time
                       : "Chưa chọn"}
                   </span>
                 </p>

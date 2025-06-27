@@ -1,9 +1,20 @@
 import React, { useState, useEffect } from "react";
 import PropTypes from "prop-types";
+import {
+  Eye,
+  Edit,
+  Trash2,
+  Send,
+  CheckCircle2,
+  XCircle,
+  Undo2,
+} from "lucide-react";
 import blogService from "../../../services/blogService";
 import BlogForm from "../../../components/blog/BlogForm";
 import LoadingSpinner from "../../ui/LoadingSpinner";
 import tokenHelper from "../../../utils/tokenHelper";
+import Pagination from "../../ui/Pagination";
+import { getBlogCategoryName } from "../../../constants/blog";
 
 // Cập nhật lại enum cho đúng
 const POST_STATUS = {
@@ -21,29 +32,26 @@ function BlogManagementTab({ role: propRole }) {
   const [error, setError] = useState(null);
   const [isCreatingPost, setIsCreatingPost] = useState(false);
   const [editingPost, setEditingPost] = useState(null);
-  const [currentUser, setCurrentUser] = useState(null);
   const [actualRole, setActualRole] = useState(propRole);
   const [viewingPost, setViewingPost] = useState(null);
   const [isViewModalOpen, setIsViewModalOpen] = useState(false);
+  const [currentPage, setCurrentPage] = useState(1);
+  const [postsPerPage] = useState(5); // Số bài viết mỗi trang
 
   // Fetch blog posts on component mount
   useEffect(() => {
     // Lấy thông tin người dùng hiện tại từ localStorage
-    const currentUserId = tokenHelper.getUserIdFromToken();
     const userJson = localStorage.getItem("user");
-    
+
     if (userJson) {
       try {
         const userData = JSON.parse(userJson);
         // Lấy role từ localStorage, nếu không có thì dùng propRole
         const userRole = userData.role || propRole || "Staff";
-        
+
         setActualRole(userRole); // Lưu role thực tế vào state
-        setCurrentUser({
-          id: currentUserId,
-          role: userRole,
-        });
-        console.log("Current user set:", { id: currentUserId, role: userRole });
+
+        console.log("Current user role set:", userRole);
       } catch (error) {
         console.error("Error parsing user data:", error);
         setActualRole(propRole || "Staff"); // Fallback về prop nếu có lỗi
@@ -51,7 +59,7 @@ function BlogManagementTab({ role: propRole }) {
     } else {
       setActualRole(propRole || "Staff");
     }
-    
+
     fetchPosts();
   }, [propRole]);
 
@@ -69,16 +77,19 @@ function BlogManagementTab({ role: propRole }) {
         const postStatus = Number(post.status);
 
         // Kiểm tra xem người dùng hiện tại có phải là tác giả không
-        const isOwner = post.staffId &&
-                        currentUserId &&
-                        post.staffId.toString() === currentUserId.toString();
+        const isOwner =
+          post.staffId &&
+          currentUserId &&
+          post.staffId.toString() === currentUserId.toString();
 
-        console.log(`Post ${post.id}: isOwner = ${isOwner}, staffId = ${post.staffId}, currentUserId = ${currentUserId}`);
+        console.log(
+          `Post ${post.id}: isOwner = ${isOwner}, staffId = ${post.staffId}, currentUserId = ${currentUserId}`
+        );
 
         return {
           ...post,
           status: postStatus,
-          isOwner: isOwner
+          isOwner: isOwner,
         };
       });
 
@@ -93,26 +104,29 @@ function BlogManagementTab({ role: propRole }) {
   };
 
   const handleSubmitForReview = async (postId) => {
-    try {
-      const postToUpdate = posts.find((post) => post.id === postId);
-      if (!postToUpdate) return;
-
-      const updatedPost = { ...postToUpdate, status: POST_STATUS.PENDING };
-      await blogService.update(postId, updatedPost);
-      fetchPosts();
-    } catch (err) {
-      console.error("Failed to submit post for review:", err);
-      alert("Không thể gửi bài đăng để xét duyệt. Vui lòng thử lại.");
+    if (window.confirm("Bạn có muốn gửi bài viết này để xét duyệt không?")) {
+      try {
+        // Dùng API approve để đổi status thành PENDING
+        await blogService.approve(postId, POST_STATUS.PENDING);
+        alert("Bài viết đã được gửi để xét duyệt thành công!");
+        fetchPosts();
+      } catch (err) {
+        console.error("Failed to submit post for review:", err);
+        alert("Không thể gửi bài đăng để xét duyệt. Vui lòng thử lại.");
+      }
     }
   };
 
   const handleApprovePost = async (postId) => {
     try {
-      const postToUpdate = posts.find((post) => post.id === postId);
-      if (!postToUpdate) return;
+      // Kiểm tra quyền trước khi thực hiện
+      if (actualRole !== "Manager" && actualRole !== "Admin") {
+        alert("Bạn không có quyền duyệt bài viết.");
+        return;
+      }
 
-      const updatedPost = { ...postToUpdate, status: POST_STATUS.APPROVED };
-      await blogService.update(postId, updatedPost);
+      // Sử dụng API mới để duyệt bài viết
+      await blogService.approve(postId, POST_STATUS.APPROVED);
       fetchPosts();
     } catch (err) {
       console.error("Failed to approve post:", err);
@@ -122,15 +136,39 @@ function BlogManagementTab({ role: propRole }) {
 
   const handleRejectPost = async (postId) => {
     try {
-      const postToUpdate = posts.find((post) => post.id === postId);
-      if (!postToUpdate) return;
+      // Kiểm tra quyền trước khi thực hiện
+      if (actualRole !== "Manager" && actualRole !== "Admin") {
+        alert("Bạn không có quyền từ chối bài viết.");
+        return;
+      }
 
-      const updatedPost = { ...postToUpdate, status: POST_STATUS.REJECTED };
-      await blogService.update(postId, updatedPost);
+      // Sử dụng API mới để từ chối bài viết
+      await blogService.approve(postId, POST_STATUS.REJECTED);
       fetchPosts();
     } catch (err) {
       console.error("Failed to reject post:", err);
       alert("Không thể từ chối bài đăng. Vui lòng thử lại.");
+    }
+  };
+
+  const handleRevertToDraft = async (postId) => {
+    if (
+      window.confirm("Bạn có chắc muốn trả bài viết này về lại bản nháp không?")
+    ) {
+      try {
+        // Chỉ Manager và Admin có quyền
+        if (actualRole !== "Manager" && actualRole !== "Admin") {
+          alert("Bạn không có quyền thực hiện thao tác này.");
+          return;
+        }
+        // Dùng API approve để đổi status thành DRAFT
+        await blogService.approve(postId, POST_STATUS.DRAFT);
+        alert("Bài viết đã được trả về bản nháp.");
+        fetchPosts();
+      } catch (err) {
+        console.error("Failed to revert post to draft:", err);
+        alert("Không thể trả bài viết về bản nháp. Vui lòng thử lại.");
+      }
     }
   };
 
@@ -163,16 +201,24 @@ function BlogManagementTab({ role: propRole }) {
     if (filter !== "all") {
       switch (filter) {
         case "drafts":
-          filtered = filtered.filter((post) => post.status === POST_STATUS.DRAFT);
+          filtered = filtered.filter(
+            (post) => post.status === POST_STATUS.DRAFT
+          );
           break;
         case "review":
-          filtered = filtered.filter((post) => post.status === POST_STATUS.PENDING);
+          filtered = filtered.filter(
+            (post) => post.status === POST_STATUS.PENDING
+          );
           break;
         case "published":
-          filtered = filtered.filter((post) => post.status === POST_STATUS.APPROVED);
+          filtered = filtered.filter(
+            (post) => post.status === POST_STATUS.APPROVED
+          );
           break;
         case "rejected":
-          filtered = filtered.filter((post) => post.status === POST_STATUS.REJECTED);
+          filtered = filtered.filter(
+            (post) => post.status === POST_STATUS.REJECTED
+          );
           break;
       }
     }
@@ -182,12 +228,24 @@ function BlogManagementTab({ role: propRole }) {
         (post) =>
           post.title?.toLowerCase().includes(searchTerm.toLowerCase()) ||
           post.content?.toLowerCase().includes(searchTerm.toLowerCase()) ||
-          getCategoryName(post.category).toLowerCase().includes(searchTerm.toLowerCase())
+          getBlogCategoryName(post.category)
+            .toLowerCase()
+            .includes(searchTerm.toLowerCase())
       );
     }
 
     return filtered;
   };
+
+  const filteredPosts = getFilteredPosts();
+
+  // Logic phân trang
+  const indexOfLastPost = currentPage * postsPerPage;
+  const indexOfFirstPost = indexOfLastPost - postsPerPage;
+  const currentPosts = filteredPosts.slice(indexOfFirstPost, indexOfLastPost);
+
+  // Hàm thay đổi trang
+  const paginate = (pageNumber) => setCurrentPage(pageNumber);
 
   const getStatusClass = (status) => {
     switch (Number(status)) {
@@ -219,55 +277,61 @@ function BlogManagementTab({ role: propRole }) {
     }
   };
 
-  const getCategoryName = (categoryId) => {
-    const categories = [
-      { id: "0", name: "Sức khỏe sinh sản" },
-      { id: "1", name: "Sức khỏe tình dục" },
-      { id: "2", name: "Sức khỏe tâm thần" },
-      { id: "3", name: "Giáo dục giới tính" },
-      { id: "5", name: "Sức khỏe tinh thần" },
-    ];
-    const category = categories.find((cat) => cat.id === (categoryId || "").toString());
-    return category ? category.name : "Khác";
-  };
-
   // Component Modal để hiển thị nội dung bài viết
   const PostViewModal = ({ post, onClose }) => {
     if (!post) return null;
-    
+
     return (
       <div className="fixed inset-0 bg-gray-600 bg-opacity-75 flex items-center justify-center z-50">
         <div className="bg-white rounded-lg shadow-xl max-w-4xl w-full max-h-[90vh] overflow-y-auto">
           <div className="p-6">
             <div className="flex justify-between items-center mb-6">
               <h2 className="text-2xl font-bold">{post.title}</h2>
-              <button onClick={onClose} className="text-gray-500 hover:text-gray-700">
-                <svg className="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
-                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M6 18L18 6M6 6l12 12"></path>
+              <button
+                onClick={onClose}
+                className="text-gray-500 hover:text-gray-700"
+              >
+                <svg
+                  className="w-6 h-6"
+                  fill="none"
+                  stroke="currentColor"
+                  viewBox="0 0 24 24"
+                  xmlns="http://www.w3.org/2000/svg"
+                >
+                  <path
+                    strokeLinecap="round"
+                    strokeLinejoin="round"
+                    strokeWidth="2"
+                    d="M6 18L18 6M6 6l12 12"
+                  ></path>
                 </svg>
               </button>
             </div>
-            
+
             <div className="mb-4">
               <span className="inline-block bg-blue-100 text-blue-800 text-xs px-2 py-1 rounded-full mr-2">
-                {getCategoryName(post.category)}
+                {getBlogCategoryName(post.category)}
               </span>
-              <span className={`inline-block text-xs px-2 py-1 rounded-full ${getStatusClass(post.status)}`}>
+              <span
+                className={`inline-block text-xs px-2 py-1 rounded-full ${getStatusClass(
+                  post.status
+                )}`}
+              >
                 {getStatusText(post.status)}
               </span>
             </div>
-            
+
             {/* Hiển thị hình ảnh chính của bài viết (nếu có) */}
             {post.imageUrl && (
               <div className="mb-6">
-                <img 
-                  src={post.imageUrl} 
-                  alt={post.title} 
+                <img
+                  src={post.imageUrl}
+                  alt={post.title}
                   className="w-full h-auto rounded-lg shadow-md"
                 />
               </div>
             )}
-            
+
             {/* Thêm CSS để đảm bảo hình ảnh bên trong nội dung hiển thị đúng */}
             <style jsx>{`
               .blog-content img {
@@ -277,13 +341,20 @@ function BlogManagementTab({ role: propRole }) {
                 border-radius: 0.375rem;
               }
             `}</style>
-            
+
             {/* Nội dung bài viết với CSS được áp dụng */}
-            <div className="prose max-w-none blog-content" dangerouslySetInnerHTML={{ __html: post.content }} />
-            
+            <div
+              className="prose max-w-none blog-content"
+              dangerouslySetInnerHTML={{ __html: post.content }}
+            />
+
             <div className="mt-6 text-sm text-gray-500">
               <p>Tác giả: {post.staff?.name || "Không xác định"}</p>
-              <p>Ngày tạo: {post.createdAt && new Date(post.createdAt).toLocaleDateString("vi-VN")}</p>
+              <p>
+                Ngày tạo:{" "}
+                {post.createdAt &&
+                  new Date(post.createdAt).toLocaleDateString("vi-VN")}
+              </p>
             </div>
           </div>
         </div>
@@ -296,7 +367,9 @@ function BlogManagementTab({ role: propRole }) {
     return (
       <div>
         <div className="flex items-center justify-between mb-6">
-          <h2 className="text-xl font-semibold text-gray-800">Tạo bài viết mới</h2>
+          <h2 className="text-xl font-semibold text-gray-800">
+            Tạo bài viết mới
+          </h2>
           <button
             onClick={() => setIsCreatingPost(false)}
             className="px-4 py-2 bg-gray-200 text-gray-700 rounded-md hover:bg-gray-300 transition-colors"
@@ -309,11 +382,15 @@ function BlogManagementTab({ role: propRole }) {
     );
   }
 
+  // Khi hiển thị form sửa
   if (editingPost) {
+    console.log("Rendering edit form with data:", editingPost);
     return (
       <div>
         <div className="flex items-center justify-between mb-6">
-          <h2 className="text-xl font-semibold text-gray-800">Chỉnh sửa bài viết</h2>
+          <h2 className="text-xl font-semibold text-gray-800">
+            Chỉnh sửa bài viết
+          </h2>
           <button
             onClick={() => setEditingPost(null)}
             className="px-4 py-2 bg-gray-200 text-gray-700 rounded-md hover:bg-gray-300 transition-colors"
@@ -321,20 +398,22 @@ function BlogManagementTab({ role: propRole }) {
             Hủy
           </button>
         </div>
-        <BlogForm initialData={editingPost} onSubmitSuccess={handleEditSuccess} />
+        <BlogForm
+          initialData={editingPost}
+          onSubmitSuccess={handleEditSuccess}
+          role={actualRole}
+        />
       </div>
     );
   }
 
   // UI phần chính
-  const filteredPosts = getFilteredPosts();
-
   return (
     <div>
       <div className="mb-6">
         <h2 className="text-xl font-semibold text-gray-800 mb-4">
-          {actualRole === "Manager" || actualRole === "Admin" 
-            ? "Quản lý & kiểm duyệt bài đăng" 
+          {actualRole === "Manager" || actualRole === "Admin"
+            ? "Quản lý & kiểm duyệt bài đăng"
             : "Quản lý bài viết của tôi"}
         </h2>
 
@@ -369,7 +448,9 @@ function BlogManagementTab({ role: propRole }) {
           <div className="flex space-x-2 mb-4 md:mb-0 overflow-x-auto">
             <button
               className={`px-3 py-1 rounded-md text-sm whitespace-nowrap ${
-                filter === "all" ? "bg-indigo-100 text-indigo-800" : "bg-gray-100 text-gray-800"
+                filter === "all"
+                  ? "bg-indigo-100 text-indigo-800"
+                  : "bg-gray-100 text-gray-800"
               }`}
               onClick={() => setFilter("all")}
             >
@@ -377,7 +458,9 @@ function BlogManagementTab({ role: propRole }) {
             </button>
             <button
               className={`px-3 py-1 rounded-md text-sm whitespace-nowrap ${
-                filter === "drafts" ? "bg-indigo-100 text-indigo-800" : "bg-gray-100 text-gray-800"
+                filter === "drafts"
+                  ? "bg-indigo-100 text-indigo-800"
+                  : "bg-gray-100 text-gray-800"
               }`}
               onClick={() => setFilter("drafts")}
             >
@@ -385,7 +468,9 @@ function BlogManagementTab({ role: propRole }) {
             </button>
             <button
               className={`px-3 py-1 rounded-md text-sm whitespace-nowrap ${
-                filter === "review" ? "bg-indigo-100 text-indigo-800" : "bg-gray-100 text-gray-800"
+                filter === "review"
+                  ? "bg-indigo-100 text-indigo-800"
+                  : "bg-gray-100 text-gray-800"
               }`}
               onClick={() => setFilter("review")}
             >
@@ -393,7 +478,9 @@ function BlogManagementTab({ role: propRole }) {
             </button>
             <button
               className={`px-3 py-1 rounded-md text-sm whitespace-nowrap ${
-                filter === "published" ? "bg-indigo-100 text-indigo-800" : "bg-gray-100 text-gray-800"
+                filter === "published"
+                  ? "bg-indigo-100 text-indigo-800"
+                  : "bg-gray-100 text-gray-800"
               }`}
               onClick={() => setFilter("published")}
             >
@@ -401,7 +488,9 @@ function BlogManagementTab({ role: propRole }) {
             </button>
             <button
               className={`px-3 py-1 rounded-md text-sm whitespace-nowrap ${
-                filter === "rejected" ? "bg-indigo-100 text-indigo-800" : "bg-gray-100 text-gray-800"
+                filter === "rejected"
+                  ? "bg-indigo-100 text-indigo-800"
+                  : "bg-gray-100 text-gray-800"
               }`}
               onClick={() => setFilter("rejected")}
             >
@@ -409,13 +498,15 @@ function BlogManagementTab({ role: propRole }) {
             </button>
           </div>
 
-          {/* Nút tạo bài viết mới */}
-          <button
-            className="w-full md:w-auto px-4 py-2 bg-indigo-600 text-white rounded-md hover:bg-indigo-700 transition-colors"
-            onClick={() => setIsCreatingPost(true)}
-          >
-            Tạo bài viết mới
-          </button>
+          {/* Nút tạo bài viết mới - Chỉ hiển thị cho Staff */}
+          {actualRole === "Staff" && (
+            <button
+              className="w-full md:w-auto px-4 py-2 bg-indigo-600 text-white rounded-md hover:bg-indigo-700 transition-colors"
+              onClick={() => setIsCreatingPost(true)}
+            >
+              Tạo bài viết mới
+            </button>
+          )}
         </div>
       </div>
 
@@ -432,32 +523,50 @@ function BlogManagementTab({ role: propRole }) {
           <table className="min-w-full divide-y divide-gray-200">
             <thead className="bg-gray-50">
               <tr>
-                <th scope="col" className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                <th
+                  scope="col"
+                  className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider"
+                >
                   Tiêu đề bài viết
                 </th>
-                <th scope="col" className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                <th
+                  scope="col"
+                  className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider"
+                >
                   Danh mục
                 </th>
-                <th scope="col" className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                <th
+                  scope="col"
+                  className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider"
+                >
                   Trạng thái
                 </th>
-                <th scope="col" className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                <th
+                  scope="col"
+                  className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider"
+                >
                   Tác giả
                 </th>
-                <th scope="col" className="px-6 py-3 text-right text-xs font-medium text-gray-500 uppercase tracking-wider">
+                <th
+                  scope="col"
+                  className="px-6 py-3 text-right text-xs font-medium text-gray-500 uppercase tracking-wider"
+                >
                   Thao tác
                 </th>
               </tr>
             </thead>
             <tbody className="bg-white divide-y divide-gray-200">
-              {filteredPosts.length === 0 ? (
+              {currentPosts.length === 0 ? (
                 <tr>
-                  <td colSpan="5" className="px-6 py-4 text-center text-gray-500">
+                  <td
+                    colSpan="5"
+                    className="px-6 py-4 text-center text-gray-500"
+                  >
                     Không có bài viết nào
                   </td>
                 </tr>
               ) : (
-                filteredPosts.map((post) => (
+                currentPosts.map((post) => (
                   <tr key={post.id}>
                     {/* Tiêu đề */}
                     <td className="px-6 py-4">
@@ -472,17 +581,20 @@ function BlogManagementTab({ role: propRole }) {
                             )}
                           </div>
                           <div className="text-xs text-gray-500 mt-1">
-                            {post.createdAt && new Date(post.createdAt).toLocaleDateString("vi-VN")}
+                            {post.createdAt &&
+                              new Date(post.createdAt).toLocaleDateString(
+                                "vi-VN"
+                              )}
                           </div>
                         </div>
                       </div>
                     </td>
-                    
+
                     {/* Danh mục */}
                     <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-900">
-                      {getCategoryName(post.category)}
+                      {getBlogCategoryName(post.category)}
                     </td>
-                    
+
                     {/* Trạng thái */}
                     <td className="px-6 py-4 whitespace-nowrap">
                       <span
@@ -493,84 +605,133 @@ function BlogManagementTab({ role: propRole }) {
                         {getStatusText(post.status)}
                       </span>
                     </td>
-                    
+
                     {/* Tác giả */}
                     <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-900">
                       {post.staff?.name || post.staffId || "Không xác định"}
                     </td>
-                    
+
                     {/* THAO TÁC - Phần quan trọng */}
                     <td className="px-6 py-4 whitespace-nowrap text-right text-sm font-medium">
-                      
-                      {/* Nút Xem - hiển thị modal xem chi tiết bài viết */}
-                      <button
-                        className="text-indigo-600 hover:text-indigo-900 mr-3"
-                        onClick={() => {
-                          setViewingPost(post);
-                          setIsViewModalOpen(true);
-                        }}
-                      >
-                        Xem
-                      </button>
-                      
-                      {/* Nút Sửa - chỉ cho Staff là tác giả và bài ở trạng thái Draft hoặc Rejected */}
-                      {actualRole === "Staff" && post.isOwner === true && 
-                       (post.status === POST_STATUS.DRAFT || post.status === POST_STATUS.REJECTED) && (
+                      <div className="flex justify-end items-center space-x-3">
+                        {/* Nút Xem */}
                         <button
-                          className="text-blue-600 hover:text-blue-900 mr-3"
-                          onClick={() => setEditingPost(post)}
+                          onClick={() => {
+                            setViewingPost(post);
+                            setIsViewModalOpen(true);
+                          }}
+                          className="text-gray-500 hover:text-indigo-600"
+                          title="Xem chi tiết"
                         >
-                          Sửa
+                          <Eye size={18} />
                         </button>
-                      )}
 
-                      {/* Nút Gửi xét duyệt - chỉ cho Staff là tác giả và bài ở trạng thái Draft hoặc Rejected */}
-                      {actualRole === "Staff" && post.isOwner === true && 
-                       (post.status === POST_STATUS.DRAFT || post.status === POST_STATUS.REJECTED) && (
-                        <button
-                          className="text-green-600 hover:text-green-900 mr-3"
-                          onClick={() => handleSubmitForReview(post.id)}
-                        >
-                          Gửi xét duyệt
-                        </button>
-                      )}
+                        {/* Nút Gửi duyệt - Staff, chủ sở hữu, bài nháp */}
+                        {actualRole === "Staff" &&
+                          post.isOwner &&
+                          post.status === POST_STATUS.DRAFT && (
+                            <button
+                              onClick={() => handleSubmitForReview(post.id)}
+                              className="text-blue-600 hover:text-blue-900"
+                              title="Gửi duyệt"
+                            >
+                              <Send size={18} />
+                            </button>
+                          )}
 
-                      {/* Nút Duyệt & xuất bản - chỉ cho Manager/Admin và bài đang xét duyệt */}
-                      {(actualRole === "Manager" || actualRole === "Admin") && post.status === POST_STATUS.PENDING && (
-                        <button
-                          className="text-green-600 hover:text-green-900 mr-3"
-                          onClick={() => handleApprovePost(post.id)}
-                        >
-                          Duyệt & xuất bản
-                        </button>
-                      )}
+                        {/* Nút Sửa - Staff là tác giả, bài ở trạng thái Nháp hoặc Bị từ chối */}
+                        {actualRole === "Staff" &&
+                          post.isOwner &&
+                          (post.status === POST_STATUS.DRAFT ||
+                            post.status === POST_STATUS.REJECTED) && (
+                            <button
+                              onClick={() => {
+                                setEditingPost({
+                                  id: post.id,
+                                  title: post.title,
+                                  content: post.content,
+                                  imageUrl: post.imageUrl,
+                                  category: post.category,
+                                  status: post.status,
+                                  staffId: post.staffId,
+                                  createdAt: post.createdAt,
+                                });
+                              }}
+                              className="text-yellow-600 hover:text-yellow-900"
+                              title="Sửa"
+                            >
+                              <Edit size={18} />
+                            </button>
+                          )}
 
-                      {/* Nút Từ chối - chỉ cho Manager/Admin và bài đang xét duyệt */}
-                      {(actualRole === "Manager" || actualRole === "Admin") && post.status === POST_STATUS.PENDING && (
-                        <button
-                          className="text-orange-600 hover:text-orange-900 mr-3"
-                          onClick={() => handleRejectPost(post.id)}
-                        >
-                          Từ chối
-                        </button>
-                      )}
+                        {/* Các nút cho Manager/Admin khi bài đang xét duyệt */}
+                        {(actualRole === "Manager" || actualRole === "Admin") &&
+                          post.status === POST_STATUS.PENDING && (
+                            <>
+                              <button
+                                onClick={() => handleApprovePost(post.id)}
+                                className="text-green-600 hover:text-green-900"
+                                title="Duyệt & xuất bản"
+                              >
+                                <CheckCircle2 size={18} />
+                              </button>
+                              <button
+                                onClick={() => handleRejectPost(post.id)}
+                                className="text-orange-600 hover:text-orange-900"
+                                title="Từ chối"
+                              >
+                                <XCircle size={18} />
+                              </button>
+                              <button
+                                onClick={() => handleRevertToDraft(post.id)}
+                                className="text-blue-600 hover:text-blue-900"
+                                title="Trả về bản nháp"
+                              >
+                                <Undo2 size={18} />
+                              </button>
+                            </>
+                          )}
 
-                      {/* Nút Xóa - Manager/Admin có thể xóa bất kỳ bài viết nào, Staff chỉ xóa được bài của mình */}
-                      {(actualRole === "Manager" || actualRole === "Admin" || 
-                        (actualRole === "Staff" && post.isOwner === true)) && (
-                        <button
-                          className="text-red-600 hover:text-red-900"
-                          onClick={() => handleDeletePost(post.id)}
-                        >
-                          Xóa
-                        </button>
-                      )}
+                        {/* Nút Xóa - Manager/Admin có thể xóa mọi bài, Staff chỉ xóa bài của mình */}
+                        {(actualRole === "Manager" ||
+                          actualRole === "Admin" ||
+                          (actualRole === "Staff" && post.isOwner)) && (
+                          <button
+                            onClick={() => handleDeletePost(post.id)}
+                            className="text-red-600 hover:text-red-900"
+                            title="Xóa"
+                          >
+                            <Trash2 size={18} />
+                          </button>
+                        )}
+                      </div>
                     </td>
                   </tr>
                 ))
               )}
             </tbody>
           </table>
+
+          {/* Component phân trang */}
+          {filteredPosts.length > postsPerPage && (
+            <div className="flex justify-between items-center p-4 border-t border-gray-200">
+              <p className="text-sm text-gray-700">
+                Hiển thị từ{" "}
+                <span className="font-medium">{indexOfFirstPost + 1}</span> đến{" "}
+                <span className="font-medium">
+                  {Math.min(indexOfLastPost, filteredPosts.length)}
+                </span>{" "}
+                trên <span className="font-medium">{filteredPosts.length}</span>{" "}
+                kết quả
+              </p>
+              <Pagination
+                postsPerPage={postsPerPage}
+                totalPosts={filteredPosts.length}
+                paginate={paginate}
+                currentPage={currentPage}
+              />
+            </div>
+          )}
         </div>
       )}
 
