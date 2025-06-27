@@ -71,6 +71,8 @@ const config = {
       update: (id) => `/api/v2.5/appointment/update/${id}`,
       cancel: (id) => `/api/v2.5/appointment/cancel/${id}`,
       getByUser: (userId) => `/api/v2.5/appointment/user/${userId}`,
+      updateMeetingLink: (id) =>
+        `/api/v2.5/appointment/update/meetinglink/${id}`,
       getByCurrentUser: "/api/v2.5/appointment/getall",
       getByConsultant: (consultantId) =>
         `/api/v2.5/appointment/consultant/${consultantId}`,
