@@ -42,8 +42,8 @@ const config = {
   // API URLs
   api: {
     baseURL: getApiBaseURL(),
-    timeout: 30000, // Increased timeout for slower Azure connections
-    // Auth endpoints
+    timeout: 30000, // 30 seconds
+    // Auth endpoints - add API prefix
     auth: {
       login: "/api/v2.5/login",
       register: "/api/v2.5/register",
@@ -81,6 +81,8 @@ const config = {
       update: (id) => `/api/v2.5/appointment/update/${id}`,
       cancel: (id) => `/api/v2.5/appointment/cancel/${id}`,
       getByUser: (userId) => `/api/v2.5/appointment/user/${userId}`,
+      updateMeetingLink: (id) =>
+        `/api/v2.5/appointment/update/meetinglink/${id}`,
       getByCurrentUser: "/api/v2.5/appointment/getall",
       getByConsultant: (consultantId) =>
         `/api/v2.5/appointment/consultant/${consultantId}`,
@@ -106,13 +108,12 @@ const config = {
     },
     // Blog endpoints
     blog: {
-      getAll: "/api/v2.5/blog/getall",
-      create: "/api/v2.5/blog/create",
-      getById: (id) => `/api/v2.5/blog/${id}`,
-      update: (id) => `/api/v2.5/blog/${id}`,
-      delete: (id) => `/api/v2.5/blog/${id}`,
-      getComments: (blogId) => `/api/v2.5/blog/${blogId}/comments`,
-      addComment: (blogId) => `/api/v2.5/blog/${blogId}/comments`,
+      getAll: "/api/v2.5/post/getall",
+      create: "/api/v2.5/post/create",
+      getById: (id) => `/api/v2.5/post/${id}`,
+      update: (id) => `/api/v2.5/post/update/${id}`,
+      approve: (id) => `/api/v2.5/post/approve/${id}`, // Thêm endpoint mới
+      delete: (id) => `/api/v2.5/post/delete/${id}`,
     },
     // Service endpoints
     services: {
