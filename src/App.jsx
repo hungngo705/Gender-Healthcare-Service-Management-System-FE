@@ -157,7 +157,7 @@ function App() {
             <Route
               path="profile/:tab"
               element={
-                <ProtectedRoute roleRequired="customer,admin,manager,staff,consultant">
+                <ProtectedRoute>
                   <CustomerProfile />
                 </ProtectedRoute>
               }

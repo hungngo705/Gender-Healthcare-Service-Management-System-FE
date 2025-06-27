@@ -59,6 +59,8 @@ function STITestingHistory({ userId }) {
   const [isDateFilterActive, setIsDateFilterActive] = useState(false);
   const [filterSlot, setFilterSlot] = useState("all");
 
+  const [activeTab, setActiveTab] = useState("details");
+
   // Hàm tiện ích để lấy class màu sắc cho trạng thái
   const getStatusColorClass = (status) => {
     return STATUS_ENUM[status]?.color || "bg-gray-100 text-gray-800";
@@ -807,6 +809,7 @@ function STITestingHistory({ userId }) {
                           className="text-indigo-600 hover:text-indigo-900 focus:outline-none border border-indigo-200 bg-indigo-50 hover:bg-indigo-100 px-3 py-1 rounded-md"
                           onClick={() => {
                             setSelectedTest(test);
+                            setActiveTab("details");
                             setShowModal(true);
                           }}
                         >
@@ -879,120 +882,48 @@ function STITestingHistory({ userId }) {
                   </span>
                 </button>
               </div>
-              <div className="relative p-6 flex-auto">
-                {/* Thông tin cơ bản */}
-                <div className="mb-6">
-                  <h4 className="text-lg font-medium text-gray-900 mb-2">
-                    Thông tin xét nghiệm
-                  </h4>
-                  <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-                    {" "}
-                    <div>
-                      <p className="text-sm text-gray-500">Gói xét nghiệm</p>
-                      <div className="mt-1">
-                        <span className="inline-block font-semibold text-purple-700 bg-purple-50 px-3 py-1.5 rounded-md border border-purple-200">
-                          {testPackageLabels[selectedTest.testPackage] ||
-                            "Không xác định"}
-                        </span>
-                      </div>
-                    </div>
-                    <div>
-                      <p className="text-sm text-gray-500">Ngày lấy mẫu</p>
-                      <p className="text-base font-medium">
-                        {new Date(
-                          selectedTest.collectedDate
-                        ).toLocaleDateString("vi-VN")}
-                      </p>
-                    </div>
-                    <div>
-                      <p className="text-sm text-gray-500">Khung giờ</p>
-                      <p className="text-base font-medium">
-                        {slotLabels[selectedTest.slot] || "Không xác định"}
-                      </p>
-                    </div>
-                    <div>
-                      <p className="text-sm text-gray-500">Trạng thái</p>
-                      <p
-                        className={`text-base font-medium ${getStatusColorClass(
-                          selectedTest.status
-                        ).replace("bg-", "text-")}`}
-                      >
-                        {statusLabels[selectedTest.status] || "Không xác định"}
-                      </p>
-                    </div>
-                  </div>
-                </div>
-                {/* Thông tin bác sĩ và lịch hẹn */}
-                {selectedTest.appointment && (
-                  <div className="mb-6">
-                    <h4 className="text-lg font-medium text-gray-900 mb-2">
-                      Thông tin lịch hẹn
-                    </h4>
-                    <div className="bg-gray-50 p-4 rounded-lg">
-                      {selectedTest.appointment.consultant && (
-                        <div className="flex items-center mb-4">
-                          <img
-                            className="h-12 w-12 rounded-full object-cover mr-4"
-                            src={
-                              selectedTest.appointment.consultant.avatarUrl ||
-                              "https://via.placeholder.com/48"
-                            }
-                            alt={selectedTest.appointment.consultant.name}
-                          />
-                          <div>
-                            <p className="text-base font-medium">
-                              {selectedTest.appointment.consultant.name}
-                            </p>
-                            <p className="text-sm text-gray-500">
-                              {selectedTest.appointment.consultant.email}
-                            </p>
-                            <p className="text-sm text-gray-500">
-                              {selectedTest.appointment.consultant.phoneNumber}
-                            </p>
-                          </div>
-                        </div>
-                      )}
-
-                      <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-                        <div>
-                          <p className="text-sm text-gray-500">Ngày hẹn</p>
-                          <p className="text-base font-medium">
-                            {new Date(
-                              selectedTest.appointment.appointmentDate
-                            ).toLocaleDateString("vi-VN")}
-                          </p>
-                        </div>
-                        <div>
-                          <p className="text-sm text-gray-500">
-                            Trạng thái lịch hẹn
-                          </p>
-                          <p className="text-base font-medium">
-                            {[
-                              "Chờ xác nhận",
-                              "Đã xác nhận",
-                              "Đã hoàn thành",
-                              "Đã hủy",
-                            ][selectedTest.appointment.status] || "N/A"}
-                          </p>
-                        </div>
-                        {selectedTest.appointment.notes && (
-                          <div className="col-span-2">
-                            <p className="text-sm text-gray-500">Ghi chú</p>
-                            <p className="text-base">
-                              {selectedTest.appointment.notes}
-                            </p>
-                          </div>
-                        )}
-                      </div>
-                    </div>
-                  </div>
-                )}{" "}
-                {/* Thông tin các loại xét nghiệm cụ thể */}
-                {selectedTest.customParameters &&
-                  selectedTest.customParameters.length > 0 && (
-                    <div className="mb-6">
-                      <h4 className="text-lg font-medium text-gray-900 mb-3">
-                        <span className="flex items-center">
+              <div className="px-6 pt-4 border-b border-gray-200">
+                <ul className="flex flex-wrap -mb-px text-sm font-medium text-center text-gray-500">
+                  <li className="mr-2">
+                    <button
+                      onClick={() => setActiveTab("details")}
+                      className={`inline-flex items-center justify-center p-4 border-b-2 rounded-t-lg group ${
+                        activeTab === "details"
+                          ? "text-indigo-600 border-indigo-600"
+                          : "border-transparent hover:text-gray-600 hover:border-gray-300"
+                      }`}
+                    >
+                      Thông tin chi tiết
+                    </button>
+                  </li>
+                  <li className="mr-2">
+                    <button
+                      onClick={() => setActiveTab("results")}
+                      className={`inline-flex items-center justify-center p-4 border-b-2 rounded-t-lg group ${
+                        activeTab === "results"
+                          ? "text-indigo-600 border-indigo-600"
+                          : "border-transparent hover:text-gray-600 hover:border-gray-300"
+                      }`}
+                      disabled={
+                        !selectedTest.testResult ||
+                        selectedTest.testResult.length === 0
+                      }
+                    >
+                      Kết quả xét nghiệm
+                    </button>
+                  </li>
+                </ul>
+              </div>
+              <div
+                className="relative p-6 flex-auto"
+                style={{ maxHeight: "60vh", overflowY: "auto" }}
+              >
+                {activeTab === "details" && (
+                  <div>
+                    {/* Thông tin người đặt */}
+                    {selectedTest.customer && (
+                      <div className="mb-6 pb-6 border-b border-gray-200">
+                        <h4 className="text-lg font-medium text-gray-900 mb-3 flex items-center">
                           <svg
                             className="w-5 h-5 mr-2 text-indigo-500"
                             fill="none"
@@ -1004,146 +935,356 @@ function STITestingHistory({ userId }) {
                               strokeLinecap="round"
                               strokeLinejoin="round"
                               strokeWidth="2"
-                              d="M19.428 15.428a2 2 0 00-1.022-.547l-2.387-.477a6 6 0 00-3.86.517l-.318.158a6 6 0 01-3.86.517L6.05 15.21a2 2 0 00-1.806.547M8 4h8l-1 1v5.172a2 2 0 00.586 1.414l5 5c1.26 1.26.367 3.414-1.415 3.414H4.828c-1.782 0-2.674-2.154-1.414-3.414l5-5A2 2 0 009 10.172V5L8 4z"
-                            />
+                              d="M16 7a4 4 0 11-8 0 4 4 0 018 0zM12 14a7 7 0 00-7 7h14a7 7 0 00-7-7z"
+                            ></path>
                           </svg>
-                          Loại xét nghiệm
-                        </span>
+                          Thông tin người đặt lịch
+                        </h4>
+                        <div className="flex items-start">
+                          <img
+                            className="h-16 w-16 rounded-full object-cover mr-5 flex-shrink-0"
+                            src={
+                              selectedTest.customer.avatarUrl ||
+                              `https://ui-avatars.com/api/?name=${encodeURIComponent(
+                                selectedTest.customer.name
+                              )}&color=7F9CF5&background=EBF4FF`
+                            }
+                            alt={selectedTest.customer.name}
+                          />
+                          <div className="grid grid-cols-1 sm:grid-cols-2 gap-x-6 gap-y-4 flex-grow">
+                            <div className="sm:col-span-2">
+                              <p className="text-sm text-gray-500">Họ và tên</p>
+                              <p className="text-base font-medium text-gray-900 truncate">
+                                {selectedTest.customer.name}
+                              </p>
+                            </div>
+                            <div>
+                              <p className="text-sm text-gray-500">Email</p>
+                              <p className="text-base font-medium text-gray-900 truncate">
+                                {selectedTest.customer.email}
+                              </p>
+                            </div>
+                          </div>
+                        </div>
+                      </div>
+                    )}
+                    {/* Thông tin cơ bản */}
+                    <div className="mb-6">
+                      <h4 className="text-lg font-medium text-gray-900 mb-2">
+                        Thông tin xét nghiệm
                       </h4>
-                      <div className="bg-indigo-50 p-5 rounded-lg border border-indigo-100">
-                        <h5 className="font-semibold text-purple-700 mb-3">
-                          {selectedTest.testPackage === 2
-                            ? "Tùy chỉnh"
-                            : selectedTest.testPackage === 1
-                            ? "Nâng cao"
-                            : "Cơ bản"}
-                        </h5>
-                        <div className="grid grid-cols-1 md:grid-cols-2 gap-3">
-                          {selectedTest.customParameters.map((paramId) => {
-                            return (
-                              <div
-                                key={paramId}
-                                className="flex items-center text-blue-600"
-                              >
-                                <span className="inline-block w-2 h-2 rounded-full bg-blue-400 mr-2"></span>
-                                <span className="text-sm">
-                                  {parameterLabels[paramId] ||
-                                    `Loại xét nghiệm ${paramId}`}
-                                </span>
-                              </div>
-                            );
-                          })}
+                      <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                        {" "}
+                        <div>
+                          <p className="text-sm text-gray-500">
+                            Gói xét nghiệm
+                          </p>
+                          <div className="mt-1">
+                            <span className="inline-block font-semibold text-purple-700 bg-purple-50 px-3 py-1.5 rounded-md border border-purple-200">
+                              {testPackageLabels[selectedTest.testPackage] ||
+                                "Không xác định"}
+                            </span>
+                          </div>
+                        </div>
+                        <div>
+                          <p className="text-sm text-gray-500">Ngày lấy mẫu</p>
+                          <p className="text-base font-medium">
+                            {new Date(
+                              selectedTest.collectedDate
+                            ).toLocaleDateString("vi-VN")}
+                          </p>
+                        </div>
+                        <div>
+                          <p className="text-sm text-gray-500">Khung giờ</p>
+                          <p className="text-base font-medium">
+                            {slotLabels[selectedTest.slot] || "Không xác định"}
+                          </p>
+                        </div>
+                        <div>
+                          <p className="text-sm text-gray-500">Trạng thái</p>
+                          <p
+                            className={`text-base font-medium ${getStatusColorClass(
+                              selectedTest.status
+                            ).replace("bg-", "text-")}`}
+                          >
+                            {statusLabels[selectedTest.status] ||
+                              "Không xác định"}
+                          </p>
+                        </div>
+                        <div>
+                          <p className="text-sm text-gray-500">Chi phí</p>
+                          <p className="text-base font-bold text-gray-800">
+                            {selectedTest.totalPrice
+                              ? new Intl.NumberFormat("vi-VN", {
+                                  style: "currency",
+                                  currency: "VND",
+                                }).format(selectedTest.totalPrice)
+                              : selectedTest.testPackage !== undefined
+                              ? new Intl.NumberFormat("vi-VN", {
+                                  style: "currency",
+                                  currency: "VND",
+                                }).format(
+                                  getPackagePrice(selectedTest.testPackage)
+                                )
+                              : "N/A"}
+                          </p>
                         </div>
                       </div>
                     </div>
-                  )}
-                {/* Kết quả xét nghiệm - Hiển thị kết quả từ API nếu có */}
-                {selectedTest.testResult &&
-                  selectedTest.testResult.length > 0 && (
-                    <div>
-                      <h4 className="text-lg font-medium text-gray-900 mb-2">
-                        Kết quả xét nghiệm
-                      </h4>
-                      <div className="bg-gray-50 p-4 rounded-lg">
-                        <div className="overflow-x-auto">
-                          <table className="min-w-full divide-y divide-gray-200">
-                            <thead className="bg-gray-50">
-                              <tr>
-                                <th
-                                  scope="col"
-                                  className="px-4 py-2 text-left text-xs font-medium text-gray-500 uppercase tracking-wider"
-                                >
-                                  Loại xét nghiệm
-                                </th>
-                                <th
-                                  scope="col"
-                                  className="px-4 py-2 text-left text-xs font-medium text-gray-500 uppercase tracking-wider"
-                                >
-                                  Kết quả
-                                </th>
-                                <th
-                                  scope="col"
-                                  className="px-4 py-2 text-left text-xs font-medium text-gray-500 uppercase tracking-wider"
-                                >
-                                  Ghi chú
-                                </th>
-                                {selectedTest.status >= 3 && (
+                    {/* Thông tin bác sĩ và lịch hẹn */}
+                    {selectedTest.appointment && (
+                      <div className="mb-6">
+                        <h4 className="text-lg font-medium text-gray-900 mb-2">
+                          Thông tin lịch hẹn
+                        </h4>
+                        <div className="bg-gray-50 p-4 rounded-lg">
+                          {selectedTest.appointment.consultant && (
+                            <div className="flex items-center mb-4">
+                              <img
+                                className="h-12 w-12 rounded-full object-cover mr-4"
+                                src={
+                                  selectedTest.appointment.consultant
+                                    .avatarUrl ||
+                                  "https://via.placeholder.com/48"
+                                }
+                                alt={selectedTest.appointment.consultant.name}
+                              />
+                              <div>
+                                <p className="text-base font-medium">
+                                  {selectedTest.appointment.consultant.name}
+                                </p>
+                                <p className="text-sm text-gray-500">
+                                  {selectedTest.appointment.consultant.email}
+                                </p>
+                                <p className="text-sm text-gray-500">
+                                  {
+                                    selectedTest.appointment.consultant
+                                      .phoneNumber
+                                  }
+                                </p>
+                              </div>
+                            </div>
+                          )}
+
+                          <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                            <div>
+                              <p className="text-sm text-gray-500">Ngày hẹn</p>
+                              <p className="text-base font-medium">
+                                {new Date(
+                                  selectedTest.appointment.appointmentDate
+                                ).toLocaleDateString("vi-VN")}
+                              </p>
+                            </div>
+                            <div>
+                              <p className="text-sm text-gray-500">
+                                Trạng thái lịch hẹn
+                              </p>
+                              <p className="text-base font-medium">
+                                {[
+                                  "Chờ xác nhận",
+                                  "Đã xác nhận",
+                                  "Đã hoàn thành",
+                                  "Đã hủy",
+                                ][selectedTest.appointment.status] || "N/A"}
+                              </p>
+                            </div>
+                            {selectedTest.appointment.notes && (
+                              <div className="col-span-2">
+                                <p className="text-sm text-gray-500">Ghi chú</p>
+                                <p className="text-base">
+                                  {selectedTest.appointment.notes}
+                                </p>
+                              </div>
+                            )}
+                          </div>
+                        </div>
+                      </div>
+                    )}{" "}
+                    {/* Thông tin các loại xét nghiệm cụ thể */}
+                    {selectedTest.customParameters &&
+                      selectedTest.customParameters.length > 0 && (
+                        <div className="mb-6">
+                          <h4 className="text-lg font-medium text-gray-900 mb-3">
+                            <span className="flex items-center">
+                              <svg
+                                className="w-5 h-5 mr-2 text-indigo-500"
+                                fill="none"
+                                stroke="currentColor"
+                                viewBox="0 0 24 24"
+                                xmlns="http://www.w3.org/2000/svg"
+                              >
+                                <path
+                                  strokeLinecap="round"
+                                  strokeLinejoin="round"
+                                  strokeWidth="2"
+                                  d="M19.428 15.428a2 2 0 00-1.022-.547l-2.387-.477a6 6 0 00-3.86.517l-.318.158a6 6 0 01-3.86.517L6.05 15.21a2 2 0 00-1.806.547M8 4h8l-1 1v5.172a2 2 0 00.586 1.414l5 5c1.26 1.26.367 3.414-1.415 3.414H4.828c-1.782 0-2.674-2.154-1.414-3.414l5-5A2 2 0 009 10.172V5L8 4z"
+                                />
+                              </svg>
+                              Loại xét nghiệm
+                            </span>
+                          </h4>
+                          <div className="bg-indigo-50 p-5 rounded-lg border border-indigo-100">
+                            <h5 className="font-semibold text-purple-700 mb-3">
+                              {selectedTest.testPackage === 2
+                                ? "Tùy chỉnh"
+                                : selectedTest.testPackage === 1
+                                ? "Nâng cao"
+                                : "Cơ bản"}
+                            </h5>
+                            <div className="grid grid-cols-1 md:grid-cols-2 gap-3">
+                              {selectedTest.customParameters.map((paramId) => {
+                                return (
+                                  <div
+                                    key={paramId}
+                                    className="flex items-center text-blue-600"
+                                  >
+                                    <span className="inline-block w-2 h-2 rounded-full bg-blue-400 mr-2"></span>
+                                    <span className="text-sm">
+                                      {parameterLabels[paramId] ||
+                                        `Loại xét nghiệm ${paramId}`}
+                                    </span>
+                                  </div>
+                                );
+                              })}
+                            </div>
+                          </div>
+                        </div>
+                      )}
+                  </div>
+                )}
+                {activeTab === "results" && (
+                  <div>
+                    {/* Kết quả xét nghiệm - Hiển thị kết quả từ API nếu có */}
+                    {selectedTest.testResult &&
+                    selectedTest.testResult.length > 0 ? (
+                      <div>
+                        <h4 className="text-lg font-medium text-gray-900 mb-2">
+                          Kết quả xét nghiệm
+                        </h4>
+                        <div className="bg-gray-50 p-4 rounded-lg">
+                          <div className="overflow-x-auto">
+                            <table className="min-w-full divide-y divide-gray-200">
+                              <thead className="bg-gray-50">
+                                <tr>
                                   <th
                                     scope="col"
                                     className="px-4 py-2 text-left text-xs font-medium text-gray-500 uppercase tracking-wider"
                                   >
-                                    Ngày xử lý
+                                    Loại xét nghiệm
                                   </th>
-                                )}
-                              </tr>
-                            </thead>
-                            <tbody className="bg-white divide-y divide-gray-200">
-                              {selectedTest.testResult.map((result) => {
-                                // Sử dụng enum từ constants thay vì định nghĩa lại
+                                  <th
+                                    scope="col"
+                                    className="px-4 py-2 text-left text-xs font-medium text-gray-500 uppercase tracking-wider"
+                                  >
+                                    Kết quả
+                                  </th>
+                                  <th
+                                    scope="col"
+                                    className="px-4 py-2 text-left text-xs font-medium text-gray-500 uppercase tracking-wider"
+                                  >
+                                    Ghi chú
+                                  </th>
+                                  {selectedTest.status >= 3 && (
+                                    <th
+                                      scope="col"
+                                      className="px-4 py-2 text-left text-xs font-medium text-gray-500 uppercase tracking-wider"
+                                    >
+                                      Ngày xử lý
+                                    </th>
+                                  )}
+                                </tr>
+                              </thead>
+                              <tbody className="bg-white divide-y divide-gray-200">
+                                {selectedTest.testResult.map((result) => {
+                                  // Sử dụng enum từ constants thay vì định nghĩa lại
 
-                                // Màu sắc theo kết quả
-                                const resultColorClass =
-                                  OUTCOME_ENUM[result.outcome]?.color ||
-                                  "text-yellow-600";
+                                  // Màu sắc theo kết quả
+                                  const resultColorClass =
+                                    OUTCOME_ENUM[result.outcome]?.color ||
+                                    "text-yellow-600";
 
-                                return (
-                                  <tr key={result.id}>
-                                    <td className="px-4 py-3 whitespace-nowrap">
-                                      <span className="font-medium">
-                                        {parameterLabels[result.parameter] ||
-                                          `Loại ${result.parameter}`}
-                                      </span>
-                                    </td>
-                                    <td className="px-4 py-3 whitespace-nowrap">
-                                      <span
-                                        className={`${resultColorClass} font-medium`}
-                                      >
-                                        {outcomeLabels[result.outcome] ||
-                                          "Không xác định"}
-                                      </span>
-                                    </td>
-                                    <td className="px-4 py-3 whitespace-nowrap">
-                                      {result.comments || "Không có"}
-                                    </td>
-                                    {selectedTest.status >= 3 && (
+                                  return (
+                                    <tr key={result.id}>
                                       <td className="px-4 py-3 whitespace-nowrap">
-                                        {result.processedAt
-                                          ? new Date(
-                                              result.processedAt
-                                            ).toLocaleDateString("vi-VN")
-                                          : "Chưa xử lý"}
+                                        <span className="font-medium">
+                                          {parameterLabels[result.parameter] ||
+                                            `Loại ${result.parameter}`}
+                                        </span>
                                       </td>
-                                    )}
-                                  </tr>
-                                );
-                              })}
-                            </tbody>
-                          </table>
-                        </div>
-
-                        {selectedTest.status === 3 && (
-                          <div className="mt-4">
-                            <p className="text-green-600 font-medium">
-                              Kết quả đã có! Vui lòng liên hệ bác sĩ tư vấn để
-                              được giải thích chi tiết.
-                            </p>
-                            <button
-                              className="mt-2 px-4 py-2 bg-indigo-600 text-white rounded-md hover:bg-indigo-700 focus:outline-none"
-                              onClick={() => {
-                                // Logic to view or download test results would go here
-                                alert(
-                                  "Đang tải kết quả xét nghiệm chi tiết..."
-                                );
-                              }}
-                            >
-                              Tải kết quả
-                            </button>
+                                      <td className="px-4 py-3 whitespace-nowrap">
+                                        <span
+                                          className={`${resultColorClass} font-medium`}
+                                        >
+                                          {outcomeLabels[result.outcome] ||
+                                            "Không xác định"}
+                                        </span>
+                                      </td>
+                                      <td className="px-4 py-3 whitespace-nowrap">
+                                        {result.comments || "Không có"}
+                                      </td>
+                                      {selectedTest.status >= 3 && (
+                                        <td className="px-4 py-3 whitespace-nowrap">
+                                          {result.processedAt
+                                            ? new Date(
+                                                result.processedAt
+                                              ).toLocaleDateString("vi-VN")
+                                            : "Chưa xử lý"}
+                                        </td>
+                                      )}
+                                    </tr>
+                                  );
+                                })}
+                              </tbody>
+                            </table>
                           </div>
-                        )}
+
+                          {selectedTest.status === 3 && (
+                            <div className="mt-4">
+                              <p className="text-green-600 font-medium">
+                                Kết quả đã có! Vui lòng liên hệ bác sĩ tư vấn để
+                                được giải thích chi tiết.
+                              </p>
+                              <button
+                                className="mt-2 px-4 py-2 bg-indigo-600 text-white rounded-md hover:bg-indigo-700 focus:outline-none"
+                                onClick={() => {
+                                  // Logic to view or download test results would go here
+                                  alert(
+                                    "Đang tải kết quả xét nghiệm chi tiết..."
+                                  );
+                                }}
+                              >
+                                Tải kết quả
+                              </button>
+                            </div>
+                          )}
+                        </div>
                       </div>
-                    </div>
-                  )}
-              </div>{" "}
+                    ) : (
+                      <div className="text-center py-8 bg-gray-50 rounded-lg">
+                        <svg
+                          className="mx-auto h-12 w-12 text-gray-400"
+                          fill="none"
+                          viewBox="0 0 24 24"
+                          stroke="currentColor"
+                        >
+                          <path
+                            strokeLinecap="round"
+                            strokeLinejoin="round"
+                            strokeWidth={2}
+                            d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z"
+                          />
+                        </svg>
+                        <p className="mt-2 text-sm text-gray-600">
+                          Chưa có kết quả xét nghiệm
+                        </p>
+                        <p className="text-sm text-gray-500">
+                          Kết quả sẽ được hiển thị ở đây khi có.
+                        </p>
+                      </div>
+                    )}
+                  </div>
+                )}
+              </div>
               <div className="flex items-center justify-end p-6 border-t border-gray-200 rounded-b">
                 <button
                   className="px-6 py-2 bg-indigo-50 text-indigo-600 font-medium rounded-md mr-2 hover:bg-indigo-100 transition duration-150"

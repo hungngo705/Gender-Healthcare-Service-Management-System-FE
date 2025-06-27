@@ -35,7 +35,7 @@ const config = {
   // API URLs
   api: {
     baseURL: getApiBaseURL(),
-    timeout: 20000, // 20 seconds
+    timeout: 30000, // 30 seconds
     // Auth endpoints - add API prefix
     auth: {
       login: "/api/v2.5/login",
@@ -93,13 +93,12 @@ const config = {
       getByTesting: (testingId) => `/api/v2.5/testresult/testing/${testingId}`,
     }, // Blog endpoints - add API prefix
     blog: {
-      getAll: "/api/v2.5/blog/getall",
-      create: "/api/v2.5/blog/create",
-      getById: (id) => `/api/v2.5/blog/${id}`,
-      update: (id) => `/api/v2.5/blog/${id}`,
-      delete: (id) => `/api/v2.5/blog/${id}`,
-      getComments: (blogId) => `/api/v2.5/blog/${blogId}/comments`,
-      addComment: (blogId) => `/api/v2.5/blog/${blogId}/comments`,
+      getAll: "/api/v2.5/post/getall",
+      create: "/api/v2.5/post/create",
+      getById: (id) => `/api/v2.5/post/${id}`,
+      update: (id) => `/api/v2.5/post/update/${id}`,
+      approve: (id) => `/api/v2.5/post/approve/${id}`, // Thêm endpoint mới
+      delete: (id) => `/api/v2.5/post/delete/${id}`,
     },
 
     // Service endpoints - add API prefix
