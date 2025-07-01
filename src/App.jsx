@@ -98,6 +98,16 @@ function App() {
           <Route path="/vnpay-callback" element={<VnpayCallback />} />
           <Route path="/payment-failed" element={<PaymentFailed />} />
 
+          {/* Meeting room route (protected) */}
+          <Route
+            path="/meeting/:appointmentId"
+            element={
+              <ProtectedRoute>
+                <MeetingPage />
+              </ProtectedRoute>
+            }
+          />
+
           {/* Dashboard routes for staff and higher */}
           <Route
             path="/dashboard/*"
