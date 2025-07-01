@@ -160,7 +160,9 @@ apiClient.interceptors.response.use(
 
       // Xử lý lỗi 500 Lỗi máy chủ nội bộ
       if (error.response.status >= 500) {
-        toastService.error("Đã xảy ra lỗi máy chủ. Vui lòng thử lại sau.");
+        if (error.response.data?.details !== "No appointments found") {
+          toastService.error("Đã xảy ra lỗi máy chủ. Vui lòng thử lại sau.");
+        }
       }
     } else if (error.request) {
       // Yêu cầu đã được gửi nhưng không nhận được phản hồi
