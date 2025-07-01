@@ -67,6 +67,9 @@ const PaymentFailed = lazy(() =>
 const VnpayCallback = lazy(() =>
   import(/* webpackChunkName: "vnpay-callback" */ "./pages/VnpayCallback")
 );
+const MeetingPage = lazy(() =>
+  import(/* webpackChunkName: "meeting" */ "./pages/Meeting")
+);
 
 function App() {
   return (

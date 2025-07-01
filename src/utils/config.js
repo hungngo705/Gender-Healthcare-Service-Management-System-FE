@@ -173,6 +173,17 @@ const config = {
       markAsRead: (notificationId) =>
         `/api/v2.5/notification/mark/${notificationId}`, // Assuming this endpoint exists
     },
+
+    // Meeting endpoints (Daily.co)
+    meeting: {
+      getMeetingInfo: (appointmentId) =>
+        `/api/meeting/appointment/${appointmentId}/meeting-info`,
+      createRoom: (appointmentId) =>
+        `/api/meeting/appointment/${appointmentId}/create-room`,
+      deleteRoom: (roomName) => `/api/meeting/room/${roomName}`,
+      getRoomStatus: (roomName) => `/api/meeting/room/${roomName}/status`,
+      testJoinNow: "/api/meeting/test-daily/join-now", // For quick testing
+    },
   },
 
   // Feature flags

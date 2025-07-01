@@ -10,6 +10,7 @@ import {
 import userService from "../../../services/userService";
 import appointmentService from "../../../services/appointmentService";
 import feedbackService from "../../../services/feedbackService";
+import { getMeetingInfo, createMeetingRoom } from "../../../services/meetingService";
 
 function AppointmentsTab({ navigate }) {
   const [isLoading, setIsLoading] = useState(true);
@@ -124,7 +125,28 @@ function AppointmentsTab({ navigate }) {
       );
 
       console.log("User appointments:", userAppointments);
-      setAppointments(userAppointments);
+        
+        // Add meeting room info to appointments
+        const appointmentsWithMeetingInfo = await Promise.all(
+          userAppointments.map(async (appointment) => {
+            try {
+              const meetingInfo = await getMeetingInfo(appointment.id, currentUserId);
+              return {
+                ...appointment,
+                meetingInfo: meetingInfo.data || meetingInfo,
+                hasMeetingRoom: !!(meetingInfo.data?.RoomUrl || meetingInfo.RoomUrl)
+              };
+            } catch (error) {
+              return {
+                ...appointment,
+                meetingInfo: null,
+                hasMeetingRoom: false
+              };
+            }
+          })
+        );
+        
+        setAppointments(appointmentsWithMeetingInfo);
 
       // Step 4: Check completed appointments for feedback
       const feedbackChecks = {};
@@ -548,10 +570,7 @@ function AppointmentsTab({ navigate }) {
                               {isScheduled && appointment.googleMeetLink && (
                                 <button
                                   onClick={() =>
-                                    window.open(
-                                      appointment.googleMeetLink,
-                                      "_blank"
-                                    )
+                                    navigate(`/meeting/${appointment.id}`)
                                   }
                                   className="inline-flex items-center px-3 py-1.5 border border-transparent text-xs font-medium rounded-full text-emerald-700 bg-emerald-100 hover:bg-emerald-200 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-emerald-500 transition-colors duration-200 mr-2"
                                 >
