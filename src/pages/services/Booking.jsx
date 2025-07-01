@@ -43,14 +43,30 @@ const Booking = () => {
         );
         setAllConsultants(consultantsResponse || []);
 
-        // Fetch all appointments
-        const appointmentsResponse = await appointmentService.getAll();
-        // Check the structure and extract the actual array
-        setAppointments(
-          Array.isArray(appointmentsResponse.data)
-            ? appointmentsResponse.data
-            : appointmentsResponse.data?.data || []
-        );
+        // Fetch all appointments - handle empty response gracefully
+        try {
+          const appointmentsResponse = await appointmentService.getAll();
+          // Check if response exists and extract data safely
+          if (!appointmentsResponse) {
+            setAppointments([]);
+          } else {
+            // Check the structure and extract the actual array
+            setAppointments(
+              Array.isArray(appointmentsResponse.data)
+                ? appointmentsResponse.data
+                : appointmentsResponse.data?.data || []
+            );
+          }
+        } catch (error) {
+          if (
+            appointmentsResponse.response.data?.details !==
+            "No appointments found"
+          ) {
+            console.error("Failed to fetch appointments:", error);
+          }
+          // If appointments can't be fetched, set to empty array and continue
+          setAppointments([]);
+        }
 
         setLoadError(null);
       } catch (error) {
@@ -154,12 +170,35 @@ const Booking = () => {
   const hasAvailableTimeSlots = (consultant, date) => {
     if (!consultant) return false;
 
-    const dateKey = format(date, "d/M/yyyy");
+    const dateKey = format(date, "yyyy-MM-dd");
     const allTimeSlots = [0, 1, 2, 3]; // All possible time slots
     const bookedSlotsForDay = consultant.bookedShifts[dateKey] || [];
 
-    // If all slots are booked, return false
-    return allTimeSlots.some((slotId) => !bookedSlotsForDay.includes(slotId));
+    // Check if it's today
+    const today = new Date();
+    const isToday = isSameDay(date, today);
+    const currentHour = today.getHours();
+
+    // Return true if at least one slot is available
+    return allTimeSlots.some((slotId) => {
+      // If booked, not available
+      if (bookedSlotsForDay.includes(slotId)) return false;
+
+      // If today and the time has passed, not available
+      if (isToday) {
+        const slotStartHours = {
+          0: 8,
+          1: 10,
+          2: 13,
+          3: 15,
+        };
+
+        if (currentHour >= slotStartHours[slotId]) return false;
+      }
+
+      // Otherwise, available
+      return true;
+    });
   };
 
   // Cập nhật danh sách ngày có thể đặt khi chọn tư vấn viên
@@ -196,6 +235,27 @@ const Booking = () => {
 
     // Convert selected date to format for lookup
     const dateKey = format(selectedDate, "yyyy-MM-dd");
+
+    // First check if this is today and the slot time has already passed
+    const today = new Date();
+    const isToday = isSameDay(selectedDate, today);
+
+    if (isToday) {
+      const currentHour = today.getHours();
+
+      // Map slot IDs to their starting hours
+      const slotStartHours = {
+        0: 8, // 8:00 - 10:00
+        1: 10, // 10:00 - 12:00
+        2: 13, // 13:00 - 15:00
+        3: 15, // 15:00 - 17:00
+      };
+
+      // If current hour is >= the slot's start hour, the slot is unavailable
+      if (currentHour >= slotStartHours[slotId]) {
+        return true; // Slot has already passed for today
+      }
+    }
 
     // If this date doesn't exist in bookedShifts, all slots are available
     if (!selectedConsultant.bookedShifts[dateKey]) {
@@ -260,6 +320,8 @@ const Booking = () => {
         notes: formData.reason,
         isVirtual: true, // Assuming all bookings are virtual
       };
+
+      console.log("Submitting appointment data:", dataToSubmit);
 
       // Call API to create appointment
       await appointmentService.create(dataToSubmit);
