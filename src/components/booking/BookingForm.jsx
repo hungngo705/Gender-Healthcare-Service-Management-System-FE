@@ -128,6 +128,7 @@ const BookingForm = ({
         appointmentDate: formattedDate,
         slot: selectedTimeSlot.id,
         notes: displayFormData?.reason || "None",
+        isVirtual: true,
       };
 
       onSubmit(e, appointmentData);
