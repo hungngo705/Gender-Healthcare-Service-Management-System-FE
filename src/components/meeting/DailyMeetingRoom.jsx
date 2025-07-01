@@ -2,6 +2,7 @@ import { useEffect, useRef, useState } from "react";
 import PropTypes from "prop-types";
 import DailyIframe from "@daily-co/daily-js";
 import { getMeetingInfo, createMeetingRoom } from "../../services/meetingService";
+import appointmentService from "../../services/appointmentService";
 import { useAuth } from "../../contexts/AuthContext";
 
 const DailyMeetingRoom = ({ appointmentId }) => {
@@ -88,6 +89,13 @@ const DailyMeetingRoom = ({ appointmentId }) => {
 
         await frame.join(joinOptions);
 
+        // Record check-in time
+        try {
+          await appointmentService.checkIn(appointmentId);
+        } catch (err) {
+          console.error("Failed to record check-in", err);
+        }
+
         // Fallback: hide loading overlay once join promise resolves
         setLoading(false);
 
@@ -102,6 +110,11 @@ const DailyMeetingRoom = ({ appointmentId }) => {
 
     return () => {
       if (callFrameRef.current) {
+        // Record check-out before destroying
+        appointmentService
+          .checkOut(appointmentId)
+          .catch((err) => console.error("Failed to record check-out", err));
+
         callFrameRef.current.destroy();
       }
     };
