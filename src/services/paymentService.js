@@ -350,6 +350,131 @@ class PaymentService {
 
     return configs[method?.toLowerCase()] || configs.vnpay;
   }
+
+  /**
+   * Get payment history for a specific customer
+   * @param {string} customerId - ID of the customer
+   * @returns {Promise<Object>} Payment history data
+   */
+  async getCustomerPaymentHistory(customerId) {
+    try {
+      if (!customerId) {
+        console.error("Missing customerId for payment history");
+        return {
+          success: false,
+          error: "ID người dùng không hợp lệ",
+        };
+      }
+
+      const response = await apiClient.get(
+        config.api.payment.getCustomerHistory(customerId)
+      );
+
+      // Kiểm tra cấu trúc dữ liệu trả về từ API
+      console.log("Payment history API response:", response.data);
+
+      // Thêm hàm chuẩn hóa dữ liệu
+      const normalizePaymentData = (rawData) => {
+        if (!Array.isArray(rawData)) {
+          console.warn("Payment data is not an array:", rawData);
+          return [];
+        }
+
+        return rawData.map((payment) => ({
+          transactionId:
+            payment.transactionId ||
+            payment.id ||
+            `TXN-${Math.random().toString(36).substring(2, 10)}`,
+          paymentDate:
+            payment.paymentDate ||
+            payment.createdAt ||
+            payment.date ||
+            new Date().toISOString(),
+          amount: payment.amount || payment.totalAmount || 0,
+          serviceInfo:
+            payment.serviceInfo ||
+            payment.orderInfo ||
+            payment.description ||
+            "Thanh toán dịch vụ",
+          paymentMethod: payment.paymentMethod || payment.method || "online",
+          status: payment.status || payment.paymentStatus || "completed",
+          customerId: payment.customerId || payment.userId || "",
+          // Các trường khác nếu cần
+        }));
+      };
+
+      if (
+        response.data &&
+        (response.data.is_success || response.status === 200)
+      ) {
+        const rawData = response.data.data || response.data;
+        // eslint-disable-next-line no-unused-vars
+        const normalizedData = normalizePaymentData(rawData);
+
+        return {
+          success: true,
+          data: response.data.data || {},
+        };
+      } else {
+        console.error("Payment API error:", response.data);
+        return {
+          success: false,
+          error: response.data?.message || "Không thể tải lịch sử giao dịch",
+        };
+      }
+    } catch (error) {
+      console.error("Error fetching payment history:", error);
+      return {
+        success: false,
+        error:
+          error.response?.data?.message ||
+          error.message ||
+          "Lỗi khi tải lịch sử thanh toán",
+      };
+    }
+  }
+
+  /**
+   * Get details for a specific transaction
+   * @param {string} transactionId - ID of the transaction
+   * @returns {Promise<Object>} Transaction details
+   */
+  async getTransactionDetails(transactionId) {
+    try {
+      if (!transactionId) {
+        console.error("Missing transactionId");
+        return {
+          success: false,
+          error: "ID giao dịch không hợp lệ",
+        };
+      }
+
+      const response = await apiClient.get(
+        config.api.payment.getTransaction(transactionId)
+      );
+
+      if (response.data && response.data.is_success) {
+        return {
+          success: true,
+          data: response.data.data || {},
+        };
+      } else {
+        return {
+          success: false,
+          error: response.data?.message || "Không thể tải thông tin giao dịch",
+        };
+      }
+    } catch (error) {
+      console.error("Error fetching transaction details:", error);
+      return {
+        success: false,
+        error:
+          error.response?.data?.message ||
+          error.message ||
+          "Lỗi khi tải thông tin giao dịch",
+      };
+    }
+  }
 }
 
 const paymentService = new PaymentService();

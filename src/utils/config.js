@@ -148,6 +148,10 @@ const config = {
       vnpayCallback: "/api/payment/vnpay-callback",
       vnpayIpn: "/api/payment/vnpay-ipn",
       getTransaction: (id) => `/api/payment/transaction/${id}`,
+      // Thêm API endpoint mới cho lịch sử thanh toán
+      getCustomerHistory: (customerId) =>
+        `/api/payment/customer/${customerId}/history`,
+      getAllPayments: "/api/payment/history", // Endpoint lấy tất cả giao dịch (cho Admin)
     },
 
     // Feedback endpoints - add API prefix
