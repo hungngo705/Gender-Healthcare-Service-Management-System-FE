@@ -1,133 +1,377 @@
-import { useEffect, useState } from "react";
-import PropTypes from "prop-types";
-import appointmentService from "../../services/appointmentService";
-import { format } from "date-fns";
+import React, { useState, useEffect } from 'react';
+import { useParams, useNavigate } from 'react-router-dom';
+import { 
+  Calendar, 
+  Clock, 
+  Video, 
+  Users, 
+  Info,
+  CheckCircle,
+  AlertCircle,
+  XCircle,
+  RefreshCw
+} from 'lucide-react';
+import * as meetingService from '../../services/meetingService';
 
-const pad = (n) => String(n).padStart(2, "0");
-
-const getTimeDiff = (target) => {
-  const diffMs = target - Date.now();
-  const diffMin = Math.max(0, Math.floor(diffMs / 60000));
-  const hours = Math.floor(diffMin / 60);
-  const mins = diffMin % 60;
-  return `${hours}h ${pad(mins)}m`;
-};
-
-const MeetingLobby = ({ appointmentId, onJoin }) => {
+const MeetingLobby = () => {
+  const { appointmentId } = useParams();
+  const navigate = useNavigate();
+  const [meetingInfo, setMeetingInfo] = useState(null);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
-  const [appointment, setAppointment] = useState(null);
-  const [now, setNow] = useState(Date.now());
+  const [timeRemaining, setTimeRemaining] = useState('');
+  const [canJoin, setCanJoin] = useState(false);
+  const [currentTime, setCurrentTime] = useState(new Date());
+  const [derivedAvailableFrom, setDerivedAvailableFrom] = useState(null);
 
   useEffect(() => {
-    const timer = setInterval(() => setNow(Date.now()), 1000);
-    return () => clearInterval(timer);
-  }, []);
-
-  useEffect(() => {
-    const fetchData = async () => {
+    let intervalId;
+    
+    const fetchMeetingInfo = async () => {
       try {
-        const res = await appointmentService.getById(appointmentId);
-        setAppointment(res.data?.data ?? res.data); // support wrapped ApiResponse
-      } catch (e) {
-        console.error(e);
-        setError("Failed to load appointment details");
+        setLoading(true);
+        setError(null);
+        
+        const response = await meetingService.getMeetingInfo(appointmentId);
+        console.log('Meeting info response:', response);
+        
+        setMeetingInfo(response);
+        setCanJoin(response.canJoinEarly);
+        
+        if (!response.canJoinEarly) {
+          // Start polling every 30 seconds when room is locked
+          intervalId = setInterval(async () => {
+            try {
+              const updatedResponse = await meetingService.getMeetingInfo(appointmentId);
+              setMeetingInfo(updatedResponse);
+              setCanJoin(updatedResponse.canJoinEarly);
+              
+              if (updatedResponse.canJoinEarly) {
+                clearInterval(intervalId);
+              }
+            } catch (err) {
+              console.error('Error polling meeting info:', err);
+            }
+          }, 30000);
+        }
+        
+      } catch (err) {
+        console.error('Error fetching meeting info:', err);
+        if (err.response?.status === 403) {
+          setError('Bạn không có quyền truy cập phòng họp này.');
+        } else if (err.response?.status === 401) {
+          setError('Vui lòng đăng nhập để tiếp tục.');
+        } else if (err.response?.status === 404) {
+          setError('Không tìm thấy cuộc hẹn này.');
+        } else {
+          setError('Có lỗi xảy ra khi tải thông tin cuộc hẹn. Vui lòng thử lại sau.');
+        }
       } finally {
         setLoading(false);
       }
     };
-    fetchData();
+
+    fetchMeetingInfo();
+
+    // Update current time every second for countdown
+    const timeInterval = setInterval(() => {
+      setCurrentTime(new Date());
+    }, 1000);
+
+    return () => {
+      if (intervalId) clearInterval(intervalId);
+      clearInterval(timeInterval);
+    };
   }, [appointmentId]);
 
-  if (loading) return <div>Loading schedule…</div>;
-  if (error) return <div className="text-red-500">{error}</div>;
-  if (!appointment) return null;
+  // Calculate time remaining until room opens (5 minutes before start)
+  useEffect(() => {
+    if (!meetingInfo) return;
 
-  const startDateTime = new Date(
-    `${appointment.appointmentDate}T${appointment.slot === "Morning1" ? "08:00:00" : appointment.slot === "Morning2" ? "10:00:00" : appointment.slot === "Afternoon1" ? "13:00:00" : "15:00:00"}`
-  );
-  const endDateTime = new Date(startDateTime.getTime() + 2 * 60 * 60 * 1000); // assume 2h
-  const availableFrom = new Date(startDateTime.getTime() - 5 * 60 * 1000);
+    // Derive the time when users are allowed to join (startTime - 5 minutes)
+    const startTimeUtc = new Date(meetingInfo.startTime);
+    const joinAvailable = new Date(startTimeUtc.getTime() - 5 * 60 * 1000);
 
-  const canJoin = now <= endDateTime;
-  const untilStart = getTimeDiff(startDateTime);
-  const untilEnd = getTimeDiff(endDateTime);
+    // Prefer backend field if provided
+    const availableFrom = meetingInfo.availableFrom
+      ? new Date(meetingInfo.availableFrom)
+      : joinAvailable;
 
-  const status = now < startDateTime ? "Upcoming" : now <= endDateTime ? "Active" : "Ended";
+    // Save for displaying later
+    setDerivedAvailableFrom(availableFrom);
+
+    // Only show countdown if not yet joinable
+    if (!canJoin) {
+      const now = new Date();
+      const diff = availableFrom.getTime() - now.getTime();
+
+      if (diff > 0) {
+        const hours = Math.floor(diff / (1000 * 60 * 60));
+        const minutes = Math.floor((diff % (1000 * 60 * 60)) / (1000 * 60));
+        const seconds = Math.floor((diff % (1000 * 60)) / 1000);
+
+        if (hours > 0) {
+          setTimeRemaining(`${hours}h ${minutes}m ${seconds}s`);
+        } else if (minutes > 0) {
+          setTimeRemaining(`${minutes}m ${seconds}s`);
+        } else {
+          setTimeRemaining(`${seconds}s`);
+        }
+      } else {
+        setTimeRemaining('0s');
+      }
+    }
+  }, [currentTime, meetingInfo, canJoin]);
+
+  const handleJoinMeeting = () => {
+    if (meetingInfo && meetingInfo.roomUrl) {
+      window.open(meetingInfo.roomUrl, '_blank');
+    }
+  };
+
+  const formatDateTime = (dateStr) => {
+    if (!dateStr) return '';
+    const dateObj = new Date(dateStr);
+    return dateObj.toLocaleString('vi-VN', {
+      hour: '2-digit',
+      minute: '2-digit',
+      second: '2-digit',
+      day: '2-digit',
+      month: '2-digit',
+      year: 'numeric',
+      timeZone: 'Asia/Ho_Chi_Minh'
+    });
+  };
+
+  const handleRefresh = () => {
+    window.location.reload();
+  };
+
+  if (loading) {
+    return (
+      <div className="min-h-screen bg-gray-50 flex items-center justify-center">
+        <div className="bg-white rounded-lg shadow p-8 w-full max-w-md">
+          <div className="text-center">
+            <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-indigo-600 mx-auto"></div>
+            <p className="mt-4 text-gray-600">Đang tải thông tin cuộc hẹn...</p>
+          </div>
+        </div>
+      </div>
+    );
+  }
+
+  if (error) {
+    return (
+      <div className="min-h-screen bg-gray-50 flex items-center justify-center p-4">
+        <div className="bg-white rounded-lg shadow p-8 w-full max-w-md">
+          <div className="text-center">
+            <XCircle className="h-16 w-16 text-red-500 mx-auto" />
+            <h2 className="mt-4 text-xl font-semibold text-gray-900">Có lỗi xảy ra</h2>
+            <p className="mt-2 text-gray-600">{error}</p>
+            <div className="mt-6 flex flex-col sm:flex-row gap-3 justify-center">
+              <button
+                onClick={handleRefresh}
+                className="px-4 py-2 bg-indigo-600 text-white rounded-md hover:bg-indigo-700 transition-colors flex items-center justify-center"
+              >
+                <RefreshCw className="h-4 w-4 mr-2" />
+                Thử lại
+              </button>
+              <button
+                onClick={() => navigate('/profile?tab=appointments')}
+                className="px-4 py-2 bg-gray-100 text-gray-700 rounded-md hover:bg-gray-200 transition-colors"
+              >
+                Quay lại lịch hẹn
+              </button>
+            </div>
+          </div>
+        </div>
+      </div>
+    );
+  }
 
   return (
-    <div className="mx-auto max-w-2xl bg-white shadow rounded-md p-6 space-y-6">
-      <h2 className="text-2xl font-bold text-center">Virtual Meeting Room</h2>
-      <p className="text-center text-sm text-gray-500">Appointment ID: {appointment.id}</p>
-
-      <div className="bg-yellow-100 text-yellow-800 py-2 px-4 rounded text-center">
-        {now < startDateTime && "You can join this meeting ahead of schedule"}
-        {now >= startDateTime && now <= endDateTime && "Meeting in progress"}
-        {now > endDateTime && "Meeting ended"}
-        <div className="text-xs text-gray-600 mt-1">
-          Current time: {format(now, "HH:mm:ss")}
-        </div>
-      </div>
-
-      <div className="grid grid-cols-2 gap-4">
-        <div className="border p-4 rounded-md">
-          <h3 className="font-semibold mb-2">Meeting Schedule</h3>
-          <div className="flex justify-between text-sm mb-1">
-            <span>Start Time:</span>
-            <span>{format(startDateTime, "hh:mm a")}</span>
-          </div>
-          <div className="flex justify-between text-sm mb-1">
-            <span>End Time:</span>
-            <span>{format(endDateTime, "hh:mm a")}</span>
-          </div>
-          <div className="flex justify-between text-sm">
-            <span>Available From:</span>
-            <span>{format(availableFrom, "hh:mm a")}</span>
+    // Background overlay with blur effect
+    <div className="fixed inset-0 bg-white/60 backdrop-blur-md flex items-center justify-center p-4 z-50">
+      {/* Main card */}
+      <div className="bg-white rounded-xl shadow-2xl w-full max-w-4xl">
+        {/* Header */}
+        <div className="bg-indigo-600 text-white p-6 rounded-t-lg">
+          <div className="text-center">
+            <Video className="h-12 w-12 mx-auto mb-3" />
+            <h1 className="text-2xl font-bold">Phòng Họp Trực Tuyến</h1>
+            <p className="text-indigo-100 mt-1">Cuộc hẹn #{appointmentId}</p>
           </div>
         </div>
-        <div className="border p-4 rounded-md">
-          <h3 className="font-semibold mb-2">Time Remaining</h3>
-          <div className="flex justify-between text-sm mb-1">
-            <span>Until Start:</span>
-            <span>{untilStart}</span>
+
+        <div className="p-6">
+          {/* Status Banner */}
+          <div className={`p-4 rounded-lg mb-6 ${
+            canJoin 
+              ? 'bg-green-50 border border-green-200' 
+              : 'bg-yellow-50 border border-yellow-200'
+          }`}>
+            <div className="flex items-center justify-center">
+              {canJoin ? (
+                <>
+                  <CheckCircle className="h-5 w-5 text-green-600 mr-2" />
+                  <span className="text-green-800 font-medium">
+                    Phòng họp đã sẵn sàng - Bạn có thể tham gia ngay
+                  </span>
+                </>
+              ) : (
+                <>
+                  <Clock className="h-5 w-5 text-yellow-600 mr-2" />
+                  <span className="text-yellow-800 font-medium">
+                    Phòng họp mở trong {timeRemaining}
+                  </span>
+                </>
+              )}
+            </div>
           </div>
-          <div className="flex justify-between text-sm mb-1">
-            <span>Until End:</span>
-            <span>{untilEnd}</span>
+
+          {/* Meeting Details Grid */}
+          <div className="grid md:grid-cols-2 gap-6 mb-6">
+            {/* Schedule Card */}
+            <div className="bg-gray-50 rounded-lg p-6">
+              <h3 className="text-lg font-semibold text-gray-900 mb-4 flex items-center">
+                <Calendar className="h-5 w-5 mr-2 text-indigo-600" />
+                Lịch Trình Cuộc Hẹn
+              </h3>
+              <div className="space-y-3">
+                <div className="flex justify-between">
+                  <span className="text-gray-600">Thời gian bắt đầu:</span>
+                  <span className="font-medium text-gray-900">
+                    {formatDateTime(meetingInfo?.startTime)} 
+                  </span>
+                </div>
+                <div className="flex justify-between">
+                  <span className="text-gray-600">Thời gian kết thúc:</span>
+                  <span className="font-medium text-gray-900">
+                    {formatDateTime(meetingInfo?.endTime)} 
+                  </span>
+                </div>
+                <div className="flex justify-between">
+                  <span className="text-gray-600">Có thể tham gia từ:</span>
+                  <span className="font-medium text-gray-900">
+                    {derivedAvailableFrom && derivedAvailableFrom.toLocaleTimeString('vi-VN', {
+                      hour: '2-digit',
+                      minute: '2-digit',
+                      second: '2-digit',
+                      timeZone: 'Asia/Ho_Chi_Minh'
+                    })} 
+                  </span>
+                </div>
+              </div>
+            </div>
+
+            {/* Status Card */}
+            <div className="bg-gray-50 rounded-lg p-6">
+              <h3 className="text-lg font-semibold text-gray-900 mb-4 flex items-center">
+                <Info className="h-5 w-5 mr-2 text-indigo-600" />
+                Thông Tin Cuộc Hẹn
+              </h3>
+              <div className="space-y-3">
+                <div className="flex justify-between">
+                  <span className="text-gray-600">Thời gian hiện tại:</span>
+                  <span className="font-medium text-gray-900">
+                    {currentTime.toLocaleTimeString('vi-VN', {
+                      hour: '2-digit',
+                      minute: '2-digit',
+                      second: '2-digit',
+                      timeZone: 'Asia/Ho_Chi_Minh'
+                    })} (UTC+7)
+                  </span>
+                </div>
+                <div className="flex justify-between">
+                  <span className="text-gray-600">Trạng thái:</span>
+                  <span className={`px-2 py-1 rounded-full text-sm font-medium ${
+                    canJoin 
+                      ? 'bg-green-100 text-green-800' 
+                      : 'bg-yellow-100 text-yellow-800'
+                  }`}>
+                    {canJoin ? 'Có thể tham gia' : 'Đang chờ'}
+                  </span>
+                </div>
+                {!canJoin && timeRemaining && (
+                  <div className="flex justify-between">
+                    <span className="text-gray-600">Thời gian còn lại:</span>
+                    <span className="font-mono text-lg font-bold text-indigo-600">
+                      {timeRemaining}
+                    </span>
+                  </div>
+                )}
+              </div>
+            </div>
           </div>
-          <div className="flex justify-between text-sm">
-            <span>Status:</span>
-            <span className={status === "Active" ? "text-green-600" : "text-gray-500"}>{status}</span>
+
+          {/* Instructions */}
+          <div className="bg-blue-50 border border-blue-200 rounded-lg p-6 mb-6">
+            <h3 className="text-lg font-semibold text-blue-900 mb-3 flex items-center">
+              <Users className="h-5 w-5 mr-2" />
+              Hướng Dẫn Tham Gia
+            </h3>
+            <ul className="space-y-2 text-blue-800">
+              <li className="flex items-start">
+                <span className="w-2 h-2 bg-blue-600 rounded-full mt-2 mr-3 flex-shrink-0"></span>
+                Phòng họp sẽ mở 5 phút trước giờ hẹn đã lên lịch
+              </li>
+              <li className="flex items-start">
+                <span className="w-2 h-2 bg-blue-600 rounded-full mt-2 mr-3 flex-shrink-0"></span>
+                Vui lòng tham gia đúng giờ để cuộc hẹn diễn ra thuận lợi
+              </li>
+              <li className="flex items-start">
+                <span className="w-2 h-2 bg-blue-600 rounded-full mt-2 mr-3 flex-shrink-0"></span>
+                Đảm bảo kết nối internet ổn định và thiết bị camera/microphone hoạt động
+              </li>
+              <li className="flex items-start">
+                <span className="w-2 h-2 bg-blue-600 rounded-full mt-2 mr-3 flex-shrink-0"></span>
+                Nếu gặp sự cố kỹ thuật, vui lòng liên hệ hỗ trợ
+              </li>
+            </ul>
           </div>
+
+          {/* Action Buttons */}
+          <div className="flex flex-col sm:flex-row gap-4 justify-center">
+            <button
+              onClick={handleJoinMeeting}
+              disabled={!canJoin || !meetingInfo?.roomUrl}
+              className={`px-8 py-3 rounded-lg font-medium text-lg transition-all duration-200 flex items-center justify-center ${
+                canJoin && meetingInfo?.roomUrl
+                  ? 'bg-indigo-600 hover:bg-indigo-700 text-white shadow-lg hover:shadow-xl transform hover:-translate-y-0.5'
+                  : 'bg-gray-300 text-gray-500 cursor-not-allowed'
+              }`}
+            >
+              <Video className="h-5 w-5 mr-2" />
+              {canJoin ? 'Tham Gia Cuộc Hẹn' : `Phòng họp mở trong ${timeRemaining}`}
+            </button>
+            
+            <button
+              onClick={() => navigate('/profile?tab=appointments')}
+              className="px-6 py-3 bg-gray-100 text-gray-700 rounded-lg font-medium hover:bg-gray-200 transition-colors"
+            >
+              Quay lại lịch hẹn
+            </button>
+          </div>
+
+          {/* Debug Information (for development)
+          {process.env.NODE_ENV === 'development' && meetingInfo && (
+            <div className="mt-8 p-4 bg-gray-100 rounded-lg">
+              <h4 className="font-medium text-gray-900 mb-2">Debug Info:</h4>
+              <pre className="text-xs text-gray-600 overflow-auto">
+                {JSON.stringify({
+                  canJoinEarly: meetingInfo.canJoinEarly,
+                  currentTimeLocal: meetingInfo.currentTimeLocal,
+                  availableFrom: meetingInfo.availableFrom,
+                  startTime: meetingInfo.startTime,
+                  endTime: meetingInfo.endTime
+                }, null, 2)}
+              </pre>
+            </div>
+          )} */}
         </div>
-      </div>
-
-      <div className="text-center">
-        <button
-          className={`px-6 py-2 rounded-md text-white font-semibold transition-colors ${canJoin ? "bg-green-600 hover:bg-green-700" : "bg-gray-400 cursor-not-allowed"}`}
-          disabled={!canJoin}
-          onClick={() => canJoin && onJoin()}
-        >
-          Join Meeting Now
-        </button>
-      </div>
-
-      <div className="bg-blue-50 p-4 rounded-md text-sm">
-        <h3 className="font-semibold mb-2">Meeting Instructions</h3>
-        <ul className="list-disc list-inside space-y-1">
-          <li>The meeting room becomes available 5 minutes before your scheduled time</li>
-          <li>Please join on time as the room will automatically close after the scheduled end time</li>
-          <li>Ensure you have a stable internet connection and working camera/microphone</li>
-          <li>If you experience any issues, please contact support</li>
-        </ul>
       </div>
     </div>
   );
-};
-
-MeetingLobby.propTypes = {
-  appointmentId: PropTypes.string.isRequired,
-  onJoin: PropTypes.func.isRequired,
 };
 
 export default MeetingLobby; 

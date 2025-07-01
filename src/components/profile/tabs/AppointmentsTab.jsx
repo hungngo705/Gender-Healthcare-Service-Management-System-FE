@@ -120,11 +120,22 @@ function AppointmentsTab({ navigate }) {
 
       // Step 3: Filter appointments for this user
       const allAppointments = appointmentsResponse.data?.data || [];
+      
+      // Debug: Log all appointments to see the data structure
+      console.log("All appointments in database:", allAppointments);
+      console.log("Current user ID:", currentUserId);
+      
       const userAppointments = allAppointments.filter(
         (appointment) => appointment.customerId === currentUserId
       );
 
-      console.log("User appointments:", userAppointments);
+      console.log("User appointments after filtering:", userAppointments);
+      
+      // Debug: Also check if user might be a consultant
+      const consultantAppointments = allAppointments.filter(
+        (appointment) => appointment.consultantId === currentUserId
+      );
+      console.log("Consultant appointments for this user:", consultantAppointments);
         
         // Add meeting room info to appointments
         const appointmentsWithMeetingInfo = await Promise.all(
