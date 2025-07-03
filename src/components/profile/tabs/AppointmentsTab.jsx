@@ -142,16 +142,23 @@ function AppointmentsTab({ navigate }) {
           userAppointments.map(async (appointment) => {
             try {
               const meetingInfo = await getMeetingInfo(appointment.id, currentUserId);
+              const meetingData = meetingInfo.data || meetingInfo;
+              
               return {
                 ...appointment,
-                meetingInfo: meetingInfo.data || meetingInfo,
-                hasMeetingRoom: !!(meetingInfo.data?.RoomUrl || meetingInfo.RoomUrl)
+                meetingInfo: meetingData,
+                hasMeetingRoom: !!(meetingData?.RoomUrl),
+                isExpired: meetingData?.IsExpired || false,
+                meetingMessage: meetingData?.Message || null
               };
             } catch (error) {
+              console.warn(`Failed to get meeting info for appointment ${appointment.id}:`, error);
               return {
                 ...appointment,
                 meetingInfo: null,
-                hasMeetingRoom: false
+                hasMeetingRoom: false,
+                isExpired: false,
+                meetingMessage: null
               };
             }
           })
@@ -578,7 +585,20 @@ function AppointmentsTab({ navigate }) {
                                   </button>
                                 ))}
 
-                              {isScheduled && appointment.googleMeetLink && (
+                              {isScheduled && (
+                                appointment.isExpired ? (
+                                  <span className="inline-flex items-center px-3 py-1.5 text-xs font-medium text-gray-500 bg-gray-100 rounded-full">
+                                    <svg
+                                      xmlns="http://www.w3.org/2000/svg"
+                                      className="w-3 h-3 mr-1"
+                                      viewBox="0 0 20 20"
+                                      fill="currentColor"
+                                    >
+                                      <path fillRule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zM8.707 7.293a1 1 0 00-1.414 1.414L8.586 10l-1.293 1.293a1 1 0 101.414 1.414L10 11.414l1.293 1.293a1 1 0 001.414-1.414L11.414 10l1.293-1.293a1 1 0 00-1.414-1.414L10 8.586 8.707 7.293z" clipRule="evenodd" />
+                                    </svg>
+                                    {appointment.meetingMessage || "Cuộc hẹn đã kết thúc"}
+                                  </span>
+                                                                 ) : (appointment.hasMeetingRoom || appointment.googleMeetLink) && (
                                 <button
                                   onClick={() =>
                                     navigate(`/meeting/${appointment.id}`)
@@ -596,6 +616,7 @@ function AppointmentsTab({ navigate }) {
                                   </svg>
                                   Bắt đầu
                                 </button>
+                                )
                               )}
 
                               {isScheduled && (
