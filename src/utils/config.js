@@ -83,6 +83,8 @@ const config = {
       getByUser: (userId) => `/api/v2.5/appointment/user/${userId}`,
       updateMeetingLink: (id) =>
         `/api/v2.5/appointment/update/meetinglink/${id}`,
+      checkIn: (id) => `/api/v2.5/appointment/checkin/${id}`,
+      checkOut: (id) => `/api/v2.5/appointment/checkout/${id}`,
       getByCurrentUser: "/api/v2.5/appointment/getall",
       getByConsultant: (consultantId) =>
         `/api/v2.5/appointment/consultant/${consultantId}`,
@@ -157,6 +159,10 @@ const config = {
       vnpayCallback: "/api/payment/vnpay-callback",
       vnpayIpn: "/api/payment/vnpay-ipn",
       getTransaction: (id) => `/api/payment/transaction/${id}`,
+      // Thêm API endpoint mới cho lịch sử thanh toán
+      getCustomerHistory: (customerId) =>
+        `/api/payment/customer/${customerId}/history`,
+      getAllPayments: "/api/payment/history", // Endpoint lấy tất cả giao dịch (cho Admin)
     },
     // Feedback endpoints
     feedback: {
@@ -173,6 +179,24 @@ const config = {
         `/api/v2.5/feedback/can-provide/${appointmentId}`,
       getConsultantPublicFeedbacks: (consultantId) =>
         `/api/v2.5/feedback/consultant/${consultantId}/public`,
+    },
+
+    // Notification endpoints
+    notification: {
+      getForUser: (userId) => `/api/v2.5/notification/user/${userId}`,
+      markAsRead: (notificationId) =>
+        `/api/v2.5/notification/mark/${notificationId}`, // Assuming this endpoint exists
+    },
+
+    // Meeting endpoints (Daily.co)
+    meeting: {
+      getMeetingInfo: (appointmentId) =>
+        `/api/meeting/appointment/${appointmentId}/meeting-info`,
+      createRoom: (appointmentId) =>
+        `/api/meeting/appointment/${appointmentId}/create-room`,
+      deleteRoom: (roomName) => `/api/meeting/room/${roomName}`,
+      getRoomStatus: (roomName) => `/api/meeting/room/${roomName}/status`,
+      testJoinNow: "/api/meeting/test-daily/join-now", // For quick testing
     },
   },
 

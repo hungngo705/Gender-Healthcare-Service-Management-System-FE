@@ -3,8 +3,11 @@ import PropTypes from "prop-types";
 import { User, Calendar, FileText, Bell, Lock, CreditCard } from "lucide-react";
 import UserAvatar from "../user/UserAvatar";
 import userUtils from "../../utils/userUtils";
+import { useNotifications } from "../../contexts/NotificationContext";
 
 function ProfileSidebar({ activeTab, setActiveTab }) {
+  const { unreadCount } = useNotifications();
+
   const tabs = [
     {
       id: "profile",
@@ -25,6 +28,7 @@ function ProfileSidebar({ activeTab, setActiveTab }) {
       id: "notifications",
       label: "Thông báo",
       icon: <Bell size={16} className="mr-3" />,
+      count: unreadCount,
     },
     {
       id: "security",
@@ -62,7 +66,7 @@ function ProfileSidebar({ activeTab, setActiveTab }) {
               <li key={tab.id}>
                 {" "}
                 <button
-                  className={`w-full flex items-center px-4 py-2 text-sm rounded-md ${
+                  className={`w-full flex items-center justify-between px-4 py-2 text-sm rounded-md ${
                     activeTab === tab.id
                       ? "bg-indigo-50 text-indigo-700 font-medium"
                       : "text-gray-700 hover:bg-gray-50"
@@ -72,8 +76,15 @@ function ProfileSidebar({ activeTab, setActiveTab }) {
                     // No need to update URL here as the parent component handles it
                   }}
                 >
-                  {tab.icon}
-                  {tab.label}
+                  <div className="flex items-center">
+                    {tab.icon}
+                    {tab.label}
+                  </div>
+                  {tab.count > 0 && (
+                    <span className="bg-red-500 text-white text-xs font-bold rounded-full h-5 w-5 flex items-center justify-center">
+                      {tab.count}
+                    </span>
+                  )}
                 </button>
               </li>
             ))}
