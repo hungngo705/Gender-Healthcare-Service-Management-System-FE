@@ -202,7 +202,7 @@ apiClient.interceptors.response.use(
       toastService.error(errorMessage);
     }
 
-    return Promise.reject("Đã xảy ra lỗi trong quá trình đăng nhập!");
+    return Promise.reject("Đã xảy ra lỗi chưa xác định");
   }
 );
 

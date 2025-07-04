@@ -73,6 +73,8 @@ const config = {
       getByUser: (userId) => `/api/v2.5/appointment/user/${userId}`,
       updateMeetingLink: (id) =>
         `/api/v2.5/appointment/update/meetinglink/${id}`,
+      checkIn: (id) => `/api/v2.5/appointment/checkin/${id}`,
+      checkOut: (id) => `/api/v2.5/appointment/checkout/${id}`,
       getByCurrentUser: "/api/v2.5/appointment/getall",
       getByConsultant: (consultantId) =>
         `/api/v2.5/appointment/consultant/${consultantId}`,
@@ -176,6 +178,17 @@ const config = {
       getForUser: (userId) => `/api/v2.5/notification/user/${userId}`,
       markAsRead: (notificationId) =>
         `/api/v2.5/notification/mark/${notificationId}`, // Assuming this endpoint exists
+    },
+
+    // Meeting endpoints (Daily.co)
+    meeting: {
+      getMeetingInfo: (appointmentId) =>
+        `/api/meeting/appointment/${appointmentId}/meeting-info`,
+      createRoom: (appointmentId) =>
+        `/api/meeting/appointment/${appointmentId}/create-room`,
+      deleteRoom: (roomName) => `/api/meeting/room/${roomName}`,
+      getRoomStatus: (roomName) => `/api/meeting/room/${roomName}/status`,
+      testJoinNow: "/api/meeting/test-daily/join-now", // For quick testing
     },
   },
 
