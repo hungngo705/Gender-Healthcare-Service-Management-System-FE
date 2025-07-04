@@ -1,5 +1,4 @@
 import { useState, useEffect, useCallback } from "react";
-import { useNavigate } from "react-router-dom";
 import { useAuth } from "../contexts/AuthContext";
 import { getDashboardConfig } from "../utils/dashboardUtils";
 import userUtils from "../utils/userUtils";
@@ -42,7 +41,6 @@ import {
 
 function Dashboard() {
   const { logout } = useAuth();
-  const navigate = useNavigate();
   const [sidebarOpen, setSidebarOpen] = useState(false);
   const [activeTab, setActiveTab] = useState("overview"); // Custom setter for activeTab
   const handleSetActiveTab = useCallback((tabId) => {
