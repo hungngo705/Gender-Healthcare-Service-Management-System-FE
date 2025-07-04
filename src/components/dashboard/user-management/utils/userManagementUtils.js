@@ -34,16 +34,43 @@ export const getRoleText = (role) => {
   }
 };
 
+// Hàm debug để kiểm tra giá trị thực tế của isActive
+export const debugUserStatus = (user) => {
+  console.log(`User ID: ${user.id}, Name: ${user.name}`);
+  console.log(`isActive (raw):`, user.isActive);
+  console.log(`isActive (type):`, typeof user.isActive);
+  console.log(`status:`, user.status);
+  console.log(`---------------------------`);
+};
+
 export const getStatusClass = (user) => {
+  // Debug để kiểm tra giá trị thực tế
+  debugUserStatus(user);
+
+  // Xác định isActive dựa trên kiểu dữ liệu boolean
   const isActive =
-    user.isActive !== undefined ? user.isActive : user.status === "active";
+    typeof user.isActive === "boolean"
+      ? user.isActive
+      : user.isActive === "TRUE" ||
+        user.isActive === true ||
+        user.status === "active";
+
+  // Hiển thị đúng theo dữ liệu API:
+  // isActive=true => Hoạt động (màu xanh)
+  // isActive=false => Ngưng hoạt động (màu đỏ)
   return isActive ? "bg-green-100 text-green-800" : "bg-red-100 text-red-800";
 };
 
 export const getStatusText = (user) => {
+  // Xác định isActive dựa trên kiểu dữ liệu
   const isActive =
-    user.isActive !== undefined ? user.isActive : user.status === "active";
-  return isActive ? "Hoạt động" : "Ngừng hoạt động";
+    typeof user.isActive === "boolean"
+      ? user.isActive
+      : user.isActive === "TRUE" ||
+        user.isActive === true ||
+        user.status === "active";
+
+  return isActive ? "Hoạt động" : "Ngưng hoạt động";
 };
 
 export const formatDate = (dateString) => {
@@ -122,13 +149,21 @@ export const filterUsers = (users, searchTerm, filter) => {
     // For status filters (active/inactive)
     if (filter === "active") {
       const isActive =
-        user.isActive !== undefined ? user.isActive : user.status === "active";
+        typeof user.isActive === "boolean"
+          ? user.isActive
+          : user.isActive === "TRUE" ||
+            user.isActive === true ||
+            user.status === "active";
       return matchesSearch && isActive;
     }
 
     if (filter === "inactive") {
       const isActive =
-        user.isActive !== undefined ? user.isActive : user.status === "active";
+        typeof user.isActive === "boolean"
+          ? user.isActive
+          : user.isActive === "TRUE" ||
+            user.isActive === true ||
+            user.status === "active";
       return matchesSearch && !isActive;
     }
 
