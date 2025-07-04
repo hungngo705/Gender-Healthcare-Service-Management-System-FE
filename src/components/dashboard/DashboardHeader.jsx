@@ -1,19 +1,15 @@
 import React, { useState, useRef, useEffect } from "react";
 import PropTypes from "prop-types";
 import { Link, useNavigate } from "react-router-dom";
-import { Bell, Search, Menu, User, LogOut, Settings } from "lucide-react";
+import { Menu, User, LogOut } from "lucide-react";
 import logo from "../../assets/logo2.svg";
 import UserAvatar from "../user/UserAvatar";
-import userService from "../../services/userService"; // Changed from userUtils
+import userService from "../../services/userService";
 import { useAuth } from "../../contexts/AuthContext";
+// Import NotificationBell component
+import NotificationBell from "../ui/NotificationBell";
 
-function DashboardHeader({
-  title,
-  activeTabLabel,
-  searchQuery,
-  setSearchQuery,
-  setSidebarOpen,
-}) {
+function DashboardHeader({ title, activeTabLabel, setSidebarOpen }) {
   const [isProfileMenuOpen, setIsProfileMenuOpen] = useState(false);
   const [isLoggingOut, setIsLoggingOut] = useState(false);
   const [isFullScreenLoading, setIsFullScreenLoading] = useState(false);
@@ -149,15 +145,8 @@ function DashboardHeader({
           </div>
 
           <div className="flex items-center space-x-4">
-            <div className="relative">
-              <button
-                className="relative p-1 text-gray-500 hover:text-gray-600 focus:outline-none"
-                aria-label="Notifications"
-              >
-                <Bell className="h-6 w-6" />
-                <span className="absolute top-0 right-0 h-2 w-2 rounded-full bg-red-500"></span>
-              </button>
-            </div>
+            {/* Thay thế button cũ bằng component NotificationBell */}
+            <NotificationBell />
             <div className="border-l h-6 mx-2 border-gray-200"></div>
             <div className="relative">
               <button
