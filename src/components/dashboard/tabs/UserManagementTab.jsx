@@ -131,20 +131,11 @@ function UserManagementTab() {
             paginatedUsers={paginatedUsers}
             showActionMenu={showActionMenu}
             setShowActionMenu={setShowActionMenu}
-            onViewUser={(user) => {
-              // Always use the handle functions from the hook
-              handleViewUser(user);
-            }}
-            onEditUser={(user) => {
-              // Always use the handle functions from the hook
-              handleEditUser(user);
-            }}
-            onToggleUserStatus={handleToggleUserStatus}
+            onViewUser={(user) => handleViewUser(user)}
+            onEditUser={(user) => handleEditUser(user)}
             onDeleteUser={handleDeleteUser}
             getRoleBadgeClass={getRoleBadgeClass}
             getRoleText={getRoleText}
-            getStatusClass={getStatusClass}
-            getStatusText={getStatusText}
             getUserDisplayInfo={getUserDisplayInfo}
             formatDate={formatDate}
           />
@@ -195,7 +186,6 @@ function UserManagementTab() {
         onClose={closeDetailsModal}
         user={selectedUser}
         onEdit={handleEditUser}
-        onToggleStatus={handleToggleUserStatus}
         getRoleBadgeClass={getRoleBadgeClass}
         getRoleText={getRoleText}
         formatDate={formatDate}
