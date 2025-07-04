@@ -1,5 +1,4 @@
 import { useState, useEffect, useCallback } from "react";
-import { useNavigate } from "react-router-dom";
 import { useAuth } from "../contexts/AuthContext";
 import { getDashboardConfig } from "../utils/dashboardUtils";
 import userUtils from "../utils/userUtils";
