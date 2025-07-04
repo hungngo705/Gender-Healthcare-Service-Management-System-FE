@@ -10,7 +10,6 @@ import {
 import userService from "../../../services/userService";
 import appointmentService from "../../../services/appointmentService";
 import feedbackService from "../../../services/feedbackService";
-import { getMeetingInfo, createMeetingRoom } from "../../../services/meetingService";
 
 function AppointmentsTab({ navigate }) {
   const [isLoading, setIsLoading] = useState(true);
@@ -120,81 +119,28 @@ function AppointmentsTab({ navigate }) {
 
       // Step 3: Filter appointments for this user
       const allAppointments = appointmentsResponse.data?.data || [];
-      
+
       // Debug: Log all appointments to see the data structure
       console.log("All appointments in database:", allAppointments);
       console.log("Current user ID:", currentUserId);
-      
+
       const userAppointments = allAppointments.filter(
         (appointment) => appointment.customerId === currentUserId
       );
 
       console.log("User appointments after filtering:", userAppointments);
-      
-      // Debug: Also check if user might be a consultant
-      const consultantAppointments = allAppointments.filter(
-        (appointment) => appointment.consultantId === currentUserId
-      );
-      console.log("Consultant appointments for this user:", consultantAppointments);
-        
-        // Add meeting room info to appointments
-        const appointmentsWithMeetingInfo = await Promise.all(
-          userAppointments.map(async (appointment) => {
-            try {
-              const meetingInfo = await getMeetingInfo(appointment.id, currentUserId);
-              const meetingData = meetingInfo.data || meetingInfo;
-              
-              return {
-                ...appointment,
-                meetingInfo: meetingData,
-                hasMeetingRoom: !!(meetingData?.RoomUrl),
-                isExpired: meetingData?.IsExpired || false,
-                meetingMessage: meetingData?.Message || null
-              };
-            } catch (error) {
-              console.warn(`Failed to get meeting info for appointment ${appointment.id}:`, error);
-              return {
-                ...appointment,
-                meetingInfo: null,
-                hasMeetingRoom: false,
-                isExpired: false,
-                meetingMessage: null
-              };
-            }
-          })
-        );
-        
-        setAppointments(appointmentsWithMeetingInfo);
 
-      // Step 4: Check completed appointments for feedback
-      const feedbackChecks = {};
-      const completedAppointments = userAppointments.filter(
-        (app) => app.status === 1 || app.status === "1"
+      // Instead of fetching meeting info for all appointments, just set the basic appointment data
+      setAppointments(
+        userAppointments.map((appointment) => ({
+          ...appointment,
+          meetingInfo: null,
+          hasMeetingRoom: false,
+          isExpired: false,
+          meetingMessage: null,
+        }))
       );
 
-      // Check each completed appointment for feedback
-      await Promise.all(
-        completedAppointments.map(async (appointment) => {
-          try {
-            const feedbackResponse = await feedbackService.getByAppointment(
-              appointment.id
-            );
-            console.log(
-              `Feedback for appointment ${appointment.id}:`,
-              feedbackResponse
-            );
-            // If feedback exists, mark this appointment
-            if (feedbackResponse && feedbackResponse.data) {
-              feedbackChecks[appointment.id] = feedbackResponse.data;
-            }
-          } catch (feedbackError) {
-            // No feedback exists, continue
-            console.log(`No feedback for appointment ${appointment.id}`);
-          }
-        })
-      );
-
-      setAppointmentsWithFeedback(feedbackChecks);
       setError(null);
     } catch (err) {
       console.error("Error fetching appointments:", err);
@@ -552,10 +498,36 @@ function AppointmentsTab({ navigate }) {
                         {getTimeBySlot(appointment.slot)}
                       </td>
                       <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-500">
-                        {appointment.checkInTimeUtc || appointment.checkInTime ? new Date(appointment.checkInTimeUtc || appointment.checkInTime).toLocaleString('vi-VN', { hour: '2-digit', minute: '2-digit', second: '2-digit', day: '2-digit', month: '2-digit', year: 'numeric', timeZone: 'Asia/Ho_Chi_Minh' }) : '-'}
+                        {appointment.checkInTimeUtc || appointment.checkInTime
+                          ? new Date(
+                              appointment.checkInTimeUtc ||
+                                appointment.checkInTime
+                            ).toLocaleString("vi-VN", {
+                              hour: "2-digit",
+                              minute: "2-digit",
+                              second: "2-digit",
+                              day: "2-digit",
+                              month: "2-digit",
+                              year: "numeric",
+                              timeZone: "Asia/Ho_Chi_Minh",
+                            })
+                          : "-"}
                       </td>
                       <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-500">
-                        {appointment.checkOutTimeUtc || appointment.checkOutTime ? new Date(appointment.checkOutTimeUtc || appointment.checkOutTime).toLocaleString('vi-VN', { hour: '2-digit', minute: '2-digit', second: '2-digit', day: '2-digit', month: '2-digit', year: 'numeric', timeZone: 'Asia/Ho_Chi_Minh' }) : '-'}
+                        {appointment.checkOutTimeUtc || appointment.checkOutTime
+                          ? new Date(
+                              appointment.checkOutTimeUtc ||
+                                appointment.checkOutTime
+                            ).toLocaleString("vi-VN", {
+                              hour: "2-digit",
+                              minute: "2-digit",
+                              second: "2-digit",
+                              day: "2-digit",
+                              month: "2-digit",
+                              year: "numeric",
+                              timeZone: "Asia/Ho_Chi_Minh",
+                            })
+                          : "-"}
                       </td>
                       <td className="px-6 py-4 whitespace-nowrap">
                         <span
@@ -603,8 +575,8 @@ function AppointmentsTab({ navigate }) {
                                   </button>
                                 ))}
 
-                              {isScheduled && (
-                                appointment.isExpired ? (
+                              {isScheduled &&
+                                (appointment.isExpired ? (
                                   <span className="inline-flex items-center px-3 py-1.5 text-xs font-medium text-gray-500 bg-gray-100 rounded-full">
                                     <svg
                                       xmlns="http://www.w3.org/2000/svg"
@@ -612,30 +584,36 @@ function AppointmentsTab({ navigate }) {
                                       viewBox="0 0 20 20"
                                       fill="currentColor"
                                     >
-                                      <path fillRule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zM8.707 7.293a1 1 0 00-1.414 1.414L8.586 10l-1.293 1.293a1 1 0 101.414 1.414L10 11.414l1.293 1.293a1 1 0 001.414-1.414L11.414 10l1.293-1.293a1 1 0 00-1.414-1.414L10 8.586 8.707 7.293z" clipRule="evenodd" />
+                                      <path
+                                        fillRule="evenodd"
+                                        d="M10 18a8 8 0 100-16 8 8 0 000 16zM8.707 7.293a1 1 0 00-1.414 1.414L8.586 10l-1.293 1.293a1 1 0 101.414 1.414L10 11.414l1.293 1.293a1 1 0 001.414-1.414L11.414 10l1.293-1.293a1 1 0 00-1.414-1.414L10 8.586 8.707 7.293z"
+                                        clipRule="evenodd"
+                                      />
                                     </svg>
-                                    {appointment.meetingMessage || "Cuộc hẹn đã kết thúc"}
+                                    {appointment.meetingMessage ||
+                                      "Cuộc hẹn đã kết thúc"}
                                   </span>
-                                                                 ) : (appointment.hasMeetingRoom || appointment.googleMeetLink) && (
-                                <button
-                                  onClick={() =>
-                                    navigate(`/meeting/${appointment.id}`)
-                                  }
-                                  className="inline-flex items-center px-3 py-1.5 border border-transparent text-xs font-medium rounded-full text-emerald-700 bg-emerald-100 hover:bg-emerald-200 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-emerald-500 transition-colors duration-200 mr-2"
-                                >
-                                  <svg
-                                    xmlns="http://www.w3.org/2000/svg"
-                                    className="w-3 h-3 mr-1"
-                                    viewBox="0 0 20 20"
-                                    fill="currentColor"
+                                ) : (
+                                  <button
+                                    onClick={() =>
+                                      navigate(
+                                        `/meeting/${appointment.id}?start=true`
+                                      )
+                                    }
+                                    className="inline-flex items-center px-3 py-1.5 border border-transparent text-xs font-medium rounded-full text-emerald-700 bg-emerald-100 hover:bg-emerald-200 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-emerald-500 transition-colors duration-200 mr-2"
                                   >
-                                    <path d="M2 6a2 2 0 012-2h6a2 2 0 012 2v8a2 2 0 01-2 2H4a2 2 0 01-2-2V6z" />
-                                    <path d="M14 6a2 2 0 012-2h2a2 2 0 012 2v8a2 2 0 01-2 2h-2a2 2 0 01-2-2V6z" />
-                                  </svg>
-                                  Bắt đầu
-                                </button>
-                                )
-                              )}
+                                    <svg
+                                      xmlns="http://www.w3.org/2000/svg"
+                                      className="w-3 h-3 mr-1"
+                                      viewBox="0 0 20 20"
+                                      fill="currentColor"
+                                    >
+                                      <path d="M2 6a2 2 0 012-2h6a2 2 0 012 2v8a2 2 0 01-2 2H4a2 2 0 01-2-2V6z" />
+                                      <path d="M14 6a2 2 0 012-2h2a2 2 0 012 2v8a2 2 0 01-2 2h-2a2 2 0 01-2-2V6z" />
+                                    </svg>
+                                    Bắt đầu
+                                  </button>
+                                ))}
 
                               {isScheduled && (
                                 <button

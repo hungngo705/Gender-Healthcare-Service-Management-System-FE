@@ -271,7 +271,7 @@ function CustomerProfile() {
 
               <div className="flex flex-col sm:flex-row sm:items-center gap-4">
                 <div className="flex-shrink-0 relative">
-                  <UserAvatar size="lg" />
+                  <UserAvatar size="lg" imageUrl={profileData.avatarUrl} />
                   <button
                     className="absolute bottom-0 right-0 bg-white rounded-full p-1 shadow-sm border border-gray-200 hover:bg-gray-50"
                     aria-label="Change profile picture"

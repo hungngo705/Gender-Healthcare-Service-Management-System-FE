@@ -1,7 +1,10 @@
 import { useEffect, useRef, useState } from "react";
 import PropTypes from "prop-types";
 import DailyIframe from "@daily-co/daily-js";
-import { getMeetingInfo, createMeetingRoom } from "../../services/meetingService";
+import {
+  getMeetingInfo,
+  createMeetingRoom,
+} from "../../services/meetingService";
 import appointmentService from "../../services/appointmentService";
 import { useAuth } from "../../contexts/AuthContext";
 
@@ -21,27 +24,30 @@ const DailyMeetingRoom = ({ appointmentId }) => {
     if (!appointmentId) return;
 
     // Debug logging
-    console.log("DailyMeetingRoom initialized with appointmentId:", appointmentId, "type:", typeof appointmentId);
+    console.log(
+      "DailyMeetingRoom initialized with appointmentId:",
+      appointmentId,
+      "type:",
+      typeof appointmentId
+    );
     console.log("Current user:", currentUser);
-    
-    // Check authentication
-    const token = localStorage.getItem('auth_token');
-    console.log("Auth token exists:", !!token);
-    if (token) {
-      console.log("Token preview:", token.substring(0, 20) + "...");
-    }
 
     const join = async () => {
       try {
         setLoading(true);
-        
-        // Get meeting info first
+
+        // Get meeting info only if we don't already have it from props
+        let payload;
+
+        // We always need to call getMeetingInfo at this point because we need the room URL
         let res = await getMeetingInfo(appointmentId, currentUser?.id);
-        let payload = res.data?.data ?? res.data ?? res;
-        
+        payload = res.data?.data ?? res.data ?? res;
+
         // If no room exists, create one
         if (!payload || !payload.RoomUrl) {
-          console.log("No room found, creating an instant room (non-pre-scheduled)...");
+          console.log(
+            "No room found, creating an instant room (non-pre-scheduled)..."
+          );
           // Create a room that opens immediately instead of waiting for the schedule
           const createRes = await createMeetingRoom(appointmentId, false);
           payload = createRes.data?.data ?? createRes.data ?? createRes;
@@ -80,29 +86,55 @@ const DailyMeetingRoom = ({ appointmentId }) => {
           frame.on("joined-meeting", async () => {
             console.log("Successfully joined Daily.co meeting");
             setLoading(false);
-            
+
             // Record check-in time when actually joined
             try {
-              console.log("Recording check-in for appointment:", appointmentId, "type:", typeof appointmentId);
-              const checkInResponse = await appointmentService.checkIn(appointmentId);
-              console.log("Check-in recorded successfully, response:", checkInResponse);
+              console.log(
+                "Recording check-in for appointment:",
+                appointmentId,
+                "type:",
+                typeof appointmentId
+              );
+              const checkInResponse = await appointmentService.checkIn(
+                appointmentId
+              );
+              console.log(
+                "Check-in recorded successfully, response:",
+                checkInResponse
+              );
             } catch (err) {
               console.error("Failed to record check-in:", err);
-              console.error("Error details:", err.response?.data || err.message);
+              console.error(
+                "Error details:",
+                err.response?.data || err.message
+              );
             }
           });
 
           frame.on("left-meeting", async () => {
             console.log("Left Daily.co meeting");
-            
+
             // Record check-out time when actually left
             try {
-              console.log("Recording check-out for appointment:", appointmentId, "type:", typeof appointmentId);
-              const checkOutResponse = await appointmentService.checkOut(appointmentId);
-              console.log("Check-out recorded successfully, response:", checkOutResponse);
+              console.log(
+                "Recording check-out for appointment:",
+                appointmentId,
+                "type:",
+                typeof appointmentId
+              );
+              const checkOutResponse = await appointmentService.checkOut(
+                appointmentId
+              );
+              console.log(
+                "Check-out recorded successfully, response:",
+                checkOutResponse
+              );
             } catch (err) {
               console.error("Failed to record check-out:", err);
-              console.error("Error details:", err.response?.data || err.message);
+              console.error(
+                "Error details:",
+                err.response?.data || err.message
+              );
             }
           });
 
@@ -126,14 +158,13 @@ const DailyMeetingRoom = ({ appointmentId }) => {
 
         // Fallback: hide loading overlay once join promise resolves
         setLoading(false);
-
       } catch (e) {
         console.error("Failed to join meeting:", e);
         setError(e.message || "Failed to join meeting");
         setLoading(false);
       }
     };
-    
+
     join();
 
     return () => {
@@ -141,12 +172,20 @@ const DailyMeetingRoom = ({ appointmentId }) => {
         callFrameRef.current.destroy();
       }
     };
-  }, [appointmentId, currentUser?.id, currentUser?.fullName, currentUser?.email]);
+  }, [
+    appointmentId,
+    currentUser?.id,
+    currentUser?.fullName,
+    currentUser?.email,
+  ]);
 
   return (
     <div className="absolute inset-0 w-full h-full">
       {/* Video container (Daily will fill this) */}
-      <div ref={containerRef} className="absolute inset-0 w-full h-full bg-black" />
+      <div
+        ref={containerRef}
+        className="absolute inset-0 w-full h-full bg-black"
+      />
 
       {loading && (
         <div className="absolute inset-0 flex items-center justify-center bg-gray-900 bg-opacity-90 text-white z-10">
@@ -154,7 +193,9 @@ const DailyMeetingRoom = ({ appointmentId }) => {
             <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-white mx-auto mb-4"></div>
             <p>Connecting to meeting room...</p>
             {meetingInfo && (
-              <p className="text-sm text-gray-400 mt-2">Room: {meetingInfo.RoomName}</p>
+              <p className="text-sm text-gray-400 mt-2">
+                Room: {meetingInfo.RoomName}
+              </p>
             )}
           </div>
         </div>
@@ -164,7 +205,9 @@ const DailyMeetingRoom = ({ appointmentId }) => {
         <div className="absolute inset-0 flex items-center justify-center bg-gray-900 bg-opacity-90 text-white z-10">
           <div className="text-center max-w-md">
             <div className="text-red-400 text-xl mb-4">⚠️</div>
-            <h3 className="text-lg font-semibold mb-2">Unable to Join Meeting</h3>
+            <h3 className="text-lg font-semibold mb-2">
+              Unable to Join Meeting
+            </h3>
             <p className="text-red-400 mb-4">{error}</p>
             <button
               onClick={() => window.location.reload()}
@@ -183,4 +226,4 @@ DailyMeetingRoom.propTypes = {
   appointmentId: PropTypes.string.isRequired,
 };
 
-export default DailyMeetingRoom; 
+export default DailyMeetingRoom;
