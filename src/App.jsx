@@ -69,6 +69,11 @@ const VnpayCallback = lazy(() =>
 );
 const MeetingPage = lazy(() =>
   import(/* webpackChunkName: "meeting" */ "./pages/Meeting")
+
+const PaymentReceipt = lazy(() =>
+  import(
+    /* webpackChunkName: "payment-receipt" */ "./pages/payment/PaymentReceipt"
+  )
 );
 
 function App() {
@@ -84,6 +89,7 @@ function App() {
         pauseOnFocusLoss
         draggable
         pauseOnHover
+        limit={1}
       />
       <Suspense fallback={<LoadingSpinner />}>
         {" "}
@@ -158,6 +164,10 @@ function App() {
             {/* Hệ thống thanh toán */}
             <Route path="payment" element={<Payment />} />
             <Route path="payment-success" element={<PaymentSuccess />} />
+            <Route
+              path="payment/receipt/:transactionId"
+              element={<PaymentReceipt />}
+            />
             {/* Trang hồ sơ khách hàng */}{" "}
             <Route
               path="profile"
