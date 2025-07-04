@@ -42,7 +42,6 @@ import {
 
 function Dashboard() {
   const { logout } = useAuth();
-  const navigate = useNavigate();
   const [sidebarOpen, setSidebarOpen] = useState(false);
   const [activeTab, setActiveTab] = useState("overview"); // Custom setter for activeTab
   const handleSetActiveTab = useCallback((tabId) => {

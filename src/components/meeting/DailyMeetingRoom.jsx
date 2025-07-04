@@ -15,10 +15,6 @@ const DailyMeetingRoom = ({ appointmentId }) => {
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
   const [meetingInfo, setMeetingInfo] = useState(null);
-  const [isCheckedIn, setIsCheckedIn] = useState(false);
-  const [isCheckedOut, setIsCheckedOut] = useState(false);
-  const [checkInLoading, setCheckInLoading] = useState(false);
-  const [checkOutLoading, setCheckOutLoading] = useState(false);
 
   useEffect(() => {
     if (!appointmentId) return;
