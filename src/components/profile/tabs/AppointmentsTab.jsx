@@ -486,6 +486,18 @@ function AppointmentsTab({ navigate }) {
                     scope="col"
                     className="w-1/6 px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider"
                   >
+                    Giờ vào
+                  </th>
+                  <th
+                    scope="col"
+                    className="w-1/6 px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider"
+                  >
+                    Giờ ra
+                  </th>
+                  <th
+                    scope="col"
+                    className="w-1/6 px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider"
+                  >
                     Trạng thái
                   </th>
                   <th
@@ -538,6 +550,12 @@ function AppointmentsTab({ navigate }) {
                       </td>
                       <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-500">
                         {getTimeBySlot(appointment.slot)}
+                      </td>
+                      <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-500">
+                        {appointment.checkInTimeUtc || appointment.checkInTime ? new Date(appointment.checkInTimeUtc || appointment.checkInTime).toLocaleString('vi-VN', { hour: '2-digit', minute: '2-digit', second: '2-digit', day: '2-digit', month: '2-digit', year: 'numeric', timeZone: 'Asia/Ho_Chi_Minh' }) : '-'}
+                      </td>
+                      <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-500">
+                        {appointment.checkOutTimeUtc || appointment.checkOutTime ? new Date(appointment.checkOutTimeUtc || appointment.checkOutTime).toLocaleString('vi-VN', { hour: '2-digit', minute: '2-digit', second: '2-digit', day: '2-digit', month: '2-digit', year: 'numeric', timeZone: 'Asia/Ho_Chi_Minh' }) : '-'}
                       </td>
                       <td className="px-6 py-4 whitespace-nowrap">
                         <span

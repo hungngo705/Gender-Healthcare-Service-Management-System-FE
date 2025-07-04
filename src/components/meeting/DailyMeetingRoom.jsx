@@ -12,9 +12,24 @@ const DailyMeetingRoom = ({ appointmentId }) => {
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
   const [meetingInfo, setMeetingInfo] = useState(null);
+  const [isCheckedIn, setIsCheckedIn] = useState(false);
+  const [isCheckedOut, setIsCheckedOut] = useState(false);
+  const [checkInLoading, setCheckInLoading] = useState(false);
+  const [checkOutLoading, setCheckOutLoading] = useState(false);
 
   useEffect(() => {
     if (!appointmentId) return;
+
+    // Debug logging
+    console.log("DailyMeetingRoom initialized with appointmentId:", appointmentId, "type:", typeof appointmentId);
+    console.log("Current user:", currentUser);
+    
+    // Check authentication
+    const token = localStorage.getItem('auth_token');
+    console.log("Auth token exists:", !!token);
+    if (token) {
+      console.log("Token preview:", token.substring(0, 20) + "...");
+    }
 
     const join = async () => {
       try {
@@ -62,13 +77,33 @@ const DailyMeetingRoom = ({ appointmentId }) => {
           callFrameRef.current = frame;
 
           // Add event listeners only once when frame is first created
-          frame.on("joined-meeting", () => {
+          frame.on("joined-meeting", async () => {
             console.log("Successfully joined Daily.co meeting");
             setLoading(false);
+            
+            // Record check-in time when actually joined
+            try {
+              console.log("Recording check-in for appointment:", appointmentId, "type:", typeof appointmentId);
+              const checkInResponse = await appointmentService.checkIn(appointmentId);
+              console.log("Check-in recorded successfully, response:", checkInResponse);
+            } catch (err) {
+              console.error("Failed to record check-in:", err);
+              console.error("Error details:", err.response?.data || err.message);
+            }
           });
 
-          frame.on("left-meeting", () => {
+          frame.on("left-meeting", async () => {
             console.log("Left Daily.co meeting");
+            
+            // Record check-out time when actually left
+            try {
+              console.log("Recording check-out for appointment:", appointmentId, "type:", typeof appointmentId);
+              const checkOutResponse = await appointmentService.checkOut(appointmentId);
+              console.log("Check-out recorded successfully, response:", checkOutResponse);
+            } catch (err) {
+              console.error("Failed to record check-out:", err);
+              console.error("Error details:", err.response?.data || err.message);
+            }
           });
 
           frame.on("error", (event) => {
@@ -89,13 +124,6 @@ const DailyMeetingRoom = ({ appointmentId }) => {
 
         await frame.join(joinOptions);
 
-        // Record check-in time
-        try {
-          await appointmentService.checkIn(appointmentId);
-        } catch (err) {
-          console.error("Failed to record check-in", err);
-        }
-
         // Fallback: hide loading overlay once join promise resolves
         setLoading(false);
 
@@ -110,11 +138,6 @@ const DailyMeetingRoom = ({ appointmentId }) => {
 
     return () => {
       if (callFrameRef.current) {
-        // Record check-out before destroying
-        appointmentService
-          .checkOut(appointmentId)
-          .catch((err) => console.error("Failed to record check-out", err));
-
         callFrameRef.current.destroy();
       }
     };

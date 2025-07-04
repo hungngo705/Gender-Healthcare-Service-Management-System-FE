@@ -12,17 +12,21 @@ import {
   RefreshCw
 } from 'lucide-react';
 import * as meetingService from '../../services/meetingService';
+import appointmentService from '../../services/appointmentService';
 
 const MeetingLobby = () => {
   const { appointmentId } = useParams();
   const navigate = useNavigate();
   const [meetingInfo, setMeetingInfo] = useState(null);
+  const [isExpired, setIsExpired] = useState(false);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
   const [timeRemaining, setTimeRemaining] = useState('');
   const [canJoin, setCanJoin] = useState(false);
   const [currentTime, setCurrentTime] = useState(new Date());
   const [derivedAvailableFrom, setDerivedAvailableFrom] = useState(null);
+  const [joiningMeeting, setJoiningMeeting] = useState(false);
+  const [meetingWindow, setMeetingWindow] = useState(null);
 
   useEffect(() => {
     let intervalId;
@@ -37,6 +41,7 @@ const MeetingLobby = () => {
         
         setMeetingInfo(response);
         setCanJoin(response.canJoinEarly);
+        setIsExpired(response.isExpired || false);
         
         if (!response.canJoinEarly) {
           // Start polling every 30 seconds when room is locked
@@ -45,6 +50,7 @@ const MeetingLobby = () => {
               const updatedResponse = await meetingService.getMeetingInfo(appointmentId);
               setMeetingInfo(updatedResponse);
               setCanJoin(updatedResponse.canJoinEarly);
+              setIsExpired(updatedResponse.isExpired || false);
               
               if (updatedResponse.canJoinEarly) {
                 clearInterval(intervalId);
@@ -123,11 +129,59 @@ const MeetingLobby = () => {
     }
   }, [currentTime, meetingInfo, canJoin]);
 
-  const handleJoinMeeting = () => {
-    if (meetingInfo && meetingInfo.roomUrl) {
-      window.open(meetingInfo.roomUrl, '_blank');
+  const handleJoinMeeting = async () => {
+    if (!meetingInfo || !meetingInfo.roomUrl) return;
+    
+    setJoiningMeeting(true);
+    
+    try {
+      // Check-in when user clicks "Tham gia cuộc hẹn"
+      console.log('Auto check-in when joining meeting for appointment:', appointmentId);
+      await appointmentService.checkIn(appointmentId);
+      console.log('Check-in successful, opening meeting room');
+      
+      // Open Daily.co meeting in new tab và giữ reference để theo dõi
+      const newWindow = window.open(meetingInfo.roomUrl, '_blank');
+      setMeetingWindow(newWindow);
+      
+    } catch (error) {
+      console.error('Check-in failed:', error);
+      // Still allow user to join meeting even if check-in fails
+      console.log('Check-in failed, but opening meeting room anyway');
+      const fallbackWindow = window.open(meetingInfo.roomUrl, '_blank');
+      setMeetingWindow(fallbackWindow);
+      
+      // Optional: Show toast notification about check-in failure
+      alert('Ghi nhận tham gia thất bại, nhưng bạn vẫn có thể tham gia cuộc họp');
+    } finally {
+      setJoiningMeeting(false);
     }
   };
+
+  /* -------------------------------------------------
+     Theo dõi khi tab Daily.co bị đóng để tự động check-out
+     -------------------------------------------------*/
+  useEffect(() => {
+    if (!meetingWindow) return;
+
+    const interval = setInterval(async () => {
+      if (meetingWindow.closed) {
+        console.log('Detected Daily.co tab closed – performing auto check-out');
+
+        try {
+          await appointmentService.checkOut(appointmentId);
+          console.log('Auto check-out (from lobby) thành công');
+        } catch (err) {
+          console.error('Auto check-out (fallback) thất bại:', err);
+        }
+
+        // Chuyển về trang lịch hẹn / feedback
+        navigate('/profile?tab=appointments');
+      }
+    }, 2000); // kiểm tra mỗi 2s
+
+    return () => clearInterval(interval);
+  }, [meetingWindow, appointmentId, navigate]);
 
   const formatDateTime = (dateStr) => {
     if (!dateStr) return '';
@@ -206,12 +260,21 @@ const MeetingLobby = () => {
         <div className="p-6">
           {/* Status Banner */}
           <div className={`p-4 rounded-lg mb-6 ${
-            canJoin 
-              ? 'bg-green-50 border border-green-200' 
-              : 'bg-yellow-50 border border-yellow-200'
+            isExpired
+              ? 'bg-red-50 border border-red-200'
+              : canJoin
+                ? 'bg-green-50 border border-green-200'
+                : 'bg-yellow-50 border border-yellow-200'
           }`}>
             <div className="flex items-center justify-center">
-              {canJoin ? (
+              {isExpired ? (
+                <>
+                  <AlertCircle className="h-5 w-5 text-red-600 mr-2" />
+                  <span className="text-red-800 font-medium">
+                    Phòng họp đã kết thúc
+                  </span>
+                </>
+              ) : canJoin ? (
                 <>
                   <CheckCircle className="h-5 w-5 text-green-600 mr-2" />
                   <span className="text-green-800 font-medium">
@@ -285,11 +348,13 @@ const MeetingLobby = () => {
                 <div className="flex justify-between">
                   <span className="text-gray-600">Trạng thái:</span>
                   <span className={`px-2 py-1 rounded-full text-sm font-medium ${
-                    canJoin 
-                      ? 'bg-green-100 text-green-800' 
-                      : 'bg-yellow-100 text-yellow-800'
+                    isExpired
+                      ? 'bg-red-100 text-red-800'
+                      : canJoin
+                        ? 'bg-green-100 text-green-800'
+                        : 'bg-yellow-100 text-yellow-800'
                   }`}>
-                    {canJoin ? 'Có thể tham gia' : 'Đang chờ'}
+                    {isExpired ? 'Đóng' : canJoin ? 'Có thể tham gia' : 'Đang chờ'}
                   </span>
                 </div>
                 {!canJoin && timeRemaining && (
@@ -334,15 +399,28 @@ const MeetingLobby = () => {
           <div className="flex flex-col sm:flex-row gap-4 justify-center">
             <button
               onClick={handleJoinMeeting}
-              disabled={!canJoin || !meetingInfo?.roomUrl}
+              disabled={isExpired || !canJoin || !meetingInfo?.roomUrl || joiningMeeting}
               className={`px-8 py-3 rounded-lg font-medium text-lg transition-all duration-200 flex items-center justify-center ${
-                canJoin && meetingInfo?.roomUrl
+                isExpired ? 'bg-gray-300 text-gray-500 cursor-not-allowed' : canJoin && meetingInfo?.roomUrl && !joiningMeeting
                   ? 'bg-indigo-600 hover:bg-indigo-700 text-white shadow-lg hover:shadow-xl transform hover:-translate-y-0.5'
                   : 'bg-gray-300 text-gray-500 cursor-not-allowed'
               }`}
             >
-              <Video className="h-5 w-5 mr-2" />
-              {canJoin ? 'Tham Gia Cuộc Hẹn' : `Phòng họp mở trong ${timeRemaining}`}
+              {isExpired ? (
+                <>
+                  Đã kết thúc
+                </>
+              ) : joiningMeeting ? (
+                <>
+                  <div className="animate-spin rounded-full h-5 w-5 border-b-2 border-white mr-2"></div>
+                  Đang tham gia...
+                </>
+              ) : (
+                <>
+                  <Video className="h-5 w-5 mr-2" />
+                  {isExpired ? 'Đã kết thúc' : canJoin ? 'Tham Gia Cuộc Hẹn' : `Phòng họp mở trong ${timeRemaining}`}
+                </>
+              )}
             </button>
             
             <button

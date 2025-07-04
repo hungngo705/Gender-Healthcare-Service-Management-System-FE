@@ -79,8 +79,8 @@ const appointmentService = {
   },
 
   // Attendance
-  checkIn: (id) => apiService.post(config.api.appointments.checkIn(id)),
-  checkOut: (id) => apiService.post(config.api.appointments.checkOut(id)),
+  checkIn: (id) => apiService.put(config.api.appointments.checkIn(id)),
+  checkOut: (id) => apiService.put(config.api.appointments.checkOut(id)),
 };
 
 export default appointmentService;

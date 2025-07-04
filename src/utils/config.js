@@ -73,8 +73,8 @@ const config = {
       getByUser: (userId) => `/api/v2.5/appointment/user/${userId}`,
       updateMeetingLink: (id) =>
         `/api/v2.5/appointment/update/meetinglink/${id}`,
-      checkIn: (id) => `/api/v2.5/appointment/${id}/checkin`,
-      checkOut: (id) => `/api/v2.5/appointment/${id}/checkout`,
+      checkIn: (id) => `/api/v2.5/appointment/checkin/${id}`,
+      checkOut: (id) => `/api/v2.5/appointment/checkout/${id}`,
       getByCurrentUser: "/api/v2.5/appointment/getall",
       getByConsultant: (consultantId) =>
         `/api/v2.5/appointment/consultant/${consultantId}`,
