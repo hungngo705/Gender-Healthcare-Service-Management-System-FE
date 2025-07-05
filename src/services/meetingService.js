@@ -59,3 +59,14 @@ export const testJoinNow = async (userRole = "user1") => {
   });
   return response.data;
 };
+
+/**
+ * Lấy thông tin phòng họp Agora
+ * @param {string|number} appointmentId
+ * @param {string} userId
+ */
+export const getAgoraMeetingInfo = async (appointmentId, userId) => {
+  const url = config.api.meeting.getAgoraInfo(appointmentId);
+  const response = await apiClient.get(url, { params: { userId } });
+  return response.data;
+};

@@ -1,7 +1,7 @@
 import { useParams } from "react-router-dom";
 import { useState } from "react";
-import DailyMeetingRoom from "../components/meeting/DailyMeetingRoom";
-import MeetingLobby from "../components/meeting/MeetingLobby";
+import AgoraMeetingRoom from "../components/meeting/AgoraMeetingRoom";
+import AgoraMeetingLobby from "../components/meeting/AgoraMeetingLobby";
 
 const MeetingPage = () => {
   const { appointmentId } = useParams();
@@ -10,9 +10,9 @@ const MeetingPage = () => {
   return (
     <div className="fixed inset-0 w-screen h-screen bg-black">
       {joined ? (
-        <DailyMeetingRoom appointmentId={appointmentId} />
+        <AgoraMeetingRoom appointmentId={appointmentId} />
       ) : (
-        <MeetingLobby appointmentId={appointmentId} onJoin={() => setJoined(true)} />
+        <AgoraMeetingLobby onJoin={() => setJoined(true)} />
       )}
     </div>
   );

@@ -189,6 +189,9 @@ const config = {
       deleteRoom: (roomName) => `/api/meeting/room/${roomName}`,
       getRoomStatus: (roomName) => `/api/meeting/room/${roomName}/status`,
       testJoinNow: "/api/meeting/test-daily/join-now", // For quick testing
+      // Endpoint mới cho Agora
+      getAgoraInfo: (appointmentId) =>
+        `/api/meeting/appointment/${appointmentId}/agora-info`,
     },
   },
 

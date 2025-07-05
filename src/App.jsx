@@ -69,6 +69,7 @@ const VnpayCallback = lazy(() =>
 );
 const MeetingPage = lazy(() =>
   import(/* webpackChunkName: "meeting" */ "./pages/Meeting")
+);
 
 const PaymentReceipt = lazy(() =>
   import(
@@ -152,8 +153,6 @@ function App() {
               }
             />
             <Route
-              commentMore
-              actions
               path="services/booking"
               element={
                 <ProtectedRoute>
