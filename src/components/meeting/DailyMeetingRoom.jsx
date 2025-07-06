@@ -7,6 +7,8 @@ import {
 } from "../../services/meetingService";
 import appointmentService from "../../services/appointmentService";
 import { useAuth } from "../../contexts/AuthContext";
+import ChatPanel from "./ChatPanel";
+import chatService from "../../services/chatService";
 
 const DailyMeetingRoom = ({ appointmentId }) => {
   const { currentUser } = useAuth();
@@ -19,6 +21,7 @@ const DailyMeetingRoom = ({ appointmentId }) => {
   const [isCheckedOut, setIsCheckedOut] = useState(false);
   const [checkInLoading, setCheckInLoading] = useState(false);
   const [checkOutLoading, setCheckOutLoading] = useState(false);
+  const [showChat, setShowChat] = useState(false);
 
   useEffect(() => {
     if (!appointmentId) return;
@@ -102,6 +105,16 @@ const DailyMeetingRoom = ({ appointmentId }) => {
                 "Check-in recorded successfully, response:",
                 checkInResponse
               );
+
+              // Send system message for join
+              try {
+                await chatService.sendSystemMessage(
+                  appointmentId,
+                  `${currentUser?.fullName || currentUser?.email || 'Người dùng'} đã tham gia cuộc họp`
+                );
+              } catch (chatError) {
+                console.error("Failed to send join message:", chatError);
+              }
             } catch (err) {
               console.error("Failed to record check-in:", err);
               console.error(
@@ -129,6 +142,16 @@ const DailyMeetingRoom = ({ appointmentId }) => {
                 "Check-out recorded successfully, response:",
                 checkOutResponse
               );
+
+              // Send system message for leave
+              try {
+                await chatService.sendSystemMessage(
+                  appointmentId,
+                  `${currentUser?.fullName || currentUser?.email || 'Người dùng'} đã rời khỏi cuộc họp`
+                );
+              } catch (chatError) {
+                console.error("Failed to send leave message:", chatError);
+              }
             } catch (err) {
               console.error("Failed to record check-out:", err);
               console.error(
@@ -185,6 +208,26 @@ const DailyMeetingRoom = ({ appointmentId }) => {
       <div
         ref={containerRef}
         className="absolute inset-0 w-full h-full bg-black"
+      />
+
+      {/* Chat Toggle Button */}
+      {!loading && !error && (
+        <button
+          onClick={() => setShowChat(!showChat)}
+          className="fixed bottom-4 left-4 bg-blue-500 hover:bg-blue-600 text-white p-3 rounded-full shadow-lg z-40 transition-colors duration-200"
+          title="Toggle Chat"
+        >
+          <svg className="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M8 12h.01M12 12h.01M16 12h.01M21 12c0 4.418-4.03 8-9 8a9.863 9.863 0 01-4.255-.949L3 20l1.395-3.72C3.512 15.042 3 13.574 3 12c0-4.418 4.03-8 9-8s9 3.582 9 8z" />
+          </svg>
+        </button>
+      )}
+
+      {/* Chat Panel */}
+      <ChatPanel 
+        appointmentId={appointmentId}
+        isVisible={showChat}
+        onToggle={() => setShowChat(false)}
       />
 
       {loading && (

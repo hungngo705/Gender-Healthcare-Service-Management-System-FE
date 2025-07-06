@@ -17,6 +17,7 @@ import {
   Shield,
   CreditCard,
   Clock,
+  HelpCircle,
 } from "lucide-react";
 import userUtils from "../utils/userUtils";
 
@@ -29,6 +30,7 @@ import SecurityTab from "../components/profile/tabs/SecurityTab";
 import SecuritySessionsTab from "../components/profile/tabs/SecuritySessionsTab";
 import PaymentsTab from "../components/profile/tabs/PaymentsTab";
 import UserAvatar from "../components/user/UserAvatar";
+import QuestionsTab from "../components/profile/tabs/QuestionsTab";
 
 /**
  * Improved Customer Profile page
@@ -177,6 +179,11 @@ function CustomerProfile() {
       label: "Thanh toán",
       icon: <CreditCard size={16} className="mr-3" />,
     },
+    {
+      id: "questions",
+      label: "Hỏi đáp",
+      icon: <HelpCircle size={16} className="mr-3" />,
+    },
   ];
 
   // Render active tab content
@@ -200,6 +207,8 @@ function CustomerProfile() {
         return <SecuritySessionsTab currentUser={profileData} />;
       case "payments":
         return <PaymentsTab />;
+      case "questions":
+        return <QuestionsTab />;
       default:
         return (
           <div className="text-center py-6 bg-gray-50 rounded-lg">
