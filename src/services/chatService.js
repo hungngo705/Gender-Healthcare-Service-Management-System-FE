@@ -1,4 +1,4 @@
-import apiClient from './api';
+import apiClient from '../utils/axiosConfig';
 
 const chatService = {
     // Gửi tin nhắn chat
