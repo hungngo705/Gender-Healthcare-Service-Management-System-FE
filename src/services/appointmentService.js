@@ -50,6 +50,7 @@ const appointmentService = {
   cancel: (id) => {
     return apiService.put(config.api.appointments.cancel(id));
   },
+
   /**
    * Get appointments by user ID
    * @param {string|number} userId - The user ID
@@ -76,6 +77,10 @@ const appointmentService = {
       params
     );
   },
+
+  // Attendance
+  checkIn: (id) => apiService.put(config.api.appointments.checkIn(id)),
+  checkOut: (id) => apiService.put(config.api.appointments.checkOut(id)),
 };
 
 export default appointmentService;

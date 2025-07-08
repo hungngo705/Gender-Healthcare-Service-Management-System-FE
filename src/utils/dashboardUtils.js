@@ -13,6 +13,11 @@ export function getDashboardConfig(userRole) {
           label: "Lịch hẹn tư vấn",
           icon: "calendar",
         },
+        {
+          id: "consultantQuestions",
+          label: "Câu hỏi khách hàng",
+          icon: "help-circle",
+        },
         { id: "messages", label: "Tin nhắn", icon: "chat" },
       ],
       description: "Quản lý lịch tư vấn và xử lý xét nghiệm",
@@ -42,19 +47,29 @@ export function getDashboardConfig(userRole) {
           label: "Quản lý dịch vụ",
           icon: "clipboard",
         },
+        {
+          id: "blogManagement",
+          label: "Phê duyệt bài viết",
+          icon: "document-check",
+        },
         { id: "messages", label: "Tin nhắn", icon: "chat" },
       ],
-      description: "Thêm và quản lý các dịch vụ",
+      description: "Thêm và quản lý các dịch vụ, phê duyệt nội dung",
     },
     admin: {
       title: "Bảng điều khiển quản trị viên",
       menuItems: [
         { id: "overview", label: "Tổng quan", icon: "chart-pie" },
         { id: "userManagement", label: "Quản lý người dùng", icon: "users" },
+        {
+          id: "blogManagement",
+          label: "Quản lý nội dung",
+          icon: "document-text",
+        },
         { id: "reports", label: "Báo cáo & Thống kê", icon: "chart-bar" },
         { id: "messages", label: "Tin nhắn", icon: "chat" },
       ],
-      description: "Thêm và quản lý người dùng và cài đặt hệ thống",
+      description: "Thêm và quản lý người dùng, nội dung và cài đặt hệ thống",
     },
   };
 

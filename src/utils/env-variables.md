@@ -5,7 +5,7 @@ This document describes the environment variables used in the project.
 ## API Configuration
 
 ```
-VITE_API_URL=https://api.example.com
+VITE_API_URL=://your-api-url.com
 ```
 
 ## Feature Flags

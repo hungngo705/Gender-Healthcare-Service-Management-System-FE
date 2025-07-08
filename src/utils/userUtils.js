@@ -25,9 +25,6 @@ const userUtils = {
    */ getAvatarInfo: (user) => {
     if (!user) return { initial: "?", imageUrl: null };
 
-    // Log user object to help debug avatar issues
-    console.log("Avatar info for user:", user);
-
     // Nếu có avatar URL trong đối tượng user (check all possible field names)
     if (
       user.avatar ||
@@ -42,7 +39,6 @@ const userUtils = {
         user.profileImage ||
         user.imageUrl ||
         user.photo;
-      console.log("Found avatar URL:", imageUrl);
 
       // Only return valid URLs (some backends might return empty strings)
       if (imageUrl && typeof imageUrl === "string" && imageUrl.trim() !== "") {

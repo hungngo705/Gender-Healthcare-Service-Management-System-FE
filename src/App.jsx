@@ -67,6 +67,15 @@ const PaymentFailed = lazy(() =>
 const VnpayCallback = lazy(() =>
   import(/* webpackChunkName: "vnpay-callback" */ "./pages/VnpayCallback")
 );
+const MeetingPage = lazy(() =>
+  import(/* webpackChunkName: "meeting" */ "./pages/Meeting")
+);
+
+const PaymentReceipt = lazy(() =>
+  import(
+    /* webpackChunkName: "payment-receipt" */ "./pages/payment/PaymentReceipt"
+  )
+);
 
 function App() {
   return (
@@ -81,6 +90,7 @@ function App() {
         pauseOnFocusLoss
         draggable
         pauseOnHover
+        limit={1}
       />
       <Suspense fallback={<LoadingSpinner />}>
         {" "}
@@ -94,6 +104,16 @@ function App() {
           {/* VNPay callback - needs to be outside Layout for proper processing */}
           <Route path="/vnpay-callback" element={<VnpayCallback />} />
           <Route path="/payment-failed" element={<PaymentFailed />} />
+
+          {/* Meeting room route (protected) */}
+          <Route
+            path="/meeting/:appointmentId"
+            element={
+              <ProtectedRoute>
+                <MeetingPage />
+              </ProtectedRoute>
+            }
+          />
 
           {/* Dashboard routes for staff and higher */}
           <Route
@@ -145,6 +165,10 @@ function App() {
             {/* Hệ thống thanh toán */}
             <Route path="payment" element={<Payment />} />
             <Route path="payment-success" element={<PaymentSuccess />} />
+            <Route
+              path="payment/receipt/:transactionId"
+              element={<PaymentReceipt />}
+            />
             {/* Trang hồ sơ khách hàng */}{" "}
             <Route
               path="profile"
@@ -157,7 +181,7 @@ function App() {
             <Route
               path="profile/:tab"
               element={
-                <ProtectedRoute roleRequired="customer,admin,manager,staff,consultant">
+                <ProtectedRoute>
                   <CustomerProfile />
                 </ProtectedRoute>
               }

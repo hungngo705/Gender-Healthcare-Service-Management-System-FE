@@ -119,39 +119,28 @@ function AppointmentsTab({ navigate }) {
 
       // Step 3: Filter appointments for this user
       const allAppointments = appointmentsResponse.data?.data || [];
+
+      // Debug: Log all appointments to see the data structure
+      console.log("All appointments in database:", allAppointments);
+      console.log("Current user ID:", currentUserId);
+
       const userAppointments = allAppointments.filter(
         (appointment) => appointment.customerId === currentUserId
       );
 
-      console.log("User appointments:", userAppointments);
-      setAppointments(userAppointments);
+      console.log("User appointments after filtering:", userAppointments);
 
-      // Step 4: Check completed appointments for feedback
-      const feedbackChecks = {};
-      const completedAppointments = userAppointments.filter(
-        (app) => app.status === 1 || app.status === "1"
+      // Instead of fetching meeting info for all appointments, just set the basic appointment data
+      setAppointments(
+        userAppointments.map((appointment) => ({
+          ...appointment,
+          meetingInfo: null,
+          hasMeetingRoom: false,
+          isExpired: false,
+          meetingMessage: null,
+        }))
       );
 
-      // Check each completed appointment for feedback
-      await Promise.all(
-        completedAppointments.map(async (appointment) => {
-          try {
-            const feedbackResponse = await feedbackService.getByAppointment(
-              appointment.id
-            );
-            console.log(`Feedback for appointment ${appointment.id}:`, feedbackResponse);
-            // If feedback exists, mark this appointment
-            if (feedbackResponse && feedbackResponse.data) {
-              feedbackChecks[appointment.id] = feedbackResponse.data;
-            }
-          } catch (feedbackError) {
-            // No feedback exists, continue
-            console.log(`No feedback for appointment ${appointment.id}`);
-          }
-        })
-      );
-
-      setAppointmentsWithFeedback(feedbackChecks);
       setError(null);
     } catch (err) {
       console.error("Error fetching appointments:", err);
@@ -268,10 +257,10 @@ function AppointmentsTab({ navigate }) {
 
       // Call the cancel API with the appointment ID
       await appointmentService.cancel(appointmentToCancel.id);
-      
+
       // Show success message
       setCancelSuccess(true);
-      
+
       // Reload all appointment data
       await fetchData();
 
@@ -443,6 +432,18 @@ function AppointmentsTab({ navigate }) {
                     scope="col"
                     className="w-1/6 px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider"
                   >
+                    Giờ vào
+                  </th>
+                  <th
+                    scope="col"
+                    className="w-1/6 px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider"
+                  >
+                    Giờ ra
+                  </th>
+                  <th
+                    scope="col"
+                    className="w-1/6 px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider"
+                  >
                     Trạng thái
                   </th>
                   <th
@@ -496,6 +497,38 @@ function AppointmentsTab({ navigate }) {
                       <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-500">
                         {getTimeBySlot(appointment.slot)}
                       </td>
+                      <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-500">
+                        {appointment.checkInTimeUtc || appointment.checkInTime
+                          ? new Date(
+                              appointment.checkInTimeUtc ||
+                                appointment.checkInTime
+                            ).toLocaleString("vi-VN", {
+                              hour: "2-digit",
+                              minute: "2-digit",
+                              second: "2-digit",
+                              day: "2-digit",
+                              month: "2-digit",
+                              year: "numeric",
+                              timeZone: "Asia/Ho_Chi_Minh",
+                            })
+                          : "-"}
+                      </td>
+                      <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-500">
+                        {appointment.checkOutTimeUtc || appointment.checkOutTime
+                          ? new Date(
+                              appointment.checkOutTimeUtc ||
+                                appointment.checkOutTime
+                            ).toLocaleString("vi-VN", {
+                              hour: "2-digit",
+                              minute: "2-digit",
+                              second: "2-digit",
+                              day: "2-digit",
+                              month: "2-digit",
+                              year: "numeric",
+                              timeZone: "Asia/Ho_Chi_Minh",
+                            })
+                          : "-"}
+                      </td>
                       <td className="px-6 py-4 whitespace-nowrap">
                         <span
                           className={`px-2 inline-flex text-xs leading-5 font-semibold rounded-full ${statusInfo.className}`}
@@ -514,14 +547,17 @@ function AppointmentsTab({ navigate }) {
                           const isScheduled =
                             appointment.status === 0 ||
                             appointment.status === "0";
-                          const hasFeedback = appointmentsWithFeedback[appointment.id];
+                          const hasFeedback =
+                            appointmentsWithFeedback[appointment.id];
 
                           return (
                             <>
-                              {isCompleted && (
-                                hasFeedback ? (
+                              {isCompleted &&
+                                (hasFeedback ? (
                                   <button
-                                    onClick={() => handleViewFeedback(appointment.id)}
+                                    onClick={() =>
+                                      handleViewFeedback(appointment.id)
+                                    }
                                     className="inline-flex items-center px-3 py-1.5 border border-transparent text-xs font-medium rounded-full text-indigo-700 bg-indigo-100 hover:bg-indigo-200 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-indigo-500 transition-colors duration-200"
                                   >
                                     <Star className="w-3 h-3 mr-1 fill-indigo-500" />
@@ -529,18 +565,61 @@ function AppointmentsTab({ navigate }) {
                                   </button>
                                 ) : (
                                   <button
-                                    onClick={() => handleOpenFeedbackModal(appointment)}
+                                    onClick={() =>
+                                      handleOpenFeedbackModal(appointment)
+                                    }
                                     className="inline-flex items-center px-3 py-1.5 border border-transparent text-xs font-medium rounded-full text-yellow-700 bg-yellow-100 hover:bg-yellow-200 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-yellow-500 transition-colors duration-200"
                                   >
                                     <Star className="w-3 h-3 mr-1" />
                                     Đánh giá
                                   </button>
-                                )
-                              )}
+                                ))}
+
+                              {isScheduled &&
+                                (appointment.isExpired ? (
+                                  <span className="inline-flex items-center px-3 py-1.5 text-xs font-medium text-gray-500 bg-gray-100 rounded-full">
+                                    <svg
+                                      xmlns="http://www.w3.org/2000/svg"
+                                      className="w-3 h-3 mr-1"
+                                      viewBox="0 0 20 20"
+                                      fill="currentColor"
+                                    >
+                                      <path
+                                        fillRule="evenodd"
+                                        d="M10 18a8 8 0 100-16 8 8 0 000 16zM8.707 7.293a1 1 0 00-1.414 1.414L8.586 10l-1.293 1.293a1 1 0 101.414 1.414L10 11.414l1.293 1.293a1 1 0 001.414-1.414L11.414 10l1.293-1.293a1 1 0 00-1.414-1.414L10 8.586 8.707 7.293z"
+                                        clipRule="evenodd"
+                                      />
+                                    </svg>
+                                    {appointment.meetingMessage ||
+                                      "Cuộc hẹn đã kết thúc"}
+                                  </span>
+                                ) : (
+                                  <button
+                                    onClick={() =>
+                                      navigate(
+                                        `/meeting/${appointment.id}?start=true`
+                                      )
+                                    }
+                                    className="inline-flex items-center px-3 py-1.5 border border-transparent text-xs font-medium rounded-full text-emerald-700 bg-emerald-100 hover:bg-emerald-200 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-emerald-500 transition-colors duration-200 mr-2"
+                                  >
+                                    <svg
+                                      xmlns="http://www.w3.org/2000/svg"
+                                      className="w-3 h-3 mr-1"
+                                      viewBox="0 0 20 20"
+                                      fill="currentColor"
+                                    >
+                                      <path d="M2 6a2 2 0 012-2h6a2 2 0 012 2v8a2 2 0 01-2 2H4a2 2 0 01-2-2V6z" />
+                                      <path d="M14 6a2 2 0 012-2h2a2 2 0 012 2v8a2 2 0 01-2 2h-2a2 2 0 01-2-2V6z" />
+                                    </svg>
+                                    Bắt đầu
+                                  </button>
+                                ))}
 
                               {isScheduled && (
                                 <button
-                                  onClick={() => handleOpenCancelModal(appointment)}
+                                  onClick={() =>
+                                    handleOpenCancelModal(appointment)
+                                  }
                                   className="inline-flex items-center px-3 py-1.5 border border-transparent text-xs font-medium rounded-full text-red-700 bg-red-100 hover:bg-red-200 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-red-500 transition-colors duration-200"
                                 >
                                   <svg
@@ -1117,16 +1196,15 @@ function AppointmentsTab({ navigate }) {
                           Ngày đánh giá
                         </label>
                         <div className="text-sm text-gray-600">
-                          {new Date(viewingFeedback.createdAt).toLocaleDateString(
-                            "vi-VN",
-                            {
-                              year: "numeric",
-                              month: "long",
-                              day: "numeric",
-                              hour: "2-digit",
-                              minute: "2-digit",
-                            }
-                          )}
+                          {new Date(
+                            viewingFeedback.createdAt
+                          ).toLocaleDateString("vi-VN", {
+                            year: "numeric",
+                            month: "long",
+                            day: "numeric",
+                            hour: "2-digit",
+                            minute: "2-digit",
+                          })}
                         </div>
                       </div>
 
