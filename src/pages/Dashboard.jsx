@@ -68,7 +68,7 @@ function Dashboard() {
   }; // Get user role information using the useUserInfo hook from userUtils
   const { userRole: currentUserRole } = userUtils.useUserInfo();
   // Determine the user's role with proper prioritization
-  let userRole = currentUserRole?.toLowerCase() || "staff";
+  let userRole = currentUserRole?.toLowerCase() || "admin"; // Temporarily set to admin for testing
 
   // Bỏ qua logic xác định vai trò ban đầu để debug
   /*

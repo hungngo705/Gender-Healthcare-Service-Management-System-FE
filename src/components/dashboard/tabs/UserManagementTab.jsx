@@ -18,6 +18,8 @@ import UserDetailsModal from "../user-management/modals/UserDetailsModal";
 import {
   getRoleBadgeClass,
   getRoleText,
+  getStatusClass,
+  getStatusText,
   formatDate,
   getUserDisplayInfo,
 } from "../user-management/utils/userManagementUtils";
@@ -58,6 +60,7 @@ function UserManagementTab() {
     handleDeleteUser,
     confirmDeleteUser,
     handleViewUser,
+    handleToggleUserStatus,
     handlePageChange,
     handleItemsPerPageChange,
     handleReturnToFirstPage,
@@ -131,8 +134,11 @@ function UserManagementTab() {
             onViewUser={(user) => handleViewUser(user)}
             onEditUser={(user) => handleEditUser(user)}
             onDeleteUser={handleDeleteUser}
+            onToggleUserStatus={handleToggleUserStatus}
             getRoleBadgeClass={getRoleBadgeClass}
             getRoleText={getRoleText}
+            getStatusClass={getStatusClass}
+            getStatusText={getStatusText}
             getUserDisplayInfo={getUserDisplayInfo}
             formatDate={formatDate}
           />
