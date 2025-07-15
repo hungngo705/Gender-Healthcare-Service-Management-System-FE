@@ -1,8 +1,7 @@
 import React from "react";
 import PropTypes from "prop-types";
-import { LogOut } from "lucide-react";
 
-function Sidebar({ menuItems, activeTab, setActiveTab, onLogout }) {
+function Sidebar({ menuItems, activeTab, setActiveTab }) {
   // Lấy thông tin userRole trực tiếp từ Dashboard.jsx thông qua props.menuItems
   // Không áp dụng bộ lọc menu items ở đây vì menuItems đã được lọc từ dashboardConfig
 

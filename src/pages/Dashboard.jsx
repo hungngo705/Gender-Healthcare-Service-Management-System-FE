@@ -1,5 +1,4 @@
 import { useState, useEffect, useCallback } from "react";
-import { useNavigate } from "react-router-dom";
 import { useAuth } from "../contexts/AuthContext";
 import { getDashboardConfig } from "../utils/dashboardUtils";
 import userUtils from "../utils/userUtils";
@@ -43,7 +42,6 @@ import {
 
 function Dashboard() {
   const { logout } = useAuth();
-  const navigate = useNavigate();
   const [sidebarOpen, setSidebarOpen] = useState(false);
   const [activeTab, setActiveTab] = useState("overview"); // Custom setter for activeTab
   const handleSetActiveTab = useCallback((tabId) => {
@@ -190,9 +188,9 @@ function Dashboard() {
       );
     }
     switch (activeTab) {
-      // case "overview":
-      //   console.log(`🎯 Rendering OverviewTab with role: ${userRole}`);
-      //   return <OverviewTab role={userRole} />;
+      case "overview":
+        console.log(`🎯 Rendering OverviewTab with role: ${userRole}`);
+        return <OverviewTab role={userRole} />;
       case "appointments":
         console.log(`Rendering AppointmentsTab with role: ${userRole}`);
         return <AppointmentsTab role={userRole} />;
@@ -236,7 +234,6 @@ function Dashboard() {
   };
   return (
     <div className="flex flex-col h-screen bg-gray-100">
-      {" "}
       {/* Dashboard Header */}
       <DashboardHeader
         title={dashboardConfig.title}
@@ -246,10 +243,8 @@ function Dashboard() {
         setSidebarOpen={setSidebarOpen}
       />
       <div className="flex flex-1 overflow-hidden">
-        {" "}
         {/* Sidebar - Desktop */}
         <div className="hidden lg:block lg:w-64 flex-shrink-0">
-          {" "}
           <Sidebar
             menuItems={menuItems}
             activeTab={activeTab}

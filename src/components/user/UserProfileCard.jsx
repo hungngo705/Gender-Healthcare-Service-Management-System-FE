@@ -60,7 +60,12 @@ const UserProfileCard = ({
 
         <div className="flex flex-col sm:flex-row sm:items-center gap-4">
           <div className="flex-shrink-0">
-            <UserAvatar size="lg" showBadge={false} />
+            <UserAvatar
+              size="lg"
+              showBadge={false}
+              imageUrl={currentUser.avatarUrl || currentUser.avatar}
+              initial={displayName?.charAt(0)?.toUpperCase()}
+            />
           </div>
 
           <div className="flex-1">
