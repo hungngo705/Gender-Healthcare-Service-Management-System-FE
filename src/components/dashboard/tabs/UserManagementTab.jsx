@@ -134,8 +134,12 @@ function UserManagementTab() {
             onViewUser={(user) => handleViewUser(user)}
             onEditUser={(user) => handleEditUser(user)}
             onDeleteUser={handleDeleteUser}
+            onToggleUserStatus={handleToggleUserStatus}
+            submitting={submitting}
             getRoleBadgeClass={getRoleBadgeClass}
             getRoleText={getRoleText}
+            getStatusClass={getStatusClass}
+            getStatusText={getStatusText}
             getUserDisplayInfo={getUserDisplayInfo}
             formatDate={formatDate}
           />

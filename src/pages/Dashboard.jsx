@@ -1,5 +1,4 @@
 import { useState, useEffect, useCallback } from "react";
-import { useNavigate } from "react-router-dom";
 import { useAuth } from "../contexts/AuthContext";
 import { getDashboardConfig } from "../utils/dashboardUtils";
 import userUtils from "../utils/userUtils";
@@ -23,6 +22,7 @@ import BlogManagementTab from "../components/dashboard/tabs/BlogManagementTab";
 import ServicesManagementTab from "../components/dashboard/tabs/ServicesManagementTab";
 import UserManagementTab from "../components/dashboard/tabs/UserManagementTab";
 import STITestingManagementTab from "../components/dashboard/tabs/STITestingManagementTab";
+import ConsultantQuestionsTab from "../components/dashboard/tabs/ConsultantQuestionsTab";
 
 // Lucide Icons
 import {
@@ -42,7 +42,6 @@ import {
 
 function Dashboard() {
   const { logout } = useAuth();
-  const navigate = useNavigate();
   const [sidebarOpen, setSidebarOpen] = useState(false);
   const [activeTab, setActiveTab] = useState("overview"); // Custom setter for activeTab
   const handleSetActiveTab = useCallback((tabId) => {
@@ -69,7 +68,7 @@ function Dashboard() {
   }; // Get user role information using the useUserInfo hook from userUtils
   const { userRole: currentUserRole } = userUtils.useUserInfo();
   // Determine the user's role with proper prioritization
-  let userRole = currentUserRole?.toLowerCase() || "staff";
+  let userRole = currentUserRole?.toLowerCase() || "admin"; // Temporarily set to admin for testing
 
   // Bỏ qua logic xác định vai trò ban đầu để debug
   /*
@@ -140,6 +139,7 @@ function Dashboard() {
         // Consultant-specific tabs
         consultantAppointments: ["consultant"],
         testProcessing: ["consultant"],
+        consultantQuestions: ["consultant"],
 
         // Staff-specific tabs
         blogManagement: ["staff", "manager", "admin"],
@@ -221,6 +221,8 @@ function Dashboard() {
       case "patients":
         console.log(`Rendering PatientsTab with role: ${userRole}`);
         return <PatientsTab role={userRole} />;
+      case "consultantQuestions":
+        return <ConsultantQuestionsTab />;
       default:
         console.log(`Tab ${activeTab} is under development`);
         return (

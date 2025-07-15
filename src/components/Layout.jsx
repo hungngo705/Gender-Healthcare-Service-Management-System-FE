@@ -3,6 +3,7 @@ import { Outlet } from "react-router-dom";
 import Header from "./Header";
 import Footer from "./Footer";
 import LoadingSpinner from "./LoadingSpinner";
+import ChatWidget from "./chat/ChatWidget";
 
 function Layout() {
   return (
@@ -14,6 +15,7 @@ function Layout() {
         </Suspense>
       </main>
       <Footer />
+      <ChatWidget />
     </div>
   );
 }
