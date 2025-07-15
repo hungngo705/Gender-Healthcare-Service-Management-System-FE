@@ -1,5 +1,6 @@
 import React from "react";
-import { MoreVertical, Edit, Trash2, Eye, Mail, Phone } from "lucide-react";
+import PropTypes from "prop-types";
+import { MoreVertical, Edit, Trash2, Eye, Mail, Phone, XCircle, CheckCircle } from "lucide-react";
 
 const UserTable = ({
   paginatedUsers,
@@ -8,8 +9,12 @@ const UserTable = ({
   onViewUser,
   onEditUser,
   onDeleteUser,
+  onToggleUserStatus,
+  submitting,
   getRoleBadgeClass,
   getRoleText,
+  getStatusClass,
+  getStatusText,
   getUserDisplayInfo,
   formatDate,
 }) => {
@@ -30,7 +35,12 @@ const UserTable = ({
             >
               Vai trò
             </th>
-            {/* Đã xóa cột Trạng thái */}
+            <th
+              scope="col"
+              className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider"
+            >
+              Trạng thái
+            </th>
             <th
               scope="col"
               className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider"
@@ -96,7 +106,15 @@ const UserTable = ({
                   </div>
                 )}
               </td>
-              {/* Đã xóa cột hiển thị trạng thái */}
+              <td className="px-6 py-4 whitespace-nowrap">
+                <span
+                  className={`px-2 inline-flex text-xs leading-5 font-semibold rounded-full ${getStatusClass(
+                    user
+                  )}`}
+                >
+                  {getStatusText(user)}
+                </span>
+              </td>
               <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-500">
                 <div>Hoạt động gần nhất: {formatDate(user.lastActive)}</div>
                 <div>Ngày tạo: {formatDate(user.createdAt)}</div>
@@ -138,7 +156,40 @@ const UserTable = ({
                           <Edit className="h-4 w-4 mr-3" />
                           Chỉnh sửa
                         </button>
-                        {/* Đã xóa nút kích hoạt/vô hiệu hóa */}
+                        {/* Toggle status button */}
+                        {(() => {
+                          const isActive =
+                            user.isActive !== undefined
+                              ? user.isActive
+                              : user.status === "active";
+                          return isActive ? (
+                            <button
+                              className={`flex items-center w-full px-4 py-2 text-sm transition-colors ${
+                                submitting 
+                                  ? 'text-gray-400 bg-gray-50 cursor-not-allowed' 
+                                  : 'text-red-700 hover:bg-red-50'
+                              }`}
+                              onClick={() => !submitting && onToggleUserStatus(user)}
+                              disabled={submitting}
+                            >
+                              <XCircle className="h-4 w-4 mr-3" />
+                              {submitting ? 'Đang xử lý...' : 'Vô hiệu hóa'}
+                            </button>
+                          ) : (
+                            <button
+                              className={`flex items-center w-full px-4 py-2 text-sm transition-colors ${
+                                submitting 
+                                  ? 'text-gray-400 bg-gray-50 cursor-not-allowed' 
+                                  : 'text-green-700 hover:bg-green-50'
+                              }`}
+                              onClick={() => !submitting && onToggleUserStatus(user)}
+                              disabled={submitting}
+                            >
+                              <CheckCircle className="h-4 w-4 mr-3" />
+                              {submitting ? 'Đang xử lý...' : 'Kích hoạt'}
+                            </button>
+                          );
+                        })()}
                         <hr className="my-1" />
                         <button
                           className="flex items-center w-full px-4 py-2 text-sm text-red-700 hover:bg-red-50 transition-colors"
@@ -158,6 +209,28 @@ const UserTable = ({
       </table>
     </div>
   );
+};
+
+UserTable.propTypes = {
+  paginatedUsers: PropTypes.array.isRequired,
+  showActionMenu: PropTypes.oneOfType([PropTypes.string, PropTypes.number]),
+  setShowActionMenu: PropTypes.func.isRequired,
+  onViewUser: PropTypes.func.isRequired,
+  onEditUser: PropTypes.func.isRequired,
+  onDeleteUser: PropTypes.func.isRequired,
+  onToggleUserStatus: PropTypes.func.isRequired,
+  submitting: PropTypes.bool,
+  getRoleBadgeClass: PropTypes.func.isRequired,
+  getRoleText: PropTypes.func.isRequired,
+  getStatusClass: PropTypes.func.isRequired,
+  getStatusText: PropTypes.func.isRequired,
+  getUserDisplayInfo: PropTypes.func.isRequired,
+  formatDate: PropTypes.func.isRequired,
+};
+
+UserTable.defaultProps = {
+  showActionMenu: null,
+  submitting: false,
 };
 
 export default UserTable;
