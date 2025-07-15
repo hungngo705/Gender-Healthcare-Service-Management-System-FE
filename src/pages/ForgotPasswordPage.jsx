@@ -22,15 +22,16 @@ function ForgotPasswordPage() {
     setIsSubmitting(true);
 
     try {
-      // Call the forgot password API
       await authService.forgotPassword(email);
       setIsSubmitted(true);
+      toastService.success("Mã xác nhận đã được gửi đến email của bạn");
     } catch (error) {
       console.error("Forgot password error:", error);
-      toastService.error(
+      const errorMessage =
         error.response?.data?.message ||
-          "Không thể gửi email khôi phục mật khẩu. Vui lòng thử lại sau."
-      );
+        error.response?.data?.error ||
+        "Không thể gửi email khôi phục mật khẩu. Vui lòng thử lại sau.";
+      toastService.error(errorMessage);
     } finally {
       setIsSubmitting(false);
     }
@@ -74,6 +75,7 @@ function ForgotPasswordPage() {
 
               <Link
                 to="/reset-password"
+                state={{ email }}
                 className="w-full inline-flex justify-center items-center px-4 py-3 bg-indigo-600 text-white rounded-lg hover:bg-indigo-700 transition-colors"
               >
                 <span>Tiếp tục đặt lại mật khẩu</span>
@@ -81,6 +83,12 @@ function ForgotPasswordPage() {
               </Link>
 
               <div className="mt-4">
+                <button
+                  onClick={() => setIsSubmitted(false)}
+                  className="text-sm text-gray-600 hover:underline mr-4"
+                >
+                  Gửi lại
+                </button>
                 <Link
                   to="/login"
                   className="text-sm text-indigo-600 hover:underline"
