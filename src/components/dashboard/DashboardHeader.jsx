@@ -1,12 +1,14 @@
 import React, { useState, useRef, useEffect } from "react";
 import PropTypes from "prop-types";
 import { Link, useNavigate } from "react-router-dom";
-import { Bell, Search, Menu, User, LogOut, Settings } from "lucide-react";
+import { Menu, User, LogOut } from "lucide-react";
 import logo from "../../assets/logo2.svg";
 import UserAvatar from "../user/UserAvatar";
 import userService from "../../services/userService"; // Changed from userUtils
 import { useAuth } from "../../contexts/AuthContext";
 
+// Import NotificationBell component
+import NotificationBell from "../ui/NotificationBell";
 function DashboardHeader({
   title,
   activeTabLabel,

@@ -13,6 +13,7 @@ import {
 } from "lucide-react";
 import * as meetingService from "../../services/meetingService";
 import appointmentService from "../../services/appointmentService";
+import DailyMeetingRoom from "./DailyMeetingRoom";
 
 const MeetingLobby = () => {
   const { appointmentId } = useParams();
@@ -31,6 +32,7 @@ const MeetingLobby = () => {
   const [joiningMeeting, setJoiningMeeting] = useState(false);
   const [meetingWindow, setMeetingWindow] = useState(null);
   const [fetchingMeetingInfo, setFetchingMeetingInfo] = useState(false);
+  const [inMeeting, setInMeeting] = useState(false);
 
   // Update current time every second for countdown
   useEffect(() => {
@@ -128,7 +130,7 @@ const MeetingLobby = () => {
   }, [currentTime, meetingInfo, canJoin, derivedAvailableFrom]);
 
   const handleJoinMeeting = async () => {
-    if (!meetingInfo || !meetingInfo.roomUrl) return;
+    if (!meetingInfo) return;
 
     setJoiningMeeting(true);
 
@@ -139,17 +141,15 @@ const MeetingLobby = () => {
         appointmentId
       );
       await appointmentService.checkIn(appointmentId);
-      console.log("Check-in successful, opening meeting room");
+      console.log("Check-in successful, entering meeting room");
 
-      // Open Daily.co meeting in new tab và giữ reference để theo dõi
-      const newWindow = window.open(meetingInfo.roomUrl, "_blank");
-      setMeetingWindow(newWindow);
+      // Chuyển sang chế độ meeting thay vì mở tab mới
+      setInMeeting(true);
     } catch (error) {
       console.error("Check-in failed:", error);
       // Still allow user to join meeting even if check-in fails
-      console.log("Check-in failed, but opening meeting room anyway");
-      const fallbackWindow = window.open(meetingInfo.roomUrl, "_blank");
-      setMeetingWindow(fallbackWindow);
+      console.log("Check-in failed, but entering meeting room anyway");
+      setInMeeting(true);
 
       // Optional: Show toast notification about check-in failure
       alert(
@@ -243,6 +243,22 @@ const MeetingLobby = () => {
             </div>
           </div>
         </div>
+      </div>
+    );
+  }
+
+  // Nếu đang trong meeting, hiển thị DailyMeetingRoom
+  if (inMeeting) {
+    return (
+      <div className="fixed inset-0 z-50">
+        <DailyMeetingRoom appointmentId={appointmentId} />
+        {/* Nút thoát meeting */}
+        <button
+          onClick={() => setInMeeting(false)}
+          className="fixed top-4 right-4 bg-red-500 hover:bg-red-600 text-white px-4 py-2 rounded-lg shadow-lg z-50"
+        >
+          Thoát Meeting
+        </button>
       </div>
     );
   }

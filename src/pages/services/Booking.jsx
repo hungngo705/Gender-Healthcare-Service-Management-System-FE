@@ -240,22 +240,22 @@ const Booking = () => {
     const today = new Date();
     const isToday = isSameDay(selectedDate, today);
 
-    if (isToday) {
-      const currentHour = today.getHours();
+    // if (isToday) {
+    //   const currentHour = today.getHours();
 
-      // Map slot IDs to their starting hours
-      const slotStartHours = {
-        0: 8, // 8:00 - 10:00
-        1: 10, // 10:00 - 12:00
-        2: 13, // 13:00 - 15:00
-        3: 15, // 15:00 - 17:00
-      };
+    //   // Map slot IDs to their starting hours
+    //   const slotStartHours = {
+    //     0: 8, // 8:00 - 10:00
+    //     1: 10, // 10:00 - 12:00
+    //     2: 13, // 13:00 - 15:00
+    //     3: 15, // 15:00 - 17:00
+    //   };
 
-      // If current hour is >= the slot's start hour, the slot is unavailable
-      if (currentHour >= slotStartHours[slotId]) {
-        return true; // Slot has already passed for today
-      }
-    }
+    //   // If current hour is >= the slot's start hour, the slot is unavailable
+    //   if (currentHour >= slotStartHours[slotId]) {
+    //     return true; // Slot has already passed for today
+    //   }
+    // }
 
     // If this date doesn't exist in bookedShifts, all slots are available
     if (!selectedConsultant.bookedShifts[dateKey]) {

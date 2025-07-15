@@ -53,6 +53,7 @@ const config = {
       getById: (id) => `/api/v2.5/user/${id}`,
       update: (id) => `/api/v2.5/user/update/${id}`,
       delete: (id) => `/api/v2.5/user/delete/${id}`,
+      toggleStatus: (id) => `/api/v2.5/user/toggle-status/${id}`,
       profile: "/api/v2.5/user/profile/me",
       changePassword: "/api/v2.5/user/change-password",
     }, // Consultant endpoints - add API prefix

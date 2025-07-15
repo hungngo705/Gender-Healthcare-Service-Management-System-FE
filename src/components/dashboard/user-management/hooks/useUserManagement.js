@@ -231,22 +231,10 @@ export const useUserManagement = () => {
 
   const handleToggleUserStatus = async (user) => {
     try {
-      const currentActive =
-        user.isActive !== undefined ? user.isActive : user.status === "active";
-      const newActive = !currentActive;
-
-      const updateData = {
-        isActive: newActive,
-        status: newActive ? "active" : "inactive",
-      };
-
-      await userService.updateUser(user.id, updateData);
+      setSubmitting(true);
+      await userService.toggleUserStatus(user.id);
+      setShowActionMenu(null);
       await loadUsers();
-      toastService.success(
-        `Người dùng đã được ${
-          newActive ? "kích hoạt" : "vô hiệu hóa"
-        } thành công!`
-      );
     } catch (error) {
       console.error("Error toggling user status:", error);
       toastService.error(
@@ -254,6 +242,8 @@ export const useUserManagement = () => {
           error.response?.data?.message || error.message
         }`
       );
+    } finally {
+      setSubmitting(false);
     }
   };
 
