@@ -1,10 +1,10 @@
 [build]
   publish = "dist"
-  command = "npm ci && npm run build"
+  command = "npm ci --include=dev && npm run build"
 
 [build.environment]
   NODE_VERSION = "18.19.0"
-  NPM_FLAGS = "--production=false"
+  NPM_FLAGS = "--legacy-peer-deps --include=dev"
   CI = "true"
 
 [[redirects]]
