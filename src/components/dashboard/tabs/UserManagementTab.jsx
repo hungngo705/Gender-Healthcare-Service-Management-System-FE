@@ -135,6 +135,7 @@ function UserManagementTab() {
             onEditUser={(user) => handleEditUser(user)}
             onDeleteUser={handleDeleteUser}
             onToggleUserStatus={handleToggleUserStatus}
+            submitting={submitting}
             getRoleBadgeClass={getRoleBadgeClass}
             getRoleText={getRoleText}
             getStatusClass={getStatusClass}
