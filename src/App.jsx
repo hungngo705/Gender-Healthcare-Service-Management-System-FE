@@ -77,6 +77,12 @@ const PaymentReceipt = lazy(() =>
   )
 );
 
+// 1. LAZY LOAD THE TEST PAGE
+const MeetingTestPage = lazy(() =>
+  import(/* webpackChunkName: "meeting-test" */ "./pages/MeetingTest")
+);
+
+
 function App() {
   return (
     <>
@@ -114,6 +120,17 @@ function App() {
               </ProtectedRoute>
             }
           />
+          
+          {/* 2. ADD THE NEW ROUTE FOR TESTING */}
+          <Route
+            path="/test-meeting"
+            element={
+              <ProtectedRoute>
+                <MeetingTestPage />
+              </ProtectedRoute>
+            }
+          />
+
 
           {/* Dashboard routes for staff and higher */}
           <Route
