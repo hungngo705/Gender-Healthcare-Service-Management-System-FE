@@ -1,14 +1,6 @@
 import React from "react";
-import {
-  MoreVertical,
-  Edit,
-  Trash2,
-  Eye,
-  CheckCircle,
-  XCircle,
-  Mail,
-  Phone,
-} from "lucide-react";
+import PropTypes from "prop-types";
+import { MoreVertical, Edit, Trash2, Eye, Mail, Phone, XCircle, CheckCircle } from "lucide-react";
 
 const UserTable = ({
   paginatedUsers,
@@ -16,8 +8,9 @@ const UserTable = ({
   setShowActionMenu,
   onViewUser,
   onEditUser,
-  onToggleUserStatus,
   onDeleteUser,
+  onToggleUserStatus,
+  submitting,
   getRoleBadgeClass,
   getRoleText,
   getStatusClass,
@@ -70,7 +63,7 @@ const UserTable = ({
                   <div className="flex-shrink-0 h-12 w-12">
                     <img
                       className="h-12 w-12 rounded-full object-cover"
-                      src={user.avatar}
+                      src={user.avatarUrl}
                       alt={user.name}
                       onError={(e) => {
                         e.target.style.display = "none";
@@ -147,7 +140,6 @@ const UserTable = ({
                           type="button"
                           className="flex items-center w-full px-4 py-2 text-sm text-gray-700 hover:bg-gray-100 transition-colors"
                           onClick={() => {
-                            // Direct invocation without event objects
                             onViewUser(user);
                           }}
                         >
@@ -158,7 +150,6 @@ const UserTable = ({
                           type="button"
                           className="flex items-center w-full px-4 py-2 text-sm text-gray-700 hover:bg-gray-100 transition-colors"
                           onClick={() => {
-                            // Direct invocation without event objects
                             onEditUser(user);
                           }}
                         >
@@ -173,19 +164,29 @@ const UserTable = ({
                               : user.status === "active";
                           return isActive ? (
                             <button
-                              className="flex items-center w-full px-4 py-2 text-sm text-red-700 hover:bg-red-50 transition-colors"
-                              onClick={() => onToggleUserStatus(user)}
+                              className={`flex items-center w-full px-4 py-2 text-sm transition-colors ${
+                                submitting 
+                                  ? 'text-gray-400 bg-gray-50 cursor-not-allowed' 
+                                  : 'text-red-700 hover:bg-red-50'
+                              }`}
+                              onClick={() => !submitting && onToggleUserStatus(user)}
+                              disabled={submitting}
                             >
                               <XCircle className="h-4 w-4 mr-3" />
-                              Vô hiệu hóa
+                              {submitting ? 'Đang xử lý...' : 'Vô hiệu hóa'}
                             </button>
                           ) : (
                             <button
-                              className="flex items-center w-full px-4 py-2 text-sm text-green-700 hover:bg-green-50 transition-colors"
-                              onClick={() => onToggleUserStatus(user)}
+                              className={`flex items-center w-full px-4 py-2 text-sm transition-colors ${
+                                submitting 
+                                  ? 'text-gray-400 bg-gray-50 cursor-not-allowed' 
+                                  : 'text-green-700 hover:bg-green-50'
+                              }`}
+                              onClick={() => !submitting && onToggleUserStatus(user)}
+                              disabled={submitting}
                             >
                               <CheckCircle className="h-4 w-4 mr-3" />
-                              Kích hoạt
+                              {submitting ? 'Đang xử lý...' : 'Kích hoạt'}
                             </button>
                           );
                         })()}
@@ -208,6 +209,28 @@ const UserTable = ({
       </table>
     </div>
   );
+};
+
+UserTable.propTypes = {
+  paginatedUsers: PropTypes.array.isRequired,
+  showActionMenu: PropTypes.oneOfType([PropTypes.string, PropTypes.number]),
+  setShowActionMenu: PropTypes.func.isRequired,
+  onViewUser: PropTypes.func.isRequired,
+  onEditUser: PropTypes.func.isRequired,
+  onDeleteUser: PropTypes.func.isRequired,
+  onToggleUserStatus: PropTypes.func.isRequired,
+  submitting: PropTypes.bool,
+  getRoleBadgeClass: PropTypes.func.isRequired,
+  getRoleText: PropTypes.func.isRequired,
+  getStatusClass: PropTypes.func.isRequired,
+  getStatusText: PropTypes.func.isRequired,
+  getUserDisplayInfo: PropTypes.func.isRequired,
+  formatDate: PropTypes.func.isRequired,
+};
+
+UserTable.defaultProps = {
+  showActionMenu: null,
+  submitting: false,
 };
 
 export default UserTable;

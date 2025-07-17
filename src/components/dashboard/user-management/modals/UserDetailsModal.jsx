@@ -3,8 +3,6 @@ import {
   Eye,
   X,
   Edit,
-  CheckCircle,
-  XCircle,
   Mail,
   Phone,
   Users,
@@ -17,7 +15,6 @@ const UserDetailsModal = ({
   onClose,
   user,
   onEdit,
-  onToggleStatus,
   getRoleBadgeClass,
   getRoleText,
 }) => {
@@ -57,8 +54,6 @@ const UserDetailsModal = ({
     return null;
   }
 
-  const isActive =
-    user.isActive !== undefined ? user.isActive : user.status === "active";
   // Create a custom handleClose that manages both local and parent state
   const handleClose = () => {
     setLocalIsOpen(false); // Update local state
@@ -138,25 +133,7 @@ const UserDetailsModal = ({
                   )}
                 </div>
               </div>
-              {/* Status Badge */}
-              <div className="flex-shrink-0 flex flex-col items-center md:items-end">
-                <span
-                  className={`inline-flex px-3 py-1 text-sm font-semibold rounded-full ${
-                    isActive
-                      ? "bg-green-100 text-green-800"
-                      : "bg-red-100 text-red-800"
-                  }`}
-                >
-                  <span className="flex items-center">
-                    {isActive ? (
-                      <CheckCircle className="h-4 w-4 mr-1.5" />
-                    ) : (
-                      <XCircle className="h-4 w-4 mr-1.5" />
-                    )}
-                    {isActive ? "Hoạt động" : "Ngừng hoạt động"}
-                  </span>
-                </span>
-              </div>
+              {/* Đã xóa Status Badge */}
             </div>
           </div>
 
@@ -183,27 +160,7 @@ const UserDetailsModal = ({
               <Edit className="h-4 w-4" />
               <span>Chỉnh sửa thông tin</span>
             </button>
-
-            <button
-              onClick={() => onToggleStatus(user)}
-              className={`flex-1 flex items-center justify-center space-x-2 px-4 py-3 text-sm font-medium rounded-lg transition-all ${
-                isActive
-                  ? "text-red-700 bg-red-50 border border-red-200 hover:bg-red-100"
-                  : "text-green-700 bg-green-50 border border-green-200 hover:bg-green-100"
-              }`}
-            >
-              {isActive ? (
-                <>
-                  <XCircle className="h-4 w-4" />
-                  <span>Vô hiệu hóa tài khoản</span>
-                </>
-              ) : (
-                <>
-                  <CheckCircle className="h-4 w-4" />
-                  <span>Kích hoạt tài khoản</span>
-                </>
-              )}
-            </button>
+            {/* Đã xóa nút kích hoạt/vô hiệu hóa */}
           </div>
         </div>
       </div>

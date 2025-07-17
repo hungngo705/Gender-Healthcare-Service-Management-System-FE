@@ -4,14 +4,23 @@ const chatService = {
     // Gửi tin nhắn chat
     async sendMessage(appointmentId, message, isSystemMessage = false) {
         try {
+            console.log('ChatService.sendMessage called with:', {
+                appointmentId,
+                message,
+                isSystemMessage
+            });
+            
             const response = await apiClient.post('/api/chat/send', {
                 appointmentId,
                 message,
                 isSystemMessage
             });
+            
+            console.log('ChatService.sendMessage response:', response.data);
             return response.data;
         } catch (error) {
             console.error('Error sending chat message:', error);
+            console.error('Error response:', error.response?.data);
             throw error;
         }
     },
@@ -69,6 +78,22 @@ const chatService = {
     // Gửi tin nhắn hệ thống (như thông báo join/leave)
     async sendSystemMessage(appointmentId, message) {
         return this.sendMessage(appointmentId, message, true);
+    },
+
+    // Debug endpoint để kiểm tra thông tin appointment và user
+    async getDebugInfo(appointmentId) {
+        try {
+            console.log('ChatService.getDebugInfo called with appointmentId:', appointmentId);
+            
+            const response = await apiClient.get(`/api/chat/debug/${appointmentId}`);
+            
+            console.log('ChatService.getDebugInfo response:', response.data);
+            return response.data;
+        } catch (error) {
+            console.error('Error getting debug info:', error);
+            console.error('Error response:', error.response?.data);
+            throw error;
+        }
     }
 };
 

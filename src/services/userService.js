@@ -85,6 +85,23 @@ export const userService = {
   },
 
   /**
+   * Toggle user status (activate/deactivate)
+   * @param {string|number} id - User ID
+   * @returns {Promise} Promise that resolves with updated user
+   */
+  toggleUserStatus: async (id) => {
+    try {
+      const response = await apiService.put(config.api.users.toggleStatus(id));
+      const responseData = response.data?.data || response.data;
+      const statusText = responseData.isActive ? "kích hoạt" : "vô hiệu hóa";
+      toastService.success(`Người dùng đã được ${statusText} thành công`);
+      return responseData;
+    } catch (error) {
+      return Promise.reject(error);
+    }
+  },
+
+  /**
    * Set user role
    * @param {string|number} id - User ID
    * @param {string} role - New role for the user
