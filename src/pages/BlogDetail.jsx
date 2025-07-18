@@ -46,7 +46,7 @@ function BlogDetail() {
               setAuthor(authorData);
             } else {
               // If user is not logged in, use a default author
-              setAuthor({ name: "Unknown Author" });
+              setAuthor({ name: data.staff.name || "Unknown Author" });
             }
           } catch (authorError) {
             console.log("Using default author info due to auth requirements");
