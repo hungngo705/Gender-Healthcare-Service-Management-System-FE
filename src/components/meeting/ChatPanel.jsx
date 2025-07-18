@@ -3,7 +3,7 @@ import PropTypes from 'prop-types';
 import chatService from '../../services/chatService';
 import { useAuth } from '../../contexts/AuthContext';
 
-const ChatPanel = ({ appointmentId, isVisible, onToggle, sendDailyMessage, dailyMessages = [] }) => {
+const ChatPanel = ({ appointmentId, isVisible, onToggle, sendDailyMessage, dailyMessages = [], onSaveChat }) => {
     const { currentUser } = useAuth();
     const [messages, setMessages] = useState([]);
     const [newMessage, setNewMessage] = useState('');
@@ -164,6 +164,15 @@ const ChatPanel = ({ appointmentId, isVisible, onToggle, sendDailyMessage, daily
                     >
                         {showHistory ? 'Live' : 'Lịch sử'}
                     </button>
+                    {chatMode === 'daily' && !showHistory && (
+                        <button
+                            onClick={onSaveChat}
+                            className="text-xs px-2 py-1 rounded bg-gray-200 text-gray-700 hover:bg-gray-300"
+                            title="Save Daily.co Chat Log"
+                        >
+                            <Download size={14} />
+                        </button>
+                    )}
                     <button
                         onClick={async () => {
                             try {
@@ -314,7 +323,8 @@ ChatPanel.propTypes = {
     isVisible: PropTypes.bool.isRequired,
     onToggle: PropTypes.func.isRequired,
     sendDailyMessage: PropTypes.func,
-    dailyMessages: PropTypes.array
+    dailyMessages: PropTypes.array,
+    onSaveChat: PropTypes.func.isRequired 
 };
 
 export default ChatPanel; 

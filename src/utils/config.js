@@ -1,5 +1,3 @@
-// Environment configuration
-
 // Environment detection and API URL configuration
 const getApiBaseURL = () => {
   // First check environment variable
@@ -9,26 +7,35 @@ const getApiBaseURL = () => {
 
   // Auto-detect based on current host
   const currentHost = window.location.hostname;
+
+  // Development environment
   if (currentHost === "localhost" || currentHost === "127.0.0.1") {
-    return "https://localhost:7050"; // Changed to remove
+    return "https://localhost:7050";
   }
 
-  // For production, you need to set the correct API URL
-  // This should match your backend server URL
+  // Netlify deployment detection
+  if (
+    currentHost.includes("netlify.app") ||
+    currentHost.includes("netlify.com")
+  ) {
+    return "https://everwell-1127.azurewebsites.net";
+  }
+
+  // Other production environments
   if (
     currentHost.includes("github.io") ||
     currentHost.includes("vercel.app") ||
-    currentHost.includes("netlify.app")
+    currentHost.includes("azurewebsites.net")
   ) {
-    // Common hosting platforms - update with your actual production API URL
-    console.warn(
-      "Production API URL not configured! Please set VITE_API_URL environment variable."
+    return (
+      import.meta.env.VITE_API_URL || "https://everwell-1127.azurewebsites.net"
     );
-    return "https://your-production-api-domain.com"; // Changed to remove /api/v2.5
   }
 
-  // Fallback for other hosts
-  return `https://${currentHost}:7050`;
+  // Fallback for custom domains
+  return (
+    import.meta.env.VITE_API_URL || "https://everwell-1127.azurewebsites.net"
+  );
 };
 
 const config = {
@@ -40,12 +47,13 @@ const config = {
     auth: {
       login: "/api/v2.5/login",
       register: "/api/v2.5/register",
-      refreshToken: "/api/v2.5.5/refresh-token",
+      refreshToken: "/api/v2.5/refresh-token", // Fixed typo: was v2.5.5
       logout: "/api/v2.5/logout",
       verifyEmail: "/api/v2.5/verify-email",
-      forgotPassword: "/send-reset-code",
-      resetPassword: "/verify-code-and-reset",
-    }, // User endpoints - add API prefix
+      forgotPassword: "/api/v2.5/send-reset-code",
+      resetPassword: "/api/v2.5/verify-code-and-reset",
+    },
+    // User endpoints
     users: {
       getAll: "/api/v2.5/user/getall",
       create: "/api/v2.5/user/create",
@@ -56,7 +64,8 @@ const config = {
       toggleStatus: (id) => `/api/v2.5/user/toggle-status/${id}`,
       profile: "/api/v2.5/user/profile/me",
       changePassword: "/api/v2.5/user/change-password",
-    }, // Consultant endpoints - add API prefix
+    },
+    // Consultant endpoints
     consultants: {
       getAll: "/api/v2.5/consultant/getall",
       getById: (id) => `/api/v2.5/consultant/${id}`,
@@ -64,7 +73,8 @@ const config = {
       update: (id) => `/api/v2.5/consultant/${id}`,
       delete: (id) => `/api/v2.5/consultant/${id}`,
       getAvailability: (id) => `/api/v2.5/consultant/${id}/availability`,
-    }, // Appointment endpoints - add API prefix
+    },
+    // Appointment endpoints
     appointments: {
       getAll: "/api/v2.5/appointment/getall",
       create: "/api/v2.5/appointment/create",
@@ -74,20 +84,28 @@ const config = {
       getByUser: (userId) => `/api/v2.5/appointment/user/${userId}`,
       updateMeetingLink: (id) =>
         `/api/v2.5/appointment/update/meetinglink/${id}`,
+      delete: (id) => `/api/v2.5/appointment/delete/${id}`,
+      getConsultantSchedules: "/api/v2.5/appointment/consultant/schedules",
+      getConsultantScheduleById: (id) =>
+        `/api/v2.5/appointment/consultant/schedules/${id}`,
+      createConsultantSchedule:
+        "/api/v2.5/appointment/consultant/schedule/create",
       checkIn: (id) => `/api/v2.5/appointment/checkin/${id}`,
       checkOut: (id) => `/api/v2.5/appointment/checkout/${id}`,
       getByCurrentUser: "/api/v2.5/appointment/getall",
       getByConsultant: (consultantId) =>
         `/api/v2.5/appointment/consultant/${consultantId}`,
-    }, // STI testing endpoints - add API prefix
+    },
+    // STI testing endpoints
     stiTesting: {
       getAll: "/api/v2.5/stitesting/getall",
-      getForCustomer: "/api/v2.5/stitesting/currentuser", // Endpoint để lấy STI test của current user
+      getForCustomer: "/api/v2.5/stitesting/currentuser",
       create: "/api/v2.5/stitesting/create",
       getById: (id) => `/api/v2.5/stitesting/${id}`,
       update: (id) => `/api/v2.5/stitesting/update/${id}`,
       delete: (id) => `/api/v2.5/stitesting/delete/${id}`,
-    }, // Test Result endpoints
+    },
+    // Test Result endpoints
     testResult: {
       getAll: "/api/v2.5/testresult/getall",
       create: "/api/v2.5/testresult/create",
@@ -96,7 +114,8 @@ const config = {
       update: (id) => `/api/v2.5/testresult/update/${id}`,
       delete: (id) => `/api/v2.5/testresult/delete/${id}`,
       getByTesting: (testingId) => `/api/v2.5/testresult/testing/${testingId}`,
-    }, // Blog endpoints - add API prefix
+    },
+    // Blog endpoints
     blog: {
       getAll: "/api/v2.5/post/getall",
       create: "/api/v2.5/post/create",
@@ -105,8 +124,7 @@ const config = {
       approve: (id) => `/api/v2.5/post/approve/${id}`, // Thêm endpoint mới
       delete: (id) => `/api/v2.5/post/delete/${id}`,
     },
-
-    // Service endpoints - add API prefix
+    // Service endpoints
     services: {
       getAll: "/api/v2.5/service/getall",
       create: "/api/v2.5/service/create",
@@ -114,8 +132,7 @@ const config = {
       update: (id) => `/api/v2.5/service/${id}`,
       delete: (id) => `/api/v2.5/service/${id}`,
     },
-
-    // Dashboard endpoints - add API prefix
+    // Dashboard endpoints
     dashboard: {
       stats: "/api/v2.5/dashboard/stats",
       data: "/api/v2.5/dashboard/data",
@@ -125,9 +142,8 @@ const config = {
       activities: "/api/v2.5/dashboard/activities",
       monthlyStats: (year, month) =>
         `/api/v2.5/dashboard/stats/monthly/${year}/${month}`,
-    }, // TestResult endpoints - add API prefix
-
-    // Menstrual cycle tracking endpoints - add API prefix
+    },
+    // Menstrual cycle tracking endpoints
     menstrualCycle: {
       getAll: "/api/menstrual-cycle-trackings",
       create: "/api/menstrual-cycle-trackings",
@@ -144,8 +160,7 @@ const config = {
         "/api/menstrual-cycle-trackings/notification-preferences",
       getTrends: "/api/menstrual-cycle-trackings/trends",
     },
-
-    // Payment endpoints - add API prefix
+    // Payment endpoints
     payment: {
       createPayment: "/api/payment/create-payment",
       vnpayCallback: "/api/payment/vnpay-callback",
@@ -156,8 +171,7 @@ const config = {
         `/api/payment/customer/${customerId}/history`,
       getAllPayments: "/api/payment/history", // Endpoint lấy tất cả giao dịch (cho Admin)
     },
-
-    // Feedback endpoints - add API prefix
+    // Feedback endpoints
     feedback: {
       getAll: "/api/v2.5/feedback/getall",
       getById: (id) => `/api/v2.5/feedback/${id}`,
@@ -198,6 +212,7 @@ const config = {
     enableAnalytics: import.meta.env.VITE_ENABLE_ANALYTICS === "true" || false,
     enableNotifications:
       import.meta.env.VITE_ENABLE_NOTIFICATIONS === "true" || false,
+    enableDebugLogging: import.meta.env.DEV || false,
   },
 
   // Authentication
@@ -205,6 +220,22 @@ const config = {
     storageKey: "auth_token",
     refreshStorageKey: "refresh_token",
   },
+
+  // Environment info
+  environment: {
+    isDevelopment: import.meta.env.DEV,
+    isProduction: import.meta.env.PROD,
+    mode: import.meta.env.MODE,
+  },
 };
+
+// Log configuration in development
+if (import.meta.env.DEV) {
+  console.log("App Configuration:", {
+    apiBaseURL: config.api.baseURL,
+    environment: config.environment,
+    features: config.features,
+  });
+}
 
 export default config;

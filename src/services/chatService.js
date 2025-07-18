@@ -94,6 +94,26 @@ const chatService = {
             console.error('Error response:', error.response?.data);
             throw error;
         }
+    },
+
+    async saveChatLog(appointmentId, logContent) {
+        try {
+        // This sends the data to your C# backend endpoint.
+        // It does NOT need to know about Supabase or any secret keys.
+        const response = await apiClient.post('/chat/save-log', {
+            appointmentId,
+            logContent,
+        });
+        return response.data;
+        } catch (error) {
+        console.error('Error sending chat log to server:', error);
+        // Return a standardized failure object so the UI doesn't break
+        // on a failed background task.
+        return { 
+            success: false, 
+            message: error.response?.data?.message || 'Failed to save chat log.' 
+        };
+    }
     }
 };
 

@@ -24,12 +24,27 @@ import BookingSuccess from "../../components/booking/BookingSuccess";
 import ConsultantDetail from "../../components/booking/ConsultantDetail";
 
 const Booking = () => {
-  // Add state for appointments data and loading status
+  // Group ALL state declarations at the top
   const [appointments, setAppointments] = useState([]);
   const [allConsultants, setAllConsultants] = useState([]);
+  const [consultantSchedules, setConsultantSchedules] = useState([]);
   const [isLoading, setIsLoading] = useState(true);
   const [loadError, setLoadError] = useState(null);
-  const [refreshKey, setRefreshKey] = useState(0); // Add a refreshKey state
+  const [refreshKey, setRefreshKey] = useState(0);
+  const [selectedConsultant, setSelectedConsultant] = useState(null);
+  const [selectedDate, setSelectedDate] = useState(null);
+  const [selectedTimeSlot, setSelectedTimeSlot] = useState(null);
+  const [formData, setFormData] = useState({
+    name: "",
+    email: "",
+    phone: "",
+    reason: "",
+    customerId: null,
+  });
+  const [isSubmitting, setIsSubmitting] = useState(false);
+  const [bookingSuccess, setBookingSuccess] = useState(false);
+  const [availableDates, setAvailableDates] = useState([]);
+  const [localBookedSlots, setLocalBookedSlots] = useState({});
 
   // Fetch appointments and consultants data from API
   useEffect(() => {
@@ -59,7 +74,7 @@ const Booking = () => {
           }
         } catch (error) {
           if (
-            appointmentsResponse.response.data?.details !==
+            appointmentsResponse?.response?.data?.details !==
             "No appointments found"
           ) {
             console.error("Failed to fetch appointments:", error);
@@ -78,9 +93,49 @@ const Booking = () => {
     };
 
     fetchData();
-  }, [refreshKey]); // Modify your useEffect to depend on the refreshKey
+  }, [refreshKey]);
 
-  // Transform appointments data to consultant data
+  // NEW: Fetch consultant's schedules when a consultant is selected
+  useEffect(() => {
+    const fetchConsultantSchedules = async () => {
+      if (!selectedConsultant) {
+        setConsultantSchedules([]);
+        return;
+      }
+
+      try {
+        // Fetch schedules for the specific consultant
+        const schedulesResponse =
+          await appointmentService.getConsultantScheduleById(
+            selectedConsultant.id
+          );
+
+        if (schedulesResponse && schedulesResponse.data) {
+          // Get only unavailable schedules (where isAvailable is false)
+          const unavailableSlots = Array.isArray(schedulesResponse.data)
+            ? schedulesResponse.data.filter(
+                (schedule) => schedule.isAvailable === false
+              )
+            : schedulesResponse.data.data?.filter(
+                (schedule) => schedule.isAvailable === false
+              ) || [];
+          setConsultantSchedules(unavailableSlots);
+        } else {
+          setConsultantSchedules([]);
+        }
+      } catch (error) {
+        console.error(
+          `Failed to fetch schedules for consultant ${selectedConsultant.id}:`,
+          error
+        );
+        setConsultantSchedules([]);
+      }
+    };
+
+    fetchConsultantSchedules();
+  }, [selectedConsultant]);
+
+  // Rest of the formatting functions remain the same
   const formatConsultants = () => {
     // Start with all consultants from the API
     const consultantsMap = {};
@@ -130,25 +185,50 @@ const Booking = () => {
       }
     });
 
+    // Add consultant days off to booked shifts
+    // Process all schedules regardless of which consultant they belong to
+    consultantSchedules.forEach((schedule) => {
+      // Make sure we have the consultant in our map
+      if (!consultantsMap[schedule.consultantId]) {
+        console.warn(
+          `Consultant ${schedule.consultantId} not found in consultantsMap`
+        );
+        return;
+      }
+
+      // Only process slots where isAvailable is false (unavailable slots)
+      if (schedule.isAvailable === false) {
+        const dateKey = schedule.workDate;
+
+        if (!consultantsMap[schedule.consultantId].bookedShifts[dateKey]) {
+          consultantsMap[schedule.consultantId].bookedShifts[dateKey] = [];
+        }
+
+        // Add the slot to booked shifts (consultant is not available)
+        if (
+          !consultantsMap[schedule.consultantId].bookedShifts[dateKey].includes(
+            schedule.slot
+          )
+        ) {
+          consultantsMap[schedule.consultantId].bookedShifts[dateKey].push(
+            schedule.slot
+          );
+        }
+      }
+    });
+
     return Object.values(consultantsMap);
   };
 
-  const consultants = formatConsultants();
+  // Re-calculate consultants whenever appointments, consultantSchedules, or selectedConsultant changes
+  const [formattedConsultants, setFormattedConsultants] = useState([]);
 
-  const [selectedConsultant, setSelectedConsultant] = useState(null);
-  const [selectedDate, setSelectedDate] = useState(null);
-  const [selectedTimeSlot, setSelectedTimeSlot] = useState(null);
-  const [formData, setFormData] = useState({
-    name: "",
-    email: "",
-    phone: "",
-    reason: "",
-    customerId: null,
-  });
-  const [isSubmitting, setIsSubmitting] = useState(false);
-  const [bookingSuccess, setBookingSuccess] = useState(false);
-  const [availableDates, setAvailableDates] = useState([]);
-  const [localBookedSlots, setLocalBookedSlots] = useState({}); // To track newly booked slots in this session
+  useEffect(() => {
+    const formatted = formatConsultants();
+    setFormattedConsultants(formatted);
+  }, [appointments, allConsultants, consultantSchedules, selectedConsultant]);
+
+  const consultants = formattedConsultants;
 
   // Danh sách các ca làm việc
   const timeSlots = [
@@ -201,33 +281,40 @@ const Booking = () => {
     });
   };
 
-  // Cập nhật danh sách ngày có thể đặt khi chọn tư vấn viên
+  // Cập nhật danh sách ngày có thể đặt khi chọn tư vấn viên hoặc khi lịch thay đổi
   useEffect(() => {
     if (selectedConsultant) {
-      // Generate all dates for the next 2 weeks
-      const allDates = generateTwoWeekDates();
-
-      // Filter to only include dates with at least one available slot
-      const datesWithAvailableSlots = allDates.filter((date) =>
-        hasAvailableTimeSlots(selectedConsultant, date)
+      // Find the updated consultant object from our formatted list
+      const updatedConsultant = consultants.find(
+        (c) => c.id === selectedConsultant.id
       );
 
-      setAvailableDates(datesWithAvailableSlots);
+      if (updatedConsultant) {
+        // Generate all dates for the next 2 weeks
+        const allDates = generateTwoWeekDates();
 
-      // Select the first date with available slots if any
-      if (datesWithAvailableSlots.length > 0) {
-        setSelectedDate(datesWithAvailableSlots[0]);
-      } else {
-        setSelectedDate(null);
+        // Filter to only include dates with at least one available slot
+        const datesWithAvailableSlots = allDates.filter((date) =>
+          hasAvailableTimeSlots(updatedConsultant, date)
+        );
+
+        setAvailableDates(datesWithAvailableSlots);
+
+        // Select the first date with available slots if any
+        if (datesWithAvailableSlots.length > 0) {
+          setSelectedDate(datesWithAvailableSlots[0]);
+        } else {
+          setSelectedDate(null);
+        }
+
+        // Reset selected time slot
+        setSelectedTimeSlot(null);
       }
-
-      // Reset selected time slot
-      setSelectedTimeSlot(null);
     } else {
       setAvailableDates([]);
       setSelectedDate(null);
     }
-  }, [selectedConsultant]);
+  }, [selectedConsultant, consultantSchedules, consultants]);
 
   // Check if a time slot is booked (unavailable)
   const isTimeSlotBooked = (slotId) => {
@@ -235,6 +322,11 @@ const Booking = () => {
 
     // Convert selected date to format for lookup
     const dateKey = format(selectedDate, "yyyy-MM-dd");
+
+    // Find the most updated consultant object
+    const latestConsultantData = consultants.find(
+      (c) => c.id === selectedConsultant.id
+    );
 
     // First check if this is today and the slot time has already passed
     const today = new Date();
@@ -257,17 +349,22 @@ const Booking = () => {
     //   }
     // }
 
+    // Get the most up-to-date consultant data from our formatted list
+    const updatedConsultant =
+      consultants.find((c) => c.id === selectedConsultant.id) ||
+      selectedConsultant;
+
     // If this date doesn't exist in bookedShifts, all slots are available
-    if (!selectedConsultant.bookedShifts[dateKey]) {
+    if (!updatedConsultant.bookedShifts[dateKey]) {
       return false; // No slots booked for this date
     }
 
     // Check if the slot is in the consultant's bookedShifts for this date
-    const bookedShiftsForDay = selectedConsultant.bookedShifts[dateKey] || [];
+    const bookedShiftsForDay = updatedConsultant.bookedShifts[dateKey] || [];
 
     // Check locally booked slots in this session
     const locallyBookedShifts =
-      localBookedSlots[selectedConsultant.id]?.[dateKey] || [];
+      localBookedSlots[updatedConsultant.id]?.[dateKey] || [];
 
     // Slot is unavailable if it's in bookedShifts or localBookedSlots
     return (
@@ -459,6 +556,7 @@ const Booking = () => {
                       {/* Lựa chọn ca làm việc */}
                       {selectedDate && (
                         <TimeSlotSelector
+                          key={`timeslots-${consultantSchedules.length}-${selectedDate}`}
                           timeSlots={timeSlots}
                           selectedTimeSlot={selectedTimeSlot}
                           onTimeSlotSelect={handleTimeSlotSelect}
@@ -502,7 +600,11 @@ const Booking = () => {
                   </div>
                   {selectedConsultant && selectedTimeSlot ? (
                     <BookingForm
-                      selectedConsultant={selectedConsultant}
+                      selectedConsultant={
+                        consultants.find(
+                          (c) => c.id === selectedConsultant.id
+                        ) || selectedConsultant
+                      }
                       selectedDate={selectedDate}
                       selectedTimeSlot={selectedTimeSlot}
                       formData={formData}

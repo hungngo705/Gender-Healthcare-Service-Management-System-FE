@@ -23,6 +23,7 @@ import ServicesManagementTab from "../components/dashboard/tabs/ServicesManageme
 import UserManagementTab from "../components/dashboard/tabs/UserManagementTab";
 import STITestingManagementTab from "../components/dashboard/tabs/STITestingManagementTab";
 import ConsultantQuestionsTab from "../components/dashboard/tabs/ConsultantQuestionsTab";
+import ConsultantScheduleTab from "../components/dashboard/tabs/ConsultantScheduleTab";
 
 // Lucide Icons
 import {
@@ -30,6 +31,7 @@ import {
   X,
   Users,
   Calendar,
+  CalendarClock,
   ClipboardList,
   MessageSquare,
   BarChart3,
@@ -112,8 +114,10 @@ function Dashboard() {
     const iconMap = {
       "chart-pie": <BarChart3 size={20} />,
       calendar: <Calendar size={20} />,
+      "calendar-clock": <CalendarClock size={20} />, // Add this line - using Calendar icon for both
       users: <Users size={20} />,
       chat: <MessageSquare size={20} />,
+      "help-circle": <MessageSquare size={20} />, // Add this for consultantQuestions
       document: <FileText size={20} />,
       archive: <Package2 size={20} />,
       "user-group": <UserCog size={20} />,
@@ -138,6 +142,7 @@ function Dashboard() {
 
         // Consultant-specific tabs
         consultantAppointments: ["consultant"],
+        consultantSchedule: ["consultant"], // Add the new tab permission
         testProcessing: ["consultant"],
         consultantQuestions: ["consultant"],
 
@@ -221,6 +226,9 @@ function Dashboard() {
       case "patients":
         console.log(`Rendering PatientsTab with role: ${userRole}`);
         return <PatientsTab role={userRole} />;
+      case "consultantSchedule":
+        console.log(`Rendering ConsultantScheduleTab with role: ${userRole}`);
+        return <ConsultantScheduleTab role={userRole} />;
       case "consultantQuestions":
         return <ConsultantQuestionsTab />;
       default:
