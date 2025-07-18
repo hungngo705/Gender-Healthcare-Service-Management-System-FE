@@ -41,13 +41,8 @@ function BlogDetail() {
         // Fetch author details if staffId exists
         if (data && data.staffId) {
           try {
-            if (localStorage.getItem("user") !== null) {
-              const authorData = await userService.getUserById(data.staffId);
-              setAuthor(authorData);
-            } else {
-              // If user is not logged in, use a default author
-              setAuthor({ name: data.staff.name || "Unknown Author" });
-            }
+            // If user is not logged in, use a default author
+            setAuthor({ name: data.staff.name || "Unknown Author" });
           } catch (authorError) {
             console.log("Using default author info due to auth requirements");
             setAuthor({ name: data.staffId || "Unknown Author" });
@@ -163,6 +158,7 @@ function BlogDetail() {
                 <img
                   src={
                     author?.avatarUrl ||
+                    blog.staff.avatarUrl ||
                     "https://images.unsplash.com/photo-1494790108377-be9c29b29330?ixlib=rb-1.2.1&ixid=eyJhcHBfaWQiOjEyMDd9&auto=format&fit=facearea&facepad=2&w=256&h=256&q=80"
                   }
                   alt={author?.name || blog.staffId}
