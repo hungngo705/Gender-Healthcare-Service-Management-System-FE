@@ -22,16 +22,6 @@ apiClient.interceptors.request.use(
       reqConfig.headers.Authorization = `Bearer ${token}`;
     }
 
-    // Log request for debugging in development
-    if (import.meta.env.DEV) {
-      console.log("API Request:", {
-        method: reqConfig.method,
-        url: reqConfig.url,
-        baseURL: reqConfig.baseURL,
-        fullURL: `${reqConfig.baseURL}${reqConfig.url}`,
-      });
-    }
-
     return reqConfig;
   },
   (error) => {
@@ -45,15 +35,6 @@ apiClient.interceptors.request.use(
 // Bộ chặn phản hồi
 apiClient.interceptors.response.use(
   (response) => {
-    // Log successful responses in development
-    if (import.meta.env.DEV) {
-      console.log("API Response:", {
-        status: response.status,
-        url: response.config.url,
-        data: response.data,
-      });
-    }
-
     return response;
   },
   async (error) => {
@@ -154,7 +135,10 @@ apiClient.interceptors.response.use(
       }
 
       // Xử lý lỗi 404 Không tìm thấy
-      if (error.response.status === 404) {
+      if (
+        error.response.status === 404 &&
+        !error.response.message === "Không lịch nào tồn tại trong hệ thống."
+      ) {
         if (error.response.data?.message) {
           toastService.error(errorMessage);
         } else {

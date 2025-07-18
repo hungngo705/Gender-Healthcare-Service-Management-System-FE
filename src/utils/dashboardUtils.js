@@ -14,6 +14,11 @@ export function getDashboardConfig(userRole) {
           icon: "calendar",
         },
         {
+          id: "consultantSchedule",
+          label: "Lịch làm việc",
+          icon: "calendar-clock", // You'll need to add this icon to your iconMap
+        },
+        {
           id: "consultantQuestions",
           label: "Câu hỏi khách hàng",
           icon: "help-circle",

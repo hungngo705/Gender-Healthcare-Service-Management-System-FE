@@ -44,14 +44,14 @@ function AppointmentsTab({ navigate }) {
   const [loadingFeedback, setLoadingFeedback] = useState(false);
 
   // Helper function to convert slot number to time string
-  const getTimeBySlot = (slotNumber) => {
+  const getTimeBySlot = (slot) => {
     const slotMap = {
-      0: "08:00 - 10:00",
-      1: "10:00 - 12:00",
-      2: "13:00 - 15:00",
-      3: "15:00 - 17:00",
+      0: "08:00",
+      1: "10:00",
+      2: "13:00",
+      3: "15:00",
     };
-    return slotMap[slotNumber] || "Không xác định";
+    return slotMap[slot] || "Unknown";
   };
 
   // Helper function to get status text and class

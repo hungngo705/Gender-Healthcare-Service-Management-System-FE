@@ -81,6 +81,63 @@ const appointmentService = {
   // Attendance
   checkIn: (id) => apiService.put(config.api.appointments.checkIn(id)),
   checkOut: (id) => apiService.put(config.api.appointments.checkOut(id)),
+
+  /**
+   * Update meeting link for an appointment
+   * @param {string|number} id - The appointment ID
+   * @param {Object} meetingLinkData - The meeting link data
+   * @returns {Promise} - The update meeting link response promise
+   */
+  updateMeetingLink: (id, meetingLinkData) => {
+    return apiService.put(
+      config.api.appointments.updateMeetingLink(id),
+      meetingLinkData
+    );
+  },
+
+  /**
+   * Delete an appointment
+   * @param {string|number} id - The appointment ID
+   * @returns {Promise} - The delete appointment response promise
+   */
+  delete: (id) => {
+    return apiService.delete(config.api.appointments.delete(id));
+  },
+
+  /**
+   * Get all consultant schedules
+   * @param {Object} params - Query parameters for filtering, pagination, etc.
+   * @returns {Promise} - The consultant schedules response promise
+   */
+  getConsultantSchedules: (params = {}) => {
+    return apiService.get(
+      config.api.appointments.getConsultantSchedules,
+      params
+    );
+  },
+
+  /**
+   * Get consultant schedule by ID
+   * @param {string|number} id - The schedule ID
+   * @returns {Promise} - The consultant schedule response promise
+   */
+  getConsultantScheduleById: (id) => {
+    return apiService.get(
+      config.api.appointments.getConsultantScheduleById(id)
+    );
+  },
+
+  /**
+   * Create a new consultant schedule
+   * @param {Object} scheduleData - The schedule data
+   * @returns {Promise} - The create schedule response promise
+   */
+  createConsultantSchedule: (scheduleData) => {
+    return apiService.post(
+      config.api.appointments.createConsultantSchedule,
+      scheduleData
+    );
+  },
 };
 
 export default appointmentService;
