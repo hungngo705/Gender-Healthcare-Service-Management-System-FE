@@ -1,7 +1,12 @@
-import React, { useState } from "react";
+import React, { useState, useEffect } from "react";
 // eslint-disable-next-line no-unused-vars
 import { motion } from "framer-motion";
-import { Link, useNavigate } from "react-router-dom";
+import {
+  Link,
+  useNavigate,
+  useLocation,
+  useSearchParams,
+} from "react-router-dom";
 import { Key, Eye, EyeOff, Loader, Check, ArrowRight } from "lucide-react";
 import authService from "../services/authService";
 import toastService from "../utils/toastService";
@@ -17,7 +22,26 @@ function ResetPasswordPage() {
   const [showConfirmPassword, setShowConfirmPassword] = useState(false);
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [isSuccessful, setIsSuccessful] = useState(false);
+  const [emailEditable, setEmailEditable] = useState(false);
   const navigate = useNavigate();
+  const location = useLocation();
+  const [searchParams] = useSearchParams();
+
+  // Auto-fill email from navigation state or URL parameters
+  useEffect(() => {
+    const emailFromState = location.state?.email;
+    const emailFromParams = searchParams.get("email");
+
+    if (emailFromState || emailFromParams) {
+      setFormData((prev) => ({
+        ...prev,
+        email: emailFromState || decodeURIComponent(emailFromParams),
+      }));
+      setEmailEditable(false); // Email từ forgot password sẽ không editable ban đầu
+    } else {
+      setEmailEditable(true); // Nếu không có email từ trước, cho phép nhập
+    }
+  }, [location.state, searchParams]);
 
   const handleChange = (e) => {
     const { name, value } = e.target;
@@ -142,12 +166,14 @@ function ResetPasswordPage() {
               className="space-y-6"
             >
               <div>
-                <label
-                  htmlFor="email"
-                  className="block text-sm font-medium text-gray-700 mb-1"
-                >
-                  Địa chỉ Email
-                </label>
+                <div className="flex justify-between items-center mb-1">
+                  <label
+                    htmlFor="email"
+                    className="block text-sm font-medium text-gray-700"
+                  >
+                    Địa chỉ Email
+                  </label>
+                </div>
                 <input
                   id="email"
                   name="email"
@@ -155,9 +181,12 @@ function ResetPasswordPage() {
                   value={formData.email}
                   onChange={handleChange}
                   required
-                  className="w-full px-3 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500"
+                  className={`w-full px-3 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500 ${
+                    !emailEditable ? "bg-gray-300" : ""
+                  }`}
                   placeholder="name@example.com"
                   disabled={isSubmitting}
+                  readOnly={!emailEditable}
                 />
               </div>
 
