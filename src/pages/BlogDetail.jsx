@@ -41,12 +41,16 @@ function BlogDetail() {
         // Fetch author details if staffId exists
         if (data && data.staffId) {
           try {
-            const authorData = await userService.getUserById(data.staffId);
-            setAuthor(authorData);
+            if (localStorage.getItem("user") !== null) {
+              const authorData = await userService.getUserById(data.staffId);
+              setAuthor(authorData);
+            } else {
+              // If user is not logged in, use a default author
+              setAuthor({ name: "Unknown Author" });
+            }
           } catch (authorError) {
-            console.error("Failed to fetch author details:", authorError);
-            // Fallback to show staffId if author fetch fails
-            setAuthor({ name: data.staffId });
+            console.log("Using default author info due to auth requirements");
+            setAuthor({ name: data.staffId || "Unknown Author" });
           }
         }
 

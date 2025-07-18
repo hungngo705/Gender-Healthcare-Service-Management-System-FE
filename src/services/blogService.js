@@ -3,26 +3,12 @@ import config from "../utils/config";
 
 const API_URL = config.api.baseURL;
 
-// Tạo hàm helper để lấy token từ localStorage
-const getAuthHeader = () => {
-  const token = localStorage.getItem(config.auth.storageKey);
-  if (!token) {
-    console.warn("No authentication token found");
-    return {};
-  }
-  return {
-    Authorization: `Bearer ${token}`,
-  };
-};
-
 const blogService = {
   // Get all blog posts
   getAll: async () => {
     try {
       console.log("Calling getAll API:", `${API_URL}${config.api.blog.getAll}`);
-      const response = await axios.get(`${API_URL}${config.api.blog.getAll}`, {
-        headers: getAuthHeader(),
-      });
+      const response = await axios.get(`${API_URL}${config.api.blog.getAll}`);
       console.log("API response:", response.data);
       return response.data.data || [];
     } catch (error) {
@@ -39,10 +25,7 @@ const blogService = {
   getById: async (id) => {
     try {
       const response = await axios.get(
-        `${API_URL}${config.api.blog.getById(id)}`,
-        {
-          headers: getAuthHeader(),
-        }
+        `${API_URL}${config.api.blog.getById(id)}`
       );
       return response.data.data;
     } catch (error) {
@@ -56,10 +39,7 @@ const blogService = {
     try {
       const response = await axios.post(
         `${API_URL}${config.api.blog.create}`,
-        blogData,
-        {
-          headers: getAuthHeader(),
-        }
+        blogData
       );
       return response.data;
     } catch (error) {
@@ -88,10 +68,7 @@ const blogService = {
 
       const response = await axios.put(
         `${API_URL}${config.api.blog.update(id)}`,
-        updateData,
-        {
-          headers: getAuthHeader(),
-        }
+        updateData
       );
 
       console.log("Update response:", response.data);
@@ -110,7 +87,6 @@ const blogService = {
         `${API_URL}/api/v2.5/post/approve/${id}`,
         null, // Body rỗng
         {
-          headers: getAuthHeader(),
           params: {
             status: statusValue,
           },
@@ -130,10 +106,7 @@ const blogService = {
   delete: async (id) => {
     try {
       const response = await axios.delete(
-        `${API_URL}${config.api.blog.delete(id)}`,
-        {
-          headers: getAuthHeader(),
-        }
+        `${API_URL}${config.api.blog.delete(id)}`
       );
       return response.data;
     } catch (error) {
@@ -142,7 +115,7 @@ const blogService = {
     }
   },
 
-  // Get comments for a blog post
+  // Get comments for a blog post (already had no auth header)
   getComments: async (blogId) => {
     try {
       const response = await axios.get(
@@ -158,7 +131,7 @@ const blogService = {
     }
   },
 
-  // Add a comment to a blog post
+  // Add a comment to a blog post (already had no auth header)
   addComment: async (blogId, commentData) => {
     try {
       const response = await axios.post(
