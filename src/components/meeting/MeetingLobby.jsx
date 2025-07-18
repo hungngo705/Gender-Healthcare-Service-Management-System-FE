@@ -141,15 +141,32 @@ const MeetingLobby = () => {
         appointmentId
       );
       await appointmentService.checkIn(appointmentId);
-      console.log("Check-in successful, entering meeting room");
+      console.log("Check-in successful, redirecting to Daily.co room");
 
-      // Chuyển sang chế độ meeting thay vì mở tab mới
-      setInMeeting(true);
+      // Redirect to the actual Daily.co room URL instead of using embedded component
+      if (meetingInfo.roomUrl) {
+        console.log("Redirecting to Daily.co room:", meetingInfo.roomUrl);
+        window.open(meetingInfo.roomUrl, '_blank');
+        
+        // Navigate back to appointments after a short delay
+        setTimeout(() => {
+          navigate("/profile?tab=appointments");
+        }, 1000);
+      } else {
+        console.error("No room URL available");
+        alert("Không thể tìm thấy liên kết phòng họp");
+      }
     } catch (error) {
       console.error("Check-in failed:", error);
       // Still allow user to join meeting even if check-in fails
-      console.log("Check-in failed, but entering meeting room anyway");
-      setInMeeting(true);
+      console.log("Check-in failed, but redirecting to meeting room anyway");
+      
+      if (meetingInfo.roomUrl) {
+        window.open(meetingInfo.roomUrl, '_blank');
+        setTimeout(() => {
+          navigate("/profile?tab=appointments");
+        }, 1000);
+      }
 
       // Optional: Show toast notification about check-in failure
       alert(
@@ -247,21 +264,21 @@ const MeetingLobby = () => {
     );
   }
 
-  // Nếu đang trong meeting, hiển thị DailyMeetingRoom
-  if (inMeeting) {
-    return (
-      <div className="fixed inset-0 z-50">
-        <DailyMeetingRoom appointmentId={appointmentId} />
-        {/* Nút thoát meeting */}
-        <button
-          onClick={() => setInMeeting(false)}
-          className="fixed top-4 right-4 bg-red-500 hover:bg-red-600 text-white px-4 py-2 rounded-lg shadow-lg z-50"
-        >
-          Thoát Meeting
-        </button>
-      </div>
-    );
-  }
+  // Note: DailyMeetingRoom component is no longer used as we redirect to external Daily.co URL
+  // if (inMeeting) {
+  //   return (
+  //     <div className="fixed inset-0 z-50">
+  //       <DailyMeetingRoom appointmentId={appointmentId} />
+  //       {/* Nút thoát meeting */}
+  //       <button
+  //         onClick={() => setInMeeting(false)}
+  //         className="fixed top-4 right-4 bg-red-500 hover:bg-red-600 text-white px-4 py-2 rounded-lg shadow-lg z-50"
+  //       >
+  //         Thoát Meeting
+  //       </button>
+  //     </div>
+  //   );
+  // }
 
   return (
     // Background overlay with blur effect
