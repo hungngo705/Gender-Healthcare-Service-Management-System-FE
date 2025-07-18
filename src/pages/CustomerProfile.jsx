@@ -255,7 +255,7 @@ function CustomerProfile() {
 
       <div className="flex flex-col lg:flex-row gap-8">
         {/* Left Column - User Information */}
-        <div className="lg:w-1/3 space-y-6">
+        <div className="lg:w-1/5 space-y-6">
           {/* Combined User Profile Card and Navigation */}
           <div className="bg-white rounded-lg shadow-sm overflow-hidden">
             {/* User Info Section */}
@@ -382,7 +382,7 @@ function CustomerProfile() {
         </div>
 
         {/* Right Column - Main Content */}
-        <div className="lg:w-2/3">
+        <div className="lg:w-4/5">
           <div className="bg-white rounded-lg shadow-sm p-6">
             {renderTabContent()}
           </div>
