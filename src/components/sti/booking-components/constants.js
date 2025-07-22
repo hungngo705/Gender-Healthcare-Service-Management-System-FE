@@ -1,24 +1,23 @@
-// Các gói xét nghiệm (cập nhật theo bảng giá mới)
+// Các gói xét nghiệm - ĐỒNG BỘ với Backend .NET TestPackage enum
 export const STI_PACKAGES = [
   {
     id: 0,
-    name: "Gói Cơ Bản",
+    name: "Gói Cơ Bản", // Backend: Basic
     price: 300000,
     description:
       "Bao gồm 3 xét nghiệm: Chlamydia, Gonorrhea (Lậu), Syphilis (Giang Mai)",
   },
   {
     id: 1,
-    name: "Gói Tự Chọn (3 loại)",
-    price: 330000,
-    description: "Tự chọn 3 loại xét nghiệm",
+    name: "Gói Nâng Cao", // Backend: Advanced (đổi từ "Gói Toàn Diện")
+    price: 550000,
+    description: "Bao gồm 10 xét nghiệm: Tất cả xét nghiệm STI có sẵn",
   },
   {
     id: 2,
-    name: "Gói Toàn Diện",
-    price: 550000,
-    description:
-      "Bao gồm 9 xét nghiệm: Gói Cơ Bản + HIV, Herpes, Hepatitis B & C, Trichomonas",
+    name: "Gói Tùy Chỉnh", // Backend: Custom (đổi từ "Gói Tự Chọn")
+    price: 330000,
+    description: "Tự chọn các loại xét nghiệm theo nhu cầu",
   },
 ];
 

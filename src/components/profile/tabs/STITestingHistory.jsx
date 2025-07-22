@@ -98,6 +98,36 @@ function STITestingHistory({ userId }) {
     }
   };
 
+  // Hàm helper để xử lý hiển thị gói/xét nghiệm đúng
+  const getTestPackageDetail = (test) => {
+    const { testPackage, customParameters } = test;
+
+    // Nếu là gói tùy chỉnh (testPackage = 2)
+    if (testPackage === 2) {
+      return {
+        label: "Gói Tùy chỉnh",
+        parameters: customParameters || [],
+      };
+    }
+
+    // Nếu là gói cơ bản hoặc nâng cao (testPackage = 0 hoặc 1)
+    // Nhưng nếu có customParameters và chỉ có 1 parameter -> đây là xét nghiệm đơn lẻ
+    if (customParameters && customParameters.length === 1) {
+      const result = {
+        label: parameterLabels[customParameters[0]] || customParameters[0], // Sử dụng parameterLabels để hiển thị tên đúng
+        parameters: customParameters,
+      };
+      return result;
+    }
+
+    // Ngược lại, hiển thị theo gói
+    const result = {
+      label: testPackageLabels[testPackage] || "Không xác định",
+      parameters: customParameters || [],
+    };
+    return result;
+  };
+
   // Fetch user's STI tests
 
   useEffect(() => {
@@ -601,7 +631,7 @@ function STITestingHistory({ userId }) {
                     <td className="px-3 py-4 text-sm text-gray-900">
                       <div className="mb-2 w-25">
                         <span className="font-semibold text-purple-700 bg-purple-50 py-1 px-1 rounded-md border border-purple-200">
-                          {testPackageLabels[test.testPackage] || "N/A"}
+                          {getTestPackageDetail(test).label}
                         </span>
                       </div>
                       <div className="flex flex-col gap-1.0">
@@ -619,9 +649,9 @@ function STITestingHistory({ userId }) {
                                   `Loại ${result.parameter}`}
                               </span>
                             ))
-                        ) : test.customParameters &&
-                          test.customParameters.length > 0 ? (
-                          test.customParameters.map((param) => (
+                        ) : getTestPackageDetail(test).parameters &&
+                          getTestPackageDetail(test).parameters.length > 0 ? (
+                          getTestPackageDetail(test).parameters.map((param) => (
                             <span
                               key={param}
                               className="flex items-center text-blue-600 text-xs"
@@ -981,8 +1011,7 @@ function STITestingHistory({ userId }) {
                           </p>
                           <div className="mt-1">
                             <span className="inline-block font-semibold text-purple-700 bg-purple-50 px-3 py-1.5 rounded-md border border-purple-200">
-                              {testPackageLabels[selectedTest.testPackage] ||
-                                "Không xác định"}
+                              {getTestPackageDetail(selectedTest).label}
                             </span>
                           </div>
                         </div>
@@ -1101,8 +1130,9 @@ function STITestingHistory({ userId }) {
                       </div>
                     )}{" "}
                     {/* Thông tin các loại xét nghiệm cụ thể */}
-                    {selectedTest.customParameters &&
-                      selectedTest.customParameters.length > 0 && (
+                    {getTestPackageDetail(selectedTest).parameters &&
+                      getTestPackageDetail(selectedTest).parameters.length >
+                        0 && (
                         <div className="mb-6">
                           <h4 className="text-lg font-medium text-gray-900 mb-3">
                             <span className="flex items-center">
@@ -1125,14 +1155,12 @@ function STITestingHistory({ userId }) {
                           </h4>
                           <div className="bg-indigo-50 p-5 rounded-lg border border-indigo-100">
                             <h5 className="font-semibold text-purple-700 mb-3">
-                              {selectedTest.testPackage === 2
-                                ? "Tùy chỉnh"
-                                : selectedTest.testPackage === 1
-                                ? "Nâng cao"
-                                : "Cơ bản"}
+                              {getTestPackageDetail(selectedTest).label}
                             </h5>
                             <div className="grid grid-cols-1 md:grid-cols-2 gap-3">
-                              {selectedTest.customParameters.map((paramId) => {
+                              {getTestPackageDetail(
+                                selectedTest
+                              ).parameters.map((paramId) => {
                                 return (
                                   <div
                                     key={paramId}
