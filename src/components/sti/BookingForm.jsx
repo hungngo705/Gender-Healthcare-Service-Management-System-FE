@@ -147,20 +147,20 @@ function BookingForm() {
         [name]: value,
       }));
     }
-  }; // Handle test type selection  // Hàm ánh xạ id xét nghiệm trong UI sang enum TestParameter trong API
+  }; // Handle test type selection  // Hàm ánh xạ id xét nghiệm trong UI sang enum TestParameter trong Backend .NET
   const mapToApiTestParameter = (testTypeId) => {
-    // Mapped directly to API enum
+    // Mapping chính xác theo STI_TEST_TYPES ID -> Backend TestParameter enum
     const mapping = {
-      0: 3, // HIV -> 3
-      1: 1, // Gonorrhea -> 1
-      2: 2, // Syphilis -> 2
-      3: 9, // HPV -> 9 (đã thêm vào enum mới)
-      4: 0, // Chlamydia -> 0
-      5: 4, // Herpes -> 4
-      6: 5, // Hepatitis B -> 5
-      7: 6, // Hepatitis C -> 6
-      8: 7, // Trichomonas -> 7
-      9: 8, // Mycoplasma Genitalium -> 8
+      0: 0, // Chlamydia -> Chlamydia (0)
+      1: 1, // Gonorrhea (Lậu) -> Gonorrhoeae (1)
+      2: 2, // Syphilis (Giang mai) -> Syphilis (2)
+      3: 3, // HIV -> HIV (3)
+      4: 5, // Hepatitis B -> HepatitisB (5)
+      5: 6, // Hepatitis C -> HepatitisC (6)
+      6: 4, // Herpes -> Herpes (4)
+      7: 9, // HPV -> HPV (9)
+      8: 8, // Mycoplasma -> MycoplasmaGenitalium (8)
+      9: 7, // Trichomonas -> Trichomonas (7)
     };
 
     return mapping[testTypeId] !== undefined ? mapping[testTypeId] : null;
@@ -336,54 +336,73 @@ function BookingForm() {
     setSubmitError(null);
     try {
       if (formData.testTypes.length === 0) {
-        throw new Error("Vui lòng chọn ít nhất một loại xét nghiệm");
+        throw new Error("Vui lòng chọn ít nhất một gói xét nghiệm");
+      }
+
+      // Kiểm tra nếu chọn Custom package nhưng chưa chọn xét nghiệm nào
+      if (formData.testTypes.includes(102)) {
+        const selectedIndividualTests = formData.testTypes.filter((id) => {
+          const type = testTypes.find((t) => t.id === id);
+          return type && !type.isPackage;
+        });
+
+        if (selectedIndividualTests.length === 0) {
+          throw new Error(
+            "Vui lòng chọn ít nhất 1 loại xét nghiệm cho gói tùy chỉnh"
+          );
+        }
       }
 
       if (formData.slot === undefined) {
         throw new Error("Vui lòng chọn khung giờ xét nghiệm");
       }
 
-      // Trước khi chuẩn bị dữ liệu API, kiểm tra và đảm bảo testPackage đúng
-      // Xác định lại testPackage dựa trên loại gói đang chọn
-      let finalTestPackage = 0; // Mặc định là gói cơ bản
+      // Chuẩn bị dữ liệu cho API - ĐỒNG BỘ với Backend .NET Entity Structure
+      // STITesting entity chỉ cần testPackage, KHÔNG cần customParameters
+      // TestResult entities sẽ được backend tạo dựa trên testPackage
+      let finalTestPackage = 0; // Mặc định là Basic (0)
 
       if (formData.testTypes.includes(101)) {
-        finalTestPackage = 1; // Gói toàn diện
-        console.log("Đã chọn gói toàn diện, testPackage = 1");
+        finalTestPackage = 1; // Advanced (Nâng Cao)
+        console.log("Đã chọn gói Nâng Cao, testPackage = 1");
       } else if (formData.testTypes.includes(102)) {
-        finalTestPackage = 2; // Gói tùy chỉnh
-        console.log("Đã chọn gói tùy chỉnh, testPackage = 2");
+        finalTestPackage = 2; // Custom (Tùy Chỉnh)
+        console.log("Đã chọn gói Tùy Chỉnh, testPackage = 2");
       } else if (formData.testTypes.includes(100)) {
-        finalTestPackage = 0; // Gói cơ bản
-        console.log("Đã chọn gói cơ bản, testPackage = 0");
+        finalTestPackage = 0; // Basic (Cơ Bản)
+        console.log("Đã chọn gói Cơ Bản, testPackage = 0");
       } else {
-        // Nếu chỉ chọn các xét nghiệm riêng lẻ, đặt là gói tùy chỉnh
-        finalTestPackage = 2;
-        console.log("Đã chọn các xét nghiệm riêng lẻ, testPackage = 2");
+        // Nếu chỉ chọn các xét nghiệm riêng lẻ -> sử dụng Custom package
+        finalTestPackage = 2; // Custom - để backend tạo TestResult theo individual tests
+        console.log(
+          "Đã chọn xét nghiệm riêng lẻ, sử dụng testPackage = 2 (Custom)"
+        );
       }
 
-      // Chuẩn bị customParameters dựa trên gói
-      let finalCustomParameters = [...formData.customParameters];
+      // Chuẩn bị danh sách parameters cho frontend display và backend processing
+      // (Backend sẽ sử dụng thông tin này để tạo TestResult records)
+      let selectedParameters = [];
       if (finalTestPackage === 1) {
-        // Gói toàn diện - đảm bảo đủ 10 parameters
-        finalCustomParameters = [0, 1, 2, 3, 4, 5, 6, 7, 8, 9]; // Full parameters
-        console.log("Gói toàn diện với 10 parameters: ", finalCustomParameters);
+        // Gói Nâng Cao (Advanced) - đầy đủ 10 parameters
+        selectedParameters = [0, 1, 2, 3, 4, 5, 6, 7, 8, 9];
       } else if (finalTestPackage === 0) {
-        // Gói cơ bản
-        finalCustomParameters = [0, 1, 2]; // Chlamydia, Gonorrhea, Syphilis
-        console.log("Gói cơ bản với 3 parameters: ", finalCustomParameters);
-      } else if (finalTestPackage === 2 && formData.testTypes.includes(102)) {
-        // Nếu là gói mục tiêu, lấy các parameters từ loại xét nghiệm đã chọn
-        finalCustomParameters = formData.testTypes
+        // Gói Cơ Bản (Basic) - 3 parameters cố định
+        selectedParameters = [0, 1, 2]; // Chlamydia, Gonorrhoeae, Syphilis
+      } else if (finalTestPackage === 2) {
+        // Custom package - individual tests hoặc user-selected tests
+        selectedParameters = formData.testTypes
           .filter((typeId) => {
             const test = testTypes.find((t) => t.id === typeId);
             return test && !test.isPackage;
           })
           .map((typeId) => mapToApiTestParameter(typeId))
           .filter((param) => param !== null);
-
-        console.log("Gói tùy chỉnh với parameters: ", finalCustomParameters);
       }
+
+      console.log(
+        "Selected parameters for TestResult creation:",
+        selectedParameters
+      );
 
       // Convert selected test types from ids to full objects for UI display
       const selectedTests = formData.testTypes.map((typeId) => {
@@ -394,18 +413,31 @@ function BookingForm() {
           price: test.price,
           isPackage: test.isPackage || false,
         };
-      }); // Prepare data for API - format theo cấu trúc API
+      });
+
+      // Prepare data for API - ĐỒNG BỘ với STITesting entity structure
       const apiRequestData = {
-        testPackage: finalTestPackage, // Sử dụng giá trị đã kiểm tra
-        customParameters: finalCustomParameters, // Sử dụng danh sách đã kiểm tra
-        status: 0, // Mặc định là Scheduled
+        testPackage: finalTestPackage, // Chỉ gửi testPackage, backend sẽ tự tạo TestResult records
+        status: 0, // Mặc định là Scheduled (TestingStatus.Scheduled)
         scheduleDate: formData.preferredDate,
         slot: formData.slot,
         totalPrice: calculateTotal(),
         notes: formData.notes || "",
+        // KHÔNG gửi customParameters vì STITesting entity không có field này!
+
+        // OPTIONAL: Có thể gửi thêm selectedParameters để backend biết tạo TestResult nào
+        // Đây là approach linh hoạt cho Custom package hoặc individual tests
+        selectedParameters: selectedParameters,
       };
 
-      console.log("Dữ liệu API sẽ gửi:", apiRequestData);
+      // Thông tin để backend biết cần tạo TestResult nào (có thể gửi trong body hoặc xử lý riêng)
+      const testResultsToCreate = selectedParameters.map((param) => ({
+        parameter: param, // TestParameter enum value (0-9)
+        outcome: 2, // ResultOutcome.Pending
+      }));
+
+      console.log("Dữ liệu STITesting API sẽ gửi:", apiRequestData);
+      console.log("TestResults cần tạo:", testResultsToCreate);
 
       // Debug để xác nhận package đúng
       console.log(
@@ -413,22 +445,23 @@ function BookingForm() {
         apiRequestData.testPackage === 0
           ? "Cơ bản"
           : apiRequestData.testPackage === 1
-          ? "Toàn diện"
+          ? "Nâng cao"
           : apiRequestData.testPackage === 2
           ? "Tùy chỉnh"
           : "Không xác định"
       );
-      console.log("Danh sách parameters:", apiRequestData.customParameters);
+      console.log("Danh sách parameters cho TestResult:", selectedParameters);
 
       // Prepare data for payment page
       const submitData = {
         ...formData,
         testPackage: finalTestPackage, // Cập nhật testPackage
-        customParameters: finalCustomParameters, // Cập nhật customParameters
+        selectedParameters: selectedParameters, // Thay thế customParameters
         userId: currentUser ? undefined : formData.userId,
         testTypes: selectedTests,
         totalAmount: calculateTotal(),
         apiData: apiRequestData,
+        testResultsToCreate: testResultsToCreate, // Thêm thông tin để tạo TestResult
       };
 
       // Tiếp tục với chuyển hướng đến trang thanh toán
@@ -474,9 +507,9 @@ function BookingForm() {
     },
     {
       id: 101,
-      label: "Xét Nghiệm Toàn Diện",
+      label: "Xét Nghiệm Nâng Cao", // Đổi tên cho đúng với backend
       description: "Gói xét nghiệm đầy đủ nhất cho sức khỏe tình dục",
-      price: `${STI_PACKAGES[2].price.toLocaleString()}đ`,
+      price: `${STI_PACKAGES[1].price.toLocaleString()}đ`, // Sử dụng index 1 (Advanced)
       isPackage: true,
       includedTests: [4, 1, 2, 0, 5, 6, 7, 8, 9, 3], // Tất cả bao gồm cả HPV (3)
       popular: true,
@@ -493,19 +526,19 @@ function BookingForm() {
     },
     {
       id: 102,
-      label: "Xét Nghiệm Mục Tiêu",
-      description: "Gói xét nghiệm tập trung cho các nguy cơ cụ thể",
-      price: `${STI_PACKAGES[1].price.toLocaleString()}đ`,
+      label: "Xét Nghiệm Tùy Chỉnh", // Đổi tên cho đúng với backend
+      description: "Tự chọn tối đa 3 loại xét nghiệm theo nhu cầu cụ thể",
+      price: `${STI_PACKAGES[2].price.toLocaleString()}đ`, // Sử dụng index 2 (Custom)
       isPackage: true,
-      includedTests: [], // User can choose 3 individual tests
+      includedTests: [], // User can choose individual tests
       popular: false,
       features: [
-        "Chọn 3 loại xét nghiệm bất kỳ",
-        "Phân tích chi tiết từng loại",
+        "Tự chọn tối đa 3 loại xét nghiệm",
+        "Phù hợp với nhu cầu cá nhân hóa",
+        "Giá cố định cho gói tùy chỉnh",
         "Kết quả trong vòng 2-4 ngày",
-        "Tư vấn sau xét nghiệm",
+        "Tư vấn chuyên sâu sau xét nghiệm",
       ],
-      maxSelection: 3,
     }, // Individual tests
     {
       id: 0,
@@ -569,18 +602,19 @@ function BookingForm() {
     },
   ];
   const calculateTotal = () => {
-    // First check if any package is selected
+    // Check if any package is selected - ĐỒNG BỘ với STI_PACKAGES index
     if (formData.testTypes.includes(100)) {
-      // Basic package
+      // Basic package (index 0)
       return STI_PACKAGES[0].price;
     } else if (formData.testTypes.includes(101)) {
-      // Advanced package
-      return STI_PACKAGES[2].price;
-    } else if (formData.testTypes.includes(102)) {
-      // Custom package
+      // Advanced package (index 1)
       return STI_PACKAGES[1].price;
+    } else if (formData.testTypes.includes(102)) {
+      // Custom package (index 2)
+      return STI_PACKAGES[2].price;
     }
 
+    // If no package selected, calculate individual test prices
     return formData.testTypes.reduce((total, typeId) => {
       const testType = testTypes.find((t) => t.id === typeId);
       if (testType) {
@@ -866,110 +900,149 @@ function BookingForm() {
                     ))}
                 </div>
               </div>{" "}
-              {/* Divider */}
-              <div className="flex items-center my-6">
-                <div className="flex-grow border-t border-gray-300"></div>
-                <div className="flex-shrink-0 px-4">
-                  <span className="text-sm font-medium text-gray-500 bg-white px-2">
-                    HOẶC CHỌN RIÊNG LẺ
-                  </span>
-                </div>
-                <div className="flex-grow border-t border-gray-300"></div>
-              </div>{" "}
-              {/* Individual Test Selection */}
+              {/* Individual Test Selection - CHỈ HIỂN THỊ KHI CHỌN GÓI CUSTOM */}
               {formData.testTypes.includes(102) && (
-                <div className="mb-4 p-4 bg-gradient-to-r from-blue-50 to-indigo-50 border border-blue-200 rounded-xl">
-                  <div className="flex items-center space-x-2">
-                    <div className="w-2 h-2 bg-blue-500 rounded-full"></div>
-                    <p className="text-sm font-medium text-blue-800">
-                      Gói Xét Nghiệm Mục Tiêu
-                    </p>
+                <>
+                  {/* Divider for Custom Package */}
+                  <div className="flex items-center my-6">
+                    <div className="flex-grow border-t border-gray-300"></div>
+                    <div className="flex-shrink-0 px-4">
+                      <span className="text-sm font-medium text-indigo-600 bg-white px-2">
+                        CHỌN XÉT NGHIỆM CHO GÓI TÙY CHỈNH
+                      </span>
+                    </div>
+                    <div className="flex-grow border-t border-gray-300"></div>
                   </div>
-                  <p className="text-sm text-blue-700 mt-1">
-                    Vui lòng chọn tối đa 3 loại xét nghiệm bên dưới.
-                    <span className="font-semibold ml-1">
-                      Đã chọn:{" "}
-                      {
-                        formData.testTypes.filter((id) => {
-                          const type = testTypes.find((t) => t.id === id);
-                          return type && !type.isPackage;
-                        }).length
-                      }
-                      /3
-                    </span>
-                  </p>
-                </div>
-              )}{" "}
-              <p className="block text-sm font-medium text-gray-700 mb-4">
-                {formData.testTypes.includes(102)
-                  ? "Chọn các xét nghiệm cho gói của bạn"
-                  : "Các Xét Nghiệm Đơn Lẻ"}
-              </p>
-              <div className="grid grid-cols-1 md:grid-cols-2 gap-3">
-                {testTypes
-                  .filter((type) => !type.isPackage)
-                  .map((type) => {
-                    const isSelected = formData.testTypes.includes(type.id);
-                    const isTargetedPackageSelected =
-                      formData.testTypes.includes(102);
-                    const currentIndividualCount = formData.testTypes.filter(
-                      (id) => {
-                        const testType = testTypes.find((t) => t.id === id);
-                        return testType && !testType.isPackage;
-                      }
-                    ).length;
-                    const canSelect =
-                      !isTargetedPackageSelected ||
-                      isSelected ||
-                      currentIndividualCount < 3;
 
-                    return (
-                      <label
-                        key={type.id}
-                        className={`flex items-center justify-between p-3 border rounded-lg cursor-pointer transition-all duration-200 ${
-                          isSelected
-                            ? "border-indigo-500 bg-indigo-50 shadow-sm"
-                            : canSelect
-                            ? "border-gray-200 hover:border-gray-300 hover:bg-gray-50"
-                            : "border-gray-100 bg-gray-50 opacity-60 cursor-not-allowed"
-                        }`}
-                      >
-                        <div className="flex items-start space-x-3">
-                          <input
-                            type="checkbox"
-                            className="h-4 w-4 text-indigo-600 focus:ring-indigo-500 border-gray-300 rounded mt-0.5"
-                            checked={isSelected}
-                            disabled={!canSelect}
-                            onChange={() => {
-                              if (canSelect) {
-                                handleTestTypeChange(type.id);
-                              }
-                            }}
+                  {/* Custom Package Notice */}
+                  <div className="mb-6 p-4 bg-gradient-to-r from-blue-50 to-indigo-50 border border-blue-200 rounded-xl">
+                    <div className="flex items-center space-x-2 mb-2">
+                      <div className="w-2 h-2 bg-blue-500 rounded-full"></div>
+                      <p className="text-sm font-medium text-blue-800">
+                        Gói Xét Nghiệm Tùy Chỉnh
+                      </p>
+                    </div>
+                    <p className="text-sm text-blue-700 mb-2">
+                      Vui lòng chọn tối đa 3 loại xét nghiệm bên dưới để tạo gói
+                      tùy chỉnh phù hợp với nhu cầu của bạn.
+                    </p>
+                    <div className="flex items-center justify-between">
+                      <span className="text-sm font-semibold text-blue-800">
+                        Đã chọn:{" "}
+                        {
+                          formData.testTypes.filter((id) => {
+                            const type = testTypes.find((t) => t.id === id);
+                            return type && !type.isPackage;
+                          }).length
+                        }
+                        /3 xét nghiệm
+                      </span>
+                      <span className="text-xs text-blue-600 bg-blue-100 px-2 py-1 rounded-full">
+                        Giá cố định: 150.000đ
+                      </span>
+                    </div>
+                  </div>
+
+                  {/* Individual Test Grid */}
+                  <div className="grid grid-cols-1 md:grid-cols-2 gap-3">
+                    {testTypes
+                      .filter((type) => !type.isPackage)
+                      .map((type) => {
+                        const isSelected = formData.testTypes.includes(type.id);
+                        const currentIndividualCount =
+                          formData.testTypes.filter((id) => {
+                            const testType = testTypes.find((t) => t.id === id);
+                            return testType && !testType.isPackage;
+                          }).length;
+                        const canSelect =
+                          isSelected || currentIndividualCount < 3;
+
+                        return (
+                          <label
+                            key={type.id}
+                            className={`flex items-center justify-between p-4 border-2 rounded-lg cursor-pointer transition-all duration-200 ${
+                              isSelected
+                                ? "border-indigo-500 bg-indigo-50 shadow-md transform scale-[1.02]"
+                                : canSelect
+                                ? "border-gray-200 hover:border-indigo-300 hover:bg-indigo-25 hover:shadow-sm"
+                                : "border-gray-100 bg-gray-50 opacity-60 cursor-not-allowed"
+                            }`}
+                          >
+                            <div className="flex items-start space-x-3 flex-1">
+                              <div className="relative">
+                                <input
+                                  type="checkbox"
+                                  className="h-5 w-5 text-indigo-600 focus:ring-indigo-500 border-gray-300 rounded"
+                                  checked={isSelected}
+                                  disabled={!canSelect}
+                                  onChange={() => {
+                                    if (canSelect) {
+                                      handleTestTypeChange(type.id);
+                                    }
+                                  }}
+                                />
+                              </div>
+                              <div className="flex-1">
+                                <div className="font-medium text-gray-900">
+                                  {type.label}
+                                </div>
+                                <div className="text-sm text-gray-600 mt-1">
+                                  {type.description}
+                                </div>
+                                <div className="mt-2">
+                                  {isSelected ? (
+                                    <span className="inline-flex items-center px-2 py-1 rounded-full text-xs font-medium bg-green-100 text-green-800">
+                                      ✓ Đã chọn
+                                    </span>
+                                  ) : (
+                                    <span className="text-sm text-gray-500">
+                                      Bao gồm trong gói
+                                    </span>
+                                  )}
+                                </div>
+                              </div>
+                            </div>
+                            {!canSelect && (
+                              <div className="ml-2">
+                                <span className="text-xs text-gray-400 bg-gray-100 px-2 py-1 rounded">
+                                  Đã đủ 3
+                                </span>
+                              </div>
+                            )}
+                          </label>
+                        );
+                      })}
+                  </div>
+
+                  {/* Custom Package Warning */}
+                  {formData.testTypes.filter((id) => {
+                    const type = testTypes.find((t) => t.id === id);
+                    return type && !type.isPackage;
+                  }).length === 0 && (
+                    <div className="mt-4 p-3 bg-amber-50 border border-amber-200 rounded-lg">
+                      <div className="flex items-center space-x-2">
+                        <svg
+                          className="h-5 w-5 text-amber-500"
+                          fill="none"
+                          viewBox="0 0 24 24"
+                          stroke="currentColor"
+                        >
+                          <path
+                            strokeLinecap="round"
+                            strokeLinejoin="round"
+                            strokeWidth="2"
+                            d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-2.5L13.732 4c-.77-.833-1.732-.833-2.5 0L3.34 16.5c-.77.833.192 2.5 1.732 2.5z"
                           />
-                          <div className="flex-1">
-                            <div className="font-medium text-gray-900 text-sm">
-                              {type.label}
-                            </div>
-                            <div className="text-xs text-gray-600 mt-1 line-clamp-2">
-                              {type.description}
-                            </div>
-                            <div className="mt-2">
-                              <span className="font-semibold text-indigo-600 text-sm">
-                                {isTargetedPackageSelected && isSelected ? (
-                                  <span className="text-green-600">
-                                    ✓ Included
-                                  </span>
-                                ) : (
-                                  type.price
-                                )}
-                              </span>
-                            </div>
-                          </div>
-                        </div>
-                      </label>
-                    );
-                  })}
-              </div>{" "}
+                        </svg>
+                        <p className="text-sm text-amber-800">
+                          Vui lòng chọn ít nhất 1 xét nghiệm để hoàn tất gói tùy
+                          chỉnh
+                        </p>
+                      </div>
+                    </div>
+                  )}
+                </>
+              )}{" "}
               {formData.testTypes.length === 0 && (
                 <p className="text-sm text-red-500 mt-2">
                   Vui lòng chọn ít nhất một loại xét nghiệm
@@ -1030,7 +1103,7 @@ function BookingForm() {
                 {formData.testTypes.some((id) => {
                   const test = testTypes.find((t) => t.id === id);
                   return test && test.isPackage;
-                }) ? (
+                }) && (
                   <>
                     {formData.testTypes.map((typeId) => {
                       const test = testTypes.find((t) => t.id === typeId);
@@ -1052,10 +1125,10 @@ function BookingForm() {
 
                             <div className="ml-3">
                               {test.id === 102 ? (
-                                // Special handling for targeted package
+                                // Custom package - hiển thị xét nghiệm đã chọn
                                 <>
                                   <p className="text-xs font-medium text-gray-700 mb-1">
-                                    Xét nghiệm đã chọn:
+                                    Xét nghiệm đã chọn cho gói tùy chỉnh:
                                   </p>
                                   {formData.testTypes
                                     .filter((id) => {
@@ -1073,21 +1146,29 @@ function BookingForm() {
                                       );
                                       return (
                                         individualTest && (
-                                          <div
+                                          <span
                                             key={individualTest.id}
-                                            className="flex justify-between text-sm text-gray-700 py-1"
+                                            className="inline-flex items-center px-2 py-1 rounded-md bg-green-100 text-green-700 text-xs mr-1 mb-1"
                                           >
-                                            <span>
-                                              {individualTest.label} (
-                                              {individualTest.price})
-                                            </span>
-                                          </div>
+                                            ✓ {individualTest.label}
+                                          </span>
                                         )
                                       );
                                     })}
+                                  {formData.testTypes.filter((id) => {
+                                    const type = testTypes.find(
+                                      (t) => t.id === id
+                                    );
+                                    return type && !type.isPackage;
+                                  }).length === 0 && (
+                                    <span className="text-xs text-amber-600 italic">
+                                      Chưa chọn xét nghiệm nào
+                                    </span>
+                                  )}
                                 </>
                               ) : (
-                                <div className="flex flex-wrap gap-2">
+                                // Packages khác - hiển thị danh sách xét nghiệm có sẵn
+                                <div className="flex flex-wrap gap-1">
                                   {test.includedTests.map((testId) => {
                                     const includedTest = testTypes.find(
                                       (t) => t.id === testId
@@ -1112,22 +1193,6 @@ function BookingForm() {
                       return null;
                     })}
                   </>
-                ) : (
-                  <div className="flex flex-wrap gap-2">
-                    {formData.testTypes.map((typeId) => {
-                      const test = testTypes.find((t) => t.id === typeId);
-                      return (
-                        test && (
-                          <span
-                            key={test.id}
-                            className="inline-flex items-center px-2 py-1 rounded-md bg-indigo-100 text-indigo-700 text-xs"
-                          >
-                            {test.label}
-                          </span>
-                        )
-                      );
-                    })}
-                  </div>
                 )}
               </div>
             ) : (

@@ -22,9 +22,10 @@ const slotLabels = {
   2: "Tối (17:00 - 21:00)",
 };
 
+// Cập nhật testPackageLabels
 const testPackageLabels = {
-  0: "Gói Cơ Bản",
-  1: "Gói Nâng Cao",
+  0: "Gói Cơ Bản / Riêng lẻ",
+  1: "Gói Toàn Diện",
   2: "Gói Tùy Chọn",
 };
 
@@ -255,6 +256,48 @@ function STITestingManagementTab() {
     return format(new Date(dateString), "dd/MM/yyyy", { locale: vi });
   };
 
+  // Thêm hàm helper để hiển thị chi tiết
+  const getTestPackageDetail = (testPackage, customParameters) => {
+    if (testPackage === 0) {
+      // testPackage = 0 có thể là gói cơ bản hoặc xét nghiệm riêng lẻ
+      if (customParameters && customParameters.length === 3) {
+        // 3 parameters = gói cơ bản
+        return "Gói Cơ Bản";
+      } else if (customParameters && customParameters.length === 1) {
+        // 1 parameter = xét nghiệm riêng lẻ
+        const parameterNames = {
+          0: "Chlamydia",
+          1: "Gonorrhea",
+          2: "Syphilis",
+          3: "HIV",
+          4: "Herpes Simplex",
+          5: "Hepatitis B",
+          6: "HPV",
+          7: "Trichomonas",
+          8: "Candida",
+          9: "Mycoplasma",
+        };
+        const paramName =
+          parameterNames[customParameters[0]] ||
+          `Parameter ${customParameters[0]}`;
+        return `${paramName} (Riêng lẻ)`;
+      } else if (customParameters && customParameters.length > 1) {
+        // Nhiều parameters nhưng không phải 3 = nhiều xét nghiệm riêng lẻ
+        return `${customParameters.length} xét nghiệm riêng lẻ`;
+      }
+      return "Gói Cơ Bản";
+    } else if (testPackage === 1) {
+      return "Gói Toàn Diện";
+    } else if (testPackage === 2) {
+      if (customParameters && customParameters.length > 0) {
+        return `Gói Tùy Chọn (${customParameters.length} xét nghiệm)`;
+      }
+      return "Gói Tùy Chọn";
+    }
+
+    return testPackageLabels[testPackage] || "Không xác định";
+  };
+
   return (
     <div className="space-y-6">
       <div className="flex justify-between items-center mb-6">
@@ -374,7 +417,10 @@ function STITestingManagementTab() {
                     </div>
                   </td>
                   <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-500">
-                    {testPackageLabels[test.testPackage] || "Không xác định"}
+                    {getTestPackageDetail(
+                      test.testPackage,
+                      test.customParameters
+                    )}
                   </td>
                   <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-500">
                     {formatDate(test.scheduleDate)}
