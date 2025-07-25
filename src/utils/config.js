@@ -1,15 +1,26 @@
 // Environment detection and API URL configuration
 const getApiBaseURL = () => {
+  // Debug environment variables in production
+  console.log("Environment Variables:", {
+    VITE_API_URL: import.meta.env.VITE_API_URL,
+    MODE: import.meta.env.MODE,
+    PROD: import.meta.env.PROD,
+    DEV: import.meta.env.DEV,
+  });
+
   // First check environment variable
   if (import.meta.env.VITE_API_URL) {
+    console.log("Using VITE_API_URL:", import.meta.env.VITE_API_URL);
     return import.meta.env.VITE_API_URL;
   }
 
   // Auto-detect based on current host
   const currentHost = window.location.hostname;
+  console.log("Current host:", currentHost);
 
   // Development environment
   if (currentHost === "localhost" || currentHost === "127.0.0.1") {
+    console.log("Using localhost API");
     return "https://localhost:7050";
   }
 
@@ -18,6 +29,7 @@ const getApiBaseURL = () => {
     currentHost.includes("netlify.app") ||
     currentHost.includes("netlify.com")
   ) {
+    console.log("Using Netlify production API");
     return "https://everwell-1127.azurewebsites.net";
   }
 
@@ -27,21 +39,46 @@ const getApiBaseURL = () => {
     currentHost.includes("vercel.app") ||
     currentHost.includes("azurewebsites.net")
   ) {
-    return (
-      import.meta.env.VITE_API_URL || "https://everwell-1127.azurewebsites.net"
-    );
+    console.log("Using production API for:", currentHost);
+    const apiUrl =
+      import.meta.env.VITE_API_URL || "https://everwell-1127.azurewebsites.net";
+    console.log("Final API URL:", apiUrl);
+    return apiUrl;
   }
 
   // Fallback for custom domains
-  return (
-    import.meta.env.VITE_API_URL || "https://everwell-1127.azurewebsites.net"
-  );
+  console.log("Using fallback API");
+  const fallbackUrl =
+    import.meta.env.VITE_API_URL || "https://everwell-1127.azurewebsites.net";
+  console.log("Fallback API URL:", fallbackUrl);
+  return fallbackUrl;
+};
+
+// Validate API URL
+const validateApiUrl = (url) => {
+  try {
+    new URL(url);
+    return true;
+  } catch (error) {
+    console.error("Invalid API URL:", url, error);
+    return false;
+  }
+};
+
+// Get validated API URL
+const getValidatedApiUrl = () => {
+  const url = getApiBaseURL();
+  if (!validateApiUrl(url)) {
+    console.error("API URL validation failed, using fallback");
+    return "https://everwell-1127.azurewebsites.net";
+  }
+  return url;
 };
 
 const config = {
   // API URLs
   api: {
-    baseURL: getApiBaseURL(),
+    baseURL: getValidatedApiUrl(),
     timeout: 30000, // 30 seconds
     // Auth endpoints - add API prefix
     auth: {
