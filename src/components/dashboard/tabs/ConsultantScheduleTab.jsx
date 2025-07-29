@@ -65,7 +65,9 @@ function ConsultantScheduleTab({ role }) {
         setSchedules(scheduleData);
       } catch (err) {
         console.error("Error fetching consultant schedules:", err);
-        setError("Không thể tải lịch nghỉ. Vui lòng thử lại.");
+        if (err.response && !err.response.status === 404) {
+          setError("Không thể tải lịch nghỉ. Vui lòng thử lại.");
+        }
       } finally {
         setIsLoading(false);
       }
