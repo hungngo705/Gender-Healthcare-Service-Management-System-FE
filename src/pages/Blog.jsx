@@ -319,7 +319,7 @@ function Blog() {
         )}
 
         {/* Newsletter section */}
-        <div className="mt-16 bg-indigo-50 rounded-2xl p-8 md:p-10">
+        {/* <div className="mt-16 bg-indigo-50 rounded-2xl p-8 md:p-10">
           <div className="max-w-2xl mx-auto text-center">
             <h3 className="text-2xl font-bold text-gray-900 mb-4">
               Đăng ký nhận bản tin
@@ -344,7 +344,7 @@ function Blog() {
               bất cứ lúc nào.
             </p>
           </div>
-        </div>
+        </div> */}
       </div>
     </div>
   );
