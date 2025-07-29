@@ -1,9 +1,10 @@
 import React, { useState } from "react";
 import { Calendar, CheckCircle, AlertTriangle, Loader } from "lucide-react";
 import menstrualCycleService from "../../services/menstrualCycleService";
+import { getCurrentVietnamDate, isDateInFuture, validateCycleDateRange } from "../../utils/timezoneUtils";
 
 const LogCycleForm = () => {
-  const today = new Date().toISOString().split("T")[0];
+  const today = getCurrentVietnamDate();
 
   const [formData, setFormData] = useState({
     cycleStartDate: today,
@@ -35,6 +36,25 @@ const LogCycleForm = () => {
     // Validate form data
     if (!formData.cycleStartDate) {
       setError("Vui lòng chọn ngày bắt đầu chu kỳ");
+      setLoading(false);
+      return;
+    }
+
+    // Validate dates using Vietnam timezone
+    if (isDateInFuture(formData.cycleStartDate)) {
+      setError("Ngày bắt đầu chu kỳ không thể là ngày trong tương lai");
+      setLoading(false);
+      return;
+    }
+
+    if (formData.cycleEndDate && isDateInFuture(formData.cycleEndDate)) {
+      setError("Ngày kết thúc chu kỳ không thể là ngày trong tương lai");
+      setLoading(false);
+      return;
+    }
+
+    if (formData.cycleEndDate && !validateCycleDateRange(formData.cycleStartDate, formData.cycleEndDate)) {
+      setError("Ngày kết thúc chu kỳ phải sau ngày bắt đầu và không quá 10 ngày");
       setLoading(false);
       return;
     }

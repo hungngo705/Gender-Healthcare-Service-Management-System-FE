@@ -3,6 +3,7 @@ import config from "../utils/config";
 import { handleApiError } from "../utils/errorUtils";
 import authHeader from "../utils/authHeader";
 import userService from "./userService";
+import { formatDateForVietnamTimezone } from "../utils/timezoneUtils";
 
 const baseURL = config.api.baseURL;
 
@@ -49,9 +50,27 @@ const menstrualCycleService = {
    */
   createTracking: async (trackingData) => {
     try {
+      // Use the timezone utility for consistent date formatting
+
+      // Transform camelCase frontend data to PascalCase backend format
+      const backendData = {
+        CycleStartDate: formatDateForVietnamTimezone(trackingData.cycleStartDate),
+        CycleEndDate: formatDateForVietnamTimezone(trackingData.cycleEndDate),
+        Symptoms: Array.isArray(trackingData.symptoms) 
+          ? trackingData.symptoms.join(', ') 
+          : (trackingData.symptoms || ''),
+        Notes: trackingData.notes || '',
+        NotifyBeforeDays: trackingData.notifyBeforeDays || 7,
+        NotificationEnabled: trackingData.notificationEnabled !== undefined ? trackingData.notificationEnabled : true
+      };
+      
+      // Debug logging
+      console.log('Frontend data:', trackingData);
+      console.log('Backend payload:', backendData);
+      
       const response = await axios.post(
         `${baseURL}${config.api.menstrualCycle.create}`,
-        trackingData,
+        backendData,
         { headers: authHeader() }
       );
       return response.data;
@@ -85,9 +104,21 @@ const menstrualCycleService = {
    */
   updateTracking: async (id, trackingData) => {
     try {
+      // Transform camelCase frontend data to PascalCase backend format
+      const backendData = {
+        CycleStartDate: trackingData.cycleStartDate,
+        CycleEndDate: trackingData.cycleEndDate || null,
+        Symptoms: Array.isArray(trackingData.symptoms) 
+          ? trackingData.symptoms.join(', ') 
+          : (trackingData.symptoms || ''),
+        Notes: trackingData.notes || '',
+        NotifyBeforeDays: trackingData.notifyBeforeDays || 7,
+        NotificationEnabled: trackingData.notificationEnabled !== undefined ? trackingData.notificationEnabled : true
+      };
+      
       const response = await axios.put(
         `${baseURL}${config.api.menstrualCycle.update(id)}`,
-        trackingData,
+        backendData,
         { headers: authHeader() }
       );
       return response.data;
