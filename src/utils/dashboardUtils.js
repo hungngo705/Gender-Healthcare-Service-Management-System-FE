@@ -48,11 +48,6 @@ export function getDashboardConfig(userRole) {
       title: "Bảng điều khiển dành cho quản lý",
       menuItems: [
         {
-          id: "servicesManagement",
-          label: "Quản lý dịch vụ",
-          icon: "clipboard",
-        },
-        {
           id: "blogManagement",
           label: "Phê duyệt bài viết",
           icon: "document-check",
