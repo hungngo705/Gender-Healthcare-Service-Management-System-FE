@@ -129,10 +129,10 @@ apiClient.interceptors.response.use(
         }
       }
 
-      // Xử lý lỗi 403 Cấm truy cập
-      if (error.response.status === 403) {
-        toastService.error("Bạn không có quyền truy cập tài nguyên này");
-      }
+      // // Xử lý lỗi 403 Cấm truy cập
+      // if (error.response.status === 403) {
+      //   toastService.error("Bạn không có quyền truy cập tài nguyên này");
+      // }
 
       // Xử lý lỗi 404 Không tìm thấy
       if (
@@ -288,7 +288,7 @@ const apiService = {
 
   /**
    * Tải xuống tệp với theo dõi tiến trình
-   * @param {string} url - URL để gửi yêu cầu đến
+   * @param {string} url - URL 403để gửi yêu cầu đến
    * @param {Function} onProgress - Hàm gọi lại tiến trình
    * @param {Object} params - Các tham số truy vấn
    * @returns {Promise} - Promise phản hồi
