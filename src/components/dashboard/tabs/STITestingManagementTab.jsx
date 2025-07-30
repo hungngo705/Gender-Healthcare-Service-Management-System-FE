@@ -2,7 +2,16 @@ import { useState, useEffect } from "react";
 import { toast } from "react-toastify";
 import { format } from "date-fns";
 import { vi } from "date-fns/locale";
-import { Search, Filter, RefreshCcw, Eye, Edit, Trash2 } from "lucide-react";
+import {
+  Search,
+  Filter,
+  RefreshCcw,
+  Eye,
+  Edit,
+  Trash2,
+  Calendar,
+  ArrowUpDown,
+} from "lucide-react";
 
 // Import services
 import {
@@ -44,6 +53,9 @@ function STITestingManagementTab() {
   const [searchTerm, setSearchTerm] = useState("");
   const [filterStatus, setFilterStatus] = useState("all");
   const [filterPackage, setFilterPackage] = useState("all");
+  const [filterDateFrom, setFilterDateFrom] = useState("");
+  const [filterDateTo, setFilterDateTo] = useState("");
+  const [sortOrder, setSortOrder] = useState("newest"); // newest, oldest
   const [currentPage, setCurrentPage] = useState(1);
   const [testsPerPage] = useState(10);
 
@@ -109,9 +121,48 @@ function STITestingManagementTab() {
       result = result.filter((test) => test.testPackage === packageValue);
     }
 
+    // Apply date range filter
+    if (filterDateFrom) {
+      const fromDate = new Date(filterDateFrom);
+      fromDate.setHours(0, 0, 0, 0); // Start of day
+      result = result.filter((test) => {
+        const testDate = new Date(test.scheduleDate);
+        return testDate >= fromDate;
+      });
+    }
+
+    if (filterDateTo) {
+      const toDate = new Date(filterDateTo);
+      toDate.setHours(23, 59, 59, 999); // End of day
+      result = result.filter((test) => {
+        const testDate = new Date(test.scheduleDate);
+        return testDate <= toDate;
+      });
+    }
+
+    // Apply sorting
+    result.sort((a, b) => {
+      const dateA = new Date(a.scheduleDate);
+      const dateB = new Date(b.scheduleDate);
+
+      if (sortOrder === "newest") {
+        return dateB - dateA; // Newest first
+      } else {
+        return dateA - dateB; // Oldest first
+      }
+    });
+
     setFilteredTests(result);
     setCurrentPage(1); // Reset to first page on filter change
-  }, [searchTerm, filterStatus, filterPackage, tests]);
+  }, [
+    searchTerm,
+    filterStatus,
+    filterPackage,
+    filterDateFrom,
+    filterDateTo,
+    sortOrder,
+    tests,
+  ]);
 
   // Pagination
   const indexOfLastTest = currentPage * testsPerPage;
@@ -256,6 +307,22 @@ function STITestingManagementTab() {
     return format(new Date(dateString), "dd/MM/yyyy", { locale: vi });
   };
 
+  // Format date for filter display
+  const formatFilterDate = (dateString) => {
+    if (!dateString) return "";
+    return format(new Date(dateString), "dd/MM/yyyy", { locale: vi });
+  };
+
+  // Reset all filters
+  const resetFilters = () => {
+    setSearchTerm("");
+    setFilterStatus("all");
+    setFilterPackage("all");
+    setFilterDateFrom("");
+    setFilterDateTo("");
+    setSortOrder("newest");
+  };
+
   // Thêm hàm helper để hiển thị chi tiết
   const getTestPackageDetail = (testPackage, customParameters) => {
     if (testPackage === 0) {
@@ -314,20 +381,22 @@ function STITestingManagementTab() {
       </div>
 
       {/* Filters and Search */}
-      <div className="flex flex-col md:flex-row gap-4 mb-6">
-        <div className="flex-1 relative">
-          <input
-            type="text"
-            placeholder="Tìm theo tên, email, số điện thoại..."
-            className="w-full pl-10 pr-4 py-2 border border-gray-300 rounded-md focus:ring-indigo-500 focus:border-indigo-500"
-            value={searchTerm}
-            onChange={(e) => setSearchTerm(e.target.value)}
-          />
-          <Search className="absolute left-3 top-2.5 h-5 w-5 text-gray-400" />
-        </div>
+      <div className="bg-white rounded-lg shadow p-6 mb-6">
+        <div className="flex flex-col lg:flex-row gap-4">
+          {/* Search */}
+          <div className="flex-1 relative">
+            <input
+              type="text"
+              placeholder="Tìm theo tên, email, số điện thoại..."
+              className="w-full pl-10 pr-4 py-2 border border-gray-300 rounded-md focus:ring-indigo-500 focus:border-indigo-500"
+              value={searchTerm}
+              onChange={(e) => setSearchTerm(e.target.value)}
+            />
+            <Search className="absolute left-3 top-2.5 h-5 w-5 text-gray-400" />
+          </div>
 
-        <div className="flex gap-4">
-          <div className="w-48 relative">
+          {/* Status Filter */}
+          <div className="w-full md:w-48 relative">
             <select
               className="w-full pl-10 pr-4 py-2 border border-gray-300 rounded-md focus:ring-indigo-500 focus:border-indigo-500 appearance-none"
               value={filterStatus}
@@ -343,7 +412,8 @@ function STITestingManagementTab() {
             <Filter className="absolute left-3 top-2.5 h-5 w-5 text-gray-400" />
           </div>
 
-          <div className="w-48 relative">
+          {/* Package Filter */}
+          <div className="w-full md:w-48 relative">
             <select
               className="w-full pl-10 pr-4 py-2 border border-gray-300 rounded-md focus:ring-indigo-500 focus:border-indigo-500 appearance-none"
               value={filterPackage}
@@ -359,7 +429,161 @@ function STITestingManagementTab() {
             <Filter className="absolute left-3 top-2.5 h-5 w-5 text-gray-400" />
           </div>
         </div>
+
+        {/* Second row with date filters and sort */}
+        <div className="flex flex-col lg:flex-row gap-4 mt-4">
+          {/* Date From */}
+          <div className="w-full md:w-48 relative">
+            <input
+              type="date"
+              className="w-full pl-10 pr-4 py-2 border border-gray-300 rounded-md focus:ring-indigo-500 focus:border-indigo-500"
+              value={filterDateFrom}
+              onChange={(e) => setFilterDateFrom(e.target.value)}
+              placeholder="Từ ngày"
+            />
+            <Calendar className="absolute left-3 top-2.5 h-5 w-5 text-gray-400" />
+          </div>
+
+          {/* Date To */}
+          <div className="w-full md:w-48 relative">
+            <input
+              type="date"
+              className="w-full pl-10 pr-4 py-2 border border-gray-300 rounded-md focus:ring-indigo-500 focus:border-indigo-500"
+              value={filterDateTo}
+              onChange={(e) => setFilterDateTo(e.target.value)}
+              placeholder="Đến ngày"
+            />
+            <Calendar className="absolute left-3 top-2.5 h-5 w-5 text-gray-400" />
+          </div>
+
+          {/* Sort Order */}
+          <div className="w-full md:w-48 relative">
+            <select
+              className="w-full pl-10 pr-4 py-2 border border-gray-300 rounded-md focus:ring-indigo-500 focus:border-indigo-500 appearance-none"
+              value={sortOrder}
+              onChange={(e) => setSortOrder(e.target.value)}
+            >
+              <option value="newest">Mới nhất trước</option>
+              <option value="oldest">Cũ nhất trước</option>
+            </select>
+            <ArrowUpDown className="absolute left-3 top-2.5 h-5 w-5 text-gray-400" />
+          </div>
+
+          {/* Reset Filters Button */}
+          <div className="flex items-center">
+            <button
+              onClick={resetFilters}
+              className="px-4 py-2 bg-gray-100 text-gray-700 rounded-md hover:bg-gray-200 transition duration-150 flex items-center"
+            >
+              <RefreshCcw size={16} className="mr-2" />
+              Đặt lại
+            </button>
+          </div>
+        </div>
+
+        {/* Filter Summary */}
+        <div className="flex flex-wrap gap-2 mt-4">
+          {searchTerm && (
+            <span className="inline-flex items-center px-2 py-1 rounded-full text-xs bg-blue-100 text-blue-800">
+              Tìm: "{searchTerm}"
+              <button
+                onClick={() => setSearchTerm("")}
+                className="ml-1 text-blue-600 hover:text-blue-800"
+              >
+                ×
+              </button>
+            </span>
+          )}
+          {filterStatus !== "all" && (
+            <span className="inline-flex items-center px-2 py-1 rounded-full text-xs bg-green-100 text-green-800">
+              Trạng thái: {statusLabels[filterStatus]?.label}
+              <button
+                onClick={() => setFilterStatus("all")}
+                className="ml-1 text-green-600 hover:text-green-800"
+              >
+                ×
+              </button>
+            </span>
+          )}
+          {filterPackage !== "all" && (
+            <span className="inline-flex items-center px-2 py-1 rounded-full text-xs bg-purple-100 text-purple-800">
+              Gói: {testPackageLabels[filterPackage]}
+              <button
+                onClick={() => setFilterPackage("all")}
+                className="ml-1 text-purple-600 hover:text-purple-800"
+              >
+                ×
+              </button>
+            </span>
+          )}
+          {filterDateFrom && (
+            <span className="inline-flex items-center px-2 py-1 rounded-full text-xs bg-yellow-100 text-yellow-800">
+              Từ: {formatFilterDate(filterDateFrom)}
+              <button
+                onClick={() => setFilterDateFrom("")}
+                className="ml-1 text-yellow-600 hover:text-yellow-800"
+              >
+                ×
+              </button>
+            </span>
+          )}
+          {filterDateTo && (
+            <span className="inline-flex items-center px-2 py-1 rounded-full text-xs bg-orange-100 text-orange-800">
+              Đến: {formatFilterDate(filterDateTo)}
+              <button
+                onClick={() => setFilterDateTo("")}
+                className="ml-1 text-orange-600 hover:text-orange-800"
+              >
+                ×
+              </button>
+            </span>
+          )}
+        </div>
       </div>
+
+      {/* Results Summary */}
+      {filteredTests.length > 0 && (
+        <div className="bg-white rounded-lg shadow p-4 mb-6">
+          <div className="flex flex-wrap gap-6 text-sm">
+            <div className="flex items-center">
+              <span className="text-gray-600">Tổng kết quả:</span>
+              <span className="ml-2 font-semibold text-gray-900">
+                {filteredTests.length}
+              </span>
+            </div>
+            <div className="flex items-center">
+              <span className="text-gray-600">Đã lên lịch:</span>
+              <span className="ml-2 font-semibold text-blue-600">
+                {filteredTests.filter((test) => test.status === 0).length}
+              </span>
+            </div>
+            <div className="flex items-center">
+              <span className="text-gray-600">Đã lấy mẫu:</span>
+              <span className="ml-2 font-semibold text-yellow-600">
+                {filteredTests.filter((test) => test.status === 1).length}
+              </span>
+            </div>
+            <div className="flex items-center">
+              <span className="text-gray-600">Đang xử lý:</span>
+              <span className="ml-2 font-semibold text-purple-600">
+                {filteredTests.filter((test) => test.status === 2).length}
+              </span>
+            </div>
+            <div className="flex items-center">
+              <span className="text-gray-600">Hoàn thành:</span>
+              <span className="ml-2 font-semibold text-green-600">
+                {filteredTests.filter((test) => test.status === 3).length}
+              </span>
+            </div>
+            <div className="flex items-center">
+              <span className="text-gray-600">Đã hủy:</span>
+              <span className="ml-2 font-semibold text-red-600">
+                {filteredTests.filter((test) => test.status === 4).length}
+              </span>
+            </div>
+          </div>
+        </div>
+      )}
 
       {/* Tests Table */}
       <div className="overflow-x-auto bg-white rounded-lg shadow">
