@@ -87,8 +87,8 @@ const config = {
       refreshToken: "/api/v2.5/refresh-token", // Fixed typo: was v2.5.5
       logout: "/api/v2.5/logout",
       verifyEmail: "/api/v2.5/verify-email",
-      forgotPassword: "/api/v2.5/send-reset-code",
-      resetPassword: "/api/v2.5/verify-code-and-reset",
+      forgotPassword: "/send-reset-code",
+      resetPassword: "/verify-code-and-reset",
     },
     // User endpoints
     users: {
