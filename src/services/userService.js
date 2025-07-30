@@ -144,30 +144,34 @@ export const userService = {
    * Update user avatar
    * @param {string|number} id - User ID
    * @param {FormData} avatarData - Avatar file data
-   * @returns {Promise} Promise that resolves with updated avatar info   */ updateUserAvatar:
-    async (avatarData) => {
-      try {
-        const response = await apiService.put(
-          `/api/v2/user/avatar/me`,
-          avatarData,
-          {
-            headers: {
-              "Content-Type": "multipart/form-data",
-            },
-          }
-        );
-        const responseData = response.data?.data || response.data;
-        toastService.success("Ảnh đại diện đã được cập nhật");
-        return responseData;
-      } catch (error) {
-        return Promise.reject(error);
-      }
-    },
+   * @returns {Promise} Promise that resolves with updated avatar info
+   */
+  updateUserAvatar: async (id, avatarData) => {
+    try {
+      const response = await apiService.put(
+        `/api/v2.5/user/avatar/${id}`,
+        avatarData,
+        {
+          headers: {
+            "Content-Type": "multipart/form-data",
+          },
+        }
+      );
+      const responseData = response.data?.data || response.data;
+      toastService.success("Ảnh đại diện đã được cập nhật");
+      return responseData;
+    } catch (error) {
+      return Promise.reject(error);
+    }
+  },
+
   /**
    * Update user avatar using URL
+   * @param {string|number} id - User ID
    * @param {Object} data - Object containing avatarUrl
    * @returns {Promise} Promise that resolves with updated avatar info
-   */ updateUserAvatarUrl: async (data) => {
+   */
+  updateUserAvatarUrl: async (id, data) => {
     try {
       // Validate that the URL is accessible
       try {
@@ -189,7 +193,10 @@ export const userService = {
         data.avatarUrl = "https://" + data.avatarUrl;
       }
 
-      const response = await apiService.put(`/api/v2/user/avatar/me`, data);
+      const response = await apiService.put(
+        `/api/v2.5/user/avatar/${id}`,
+        data
+      );
       const responseData = response.data?.data || response.data;
       toastService.success("Ảnh đại diện đã được cập nhật");
       return responseData;
