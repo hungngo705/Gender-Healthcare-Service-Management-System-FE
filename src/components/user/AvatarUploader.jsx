@@ -1,8 +1,9 @@
-import React, { useState } from "react";
+import React, { useState, useEffect } from "react";
 import { Upload, X, Check, Link, Image } from "lucide-react";
 import UserAvatar from "./UserAvatar";
 import userUtils from "../../utils/userUtils";
-import userService from "../../services/userService";
+// Fix import if userService is exported as a named export
+import { userService } from "../../services/userService";
 
 /**
  * Component for uploading and managing user profile photos
@@ -14,8 +15,34 @@ function AvatarUploader() {
   const [selectedFile, setSelectedFile] = useState(null);
   const [imageUrl, setImageUrl] = useState("");
   const [uploadMethod, setUploadMethod] = useState("file"); // "file" or "url"
+  const [userId, setUserId] = useState(null);
 
-  const { currentUser } = userUtils.useUserInfo(); // Handle file selection
+  const { currentUser } = userUtils.useUserInfo();
+
+  // Fetch current user profile on mount to ensure we have userId
+  useEffect(() => {
+    const fetchCurrentUser = async () => {
+      try {
+        const profile = await userService.getCurrentUserProfile();
+        console.log("Fetched current user profile:", profile);
+        if (profile && profile.id) {
+          setUserId(profile.id);
+        } else if (currentUser?.id) {
+          setUserId(currentUser.id);
+        }
+      } catch (error) {
+        console.error("Error fetching current user:", error);
+        // Fallback to currentUser from context if available
+        if (currentUser?.id) {
+          setUserId(currentUser.id);
+        }
+      }
+    };
+
+    fetchCurrentUser();
+  }, [currentUser]);
+
+  // Handle file selection
   const handleFileChange = (event) => {
     const file = event.target.files[0];
     if (!file) return;
@@ -72,7 +99,32 @@ function AvatarUploader() {
     setUploadError(null);
   }; // Upload avatar to server
   const handleUpload = async () => {
-    if (!previewUrl || (!selectedFile && !imageUrl) || !currentUser?.id) return;
+    console.log("Upload button clicked");
+    console.log("Current state:", {
+      previewUrl,
+      selectedFile,
+      imageUrl,
+      userId,
+    });
+
+    // Check each condition separately for better debugging
+    if (!previewUrl) {
+      console.error("No preview URL available");
+      setUploadError("Không có ảnh xem trước");
+      return;
+    }
+
+    if (!selectedFile && !imageUrl) {
+      console.error("No file or URL selected");
+      setUploadError("Vui lòng chọn file hoặc nhập URL");
+      return;
+    }
+
+    if (!userId) {
+      console.error("No user ID available");
+      setUploadError("Không có thông tin người dùng. Vui lòng đăng nhập lại");
+      return;
+    }
 
     setIsUploading(true);
     setUploadError(null);
@@ -85,17 +137,21 @@ function AvatarUploader() {
         // Create FormData for file upload
         const formData = new FormData();
         formData.append("avatar", selectedFile);
-        console.log("Uploading avatar file");
+        console.log("Uploading avatar file for user ID:", userId);
         console.log("File details:", {
           name: selectedFile.name,
           size: selectedFile.size,
           type: selectedFile.type,
-        }); // Upload avatar using userService
-        result = await userService.updateUserAvatar(formData);
+        });
+
+        // Use userId from state instead of currentUser.id
+        result = await userService.updateUserAvatar(userId, formData);
       } else if (imageUrl) {
         // URL upload method
-        console.log("Uploading avatar URL");
-        console.log("URL:", imageUrl); // For pravatar.cc, add a unique identifier to prevent caching
+        console.log("Uploading avatar URL for user ID:", userId);
+        console.log("URL:", imageUrl);
+
+        // For pravatar.cc, add a unique identifier to prevent caching
         let finalImageUrl = imageUrl;
         if (imageUrl.includes("pravatar.cc")) {
           // Add a random query parameter to avoid caching
@@ -108,11 +164,12 @@ function AvatarUploader() {
           );
         }
 
-        // Upload avatar URL
-        result = await userService.updateUserAvatarUrl({
+        // Use userId from state
+        result = await userService.updateUserAvatarUrl(userId, {
           avatarUrl: finalImageUrl,
         });
       }
+
       console.log("Avatar upload successful:", result);
 
       // Success handling
