@@ -58,6 +58,7 @@ function STITestingHistory({ userId }) {
   const [endDate, setEndDate] = useState("");
   const [isDateFilterActive, setIsDateFilterActive] = useState(false);
   const [filterSlot, setFilterSlot] = useState("all");
+  const [sortOrder, setSortOrder] = useState("newest"); // newest, oldest
 
   const [activeTab, setActiveTab] = useState("details");
 
@@ -82,7 +83,6 @@ function STITestingHistory({ userId }) {
     if (!dateString) return "N/A";
     try {
       return format(new Date(dateString), "HH:mm - dd/MM/yyyy", { locale: vi });
-      // eslint-disable-next-line no-unused-vars
     } catch (error) {
       return "N/A";
     }
@@ -236,6 +236,18 @@ function STITestingHistory({ userId }) {
       );
     }
 
+    // Apply sorting
+    result.sort((a, b) => {
+      const dateA = new Date(a.scheduleDate || a.collectedDate || a.createdAt);
+      const dateB = new Date(b.scheduleDate || b.collectedDate || b.createdAt);
+
+      if (sortOrder === "newest") {
+        return dateB - dateA; // Newest first
+      } else {
+        return dateA - dateB; // Oldest first
+      }
+    });
+
     setFilteredTests(result);
   }, [
     userTests,
@@ -245,6 +257,7 @@ function STITestingHistory({ userId }) {
     startDate,
     endDate,
     isDateFilterActive,
+    sortOrder, // Thêm sortOrder vào dependencies
   ]);
 
   // Sửa hàm getPackagePrice để sử dụng TEST_PACKAGE_ENUM
@@ -307,6 +320,7 @@ function STITestingHistory({ userId }) {
     setEndDate("");
     setIsDateFilterActive(false);
     setSearchText("");
+    setSortOrder("newest");
   };
 
   if (isLoading) {
@@ -367,10 +381,11 @@ function STITestingHistory({ userId }) {
       <h4 className="text-lg font-medium text-gray-900 mb-4">
         Lịch Sử Xét Nghiệm STI
       </h4>
-      {/* Search and Filter Bar - Updated with date range */}
+      {/* Search and Filter Bar - Updated with date range and sort */}
       <div className="mb-6 space-y-4">
-        <div className="flex flex-col sm:flex-row gap-4 items-center justify-between">
-          <div className="relative w-full sm:w-64">
+        {/* Row 1: Search và các dropdown filters */}
+        <div className="flex flex-col lg:flex-row gap-4 items-center justify-between">
+          <div className="relative w-full lg:w-64">
             <div className="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
               <svg
                 className="h-5 w-5 text-gray-400"
@@ -393,7 +408,7 @@ function STITestingHistory({ userId }) {
             />
           </div>
 
-          <div className="flex flex-col sm:flex-row gap-2">
+          <div className="flex flex-col sm:flex-row gap-2 w-full lg:w-auto">
             {/* Bộ lọc trạng thái */}
             <div className="flex items-center space-x-2">
               <label
@@ -404,7 +419,7 @@ function STITestingHistory({ userId }) {
               </label>
               <select
                 id="filterStatus"
-                className="border border-gray-300 rounded-md px-3 py-2 focus:ring-indigo-500 focus:border-indigo-500"
+                className="border border-gray-300 rounded-md px-3 py-2 focus:ring-indigo-500 focus:border-indigo-500 min-w-[120px]"
                 value={filterStatus}
                 onChange={(e) => setFilterStatus(e.target.value)}
               >
@@ -427,7 +442,7 @@ function STITestingHistory({ userId }) {
               </label>
               <select
                 id="filterSlot"
-                className="border border-gray-300 rounded-md px-3 py-2 focus:ring-indigo-500 focus:border-indigo-500"
+                className="border border-gray-300 rounded-md px-3 py-2 focus:ring-indigo-500 focus:border-indigo-500 min-w-[120px]"
                 value={filterSlot}
                 onChange={(e) => setFilterSlot(e.target.value)}
               >
@@ -437,6 +452,25 @@ function STITestingHistory({ userId }) {
                     {slot.display}
                   </option>
                 ))}
+              </select>
+            </div>
+
+            {/* Bộ sắp xếp theo thời gian */}
+            <div className="flex items-center space-x-2">
+              <label
+                htmlFor="sortOrder"
+                className="text-sm font-medium text-gray-700 whitespace-nowrap"
+              >
+                Sắp xếp:
+              </label>
+              <select
+                id="sortOrder"
+                className="border border-gray-300 rounded-md px-3 py-2 focus:ring-indigo-500 focus:border-indigo-500 min-w-[130px]"
+                value={sortOrder}
+                onChange={(e) => setSortOrder(e.target.value)}
+              >
+                <option value="newest">Mới nhất trước</option>
+                <option value="oldest">Cũ nhất trước</option>
               </select>
             </div>
           </div>
@@ -573,8 +607,80 @@ function STITestingHistory({ userId }) {
               </span>
             </div>
           )}
+
+          {sortOrder !== "newest" && (
+            <div className="flex items-center bg-green-50 p-2 rounded-md">
+              <span className="text-xs text-green-700 mr-2">Sắp xếp:</span>
+              <span className="text-xs bg-green-100 text-green-800 px-2 py-1 rounded flex items-center">
+                {sortOrder === "oldest" ? "Cũ nhất trước" : "Mới nhất trước"}
+                <button
+                  onClick={() => setSortOrder("newest")}
+                  className="ml-1 text-green-600 hover:text-green-800"
+                >
+                  <svg
+                    className="w-3 h-3"
+                    fill="currentColor"
+                    viewBox="0 0 20 20"
+                    xmlns="http://www.w3.org/2000/svg"
+                  >
+                    <path
+                      fillRule="evenodd"
+                      d="M4.293 4.293a1 1 0 011.414 0L10 8.586l4.293-4.293a1 1 0 111.414 1.414L11.414 10l4.293 4.293a1 1 0 01-1.414 1.414L10 11.414l-4.293 4.293a1 1 0 01-1.414-1.414L8.586 10 4.293 5.707a1 1 0 010-1.414z"
+                      clipRule="evenodd"
+                    ></path>
+                  </svg>
+                </button>
+              </span>
+            </div>
+          )}
         </div>
       </div>
+
+      {/* Statistics Summary */}
+      {filteredTests.length > 0 && (
+        <div className="bg-gray-50 rounded-lg p-4 mb-6 border border-gray-200">
+          <div className="flex flex-wrap gap-6 text-sm">
+            <div className="flex items-center">
+              <span className="text-gray-600">Tổng kết quả:</span>
+              <span className="ml-2 font-semibold text-gray-900">
+                {filteredTests.length}
+              </span>
+            </div>
+            <div className="flex items-center">
+              <span className="text-gray-600">Đã lên lịch:</span>
+              <span className="ml-2 font-semibold text-blue-600">
+                {filteredTests.filter((test) => test.status === 0).length}
+              </span>
+            </div>
+            <div className="flex items-center">
+              <span className="text-gray-600">Đã lấy mẫu:</span>
+              <span className="ml-2 font-semibold text-yellow-600">
+                {filteredTests.filter((test) => test.status === 1).length}
+              </span>
+            </div>
+            <div className="flex items-center">
+              <span className="text-gray-600">Đang xử lý:</span>
+              <span className="ml-2 font-semibold text-purple-600">
+                {filteredTests.filter((test) => test.status === 2).length}
+              </span>
+            </div>
+            <div className="flex items-center">
+              <span className="text-gray-600">Hoàn thành:</span>
+              <span className="ml-2 font-semibold text-green-600">
+                {filteredTests.filter((test) => test.status === 3).length}
+              </span>
+            </div>
+            <div className="flex items-center">
+              <span className="text-gray-600">Đã hủy:</span>
+              <span className="ml-2 font-semibold text-red-600">
+                {filteredTests.filter((test) => test.status === 4).length}
+              </span>
+            </div>
+          </div>
+        </div>
+      )}
+
+      {/* Main Table */}
       <div className="bg-white shadow-md rounded-lg overflow-auto">
         <table className="min-w-full divide-y divide-gray-200">
           <thead className="bg-gradient-to-r from-indigo-50 to-blue-50">
