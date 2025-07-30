@@ -129,13 +129,13 @@ const MeetingLobby = () => {
     }
   }, [currentTime, meetingInfo, canJoin, derivedAvailableFrom]);
 
-  const handleJoinMeeting = async () => {
+const handleJoinMeeting = async () => {
     if (!meetingInfo) return;
 
     setJoiningMeeting(true);
 
     try {
-      // Check-in when user clicks "Tham gia cuộc hẹn"
+      // Check-in ween user clicks "Tham gia cuộc hẹn"
       console.log(
         "Auto check-in when joining meeting for appointment:",
         appointmentId
@@ -146,12 +146,13 @@ const MeetingLobby = () => {
       // Redirect to the actual Daily.co room URL instead of using embedded component
       if (meetingInfo.roomUrl) {
         console.log("Redirecting to Daily.co room:", meetingInfo.roomUrl);
-        window.open(meetingInfo.roomUrl, '_blank');
+        const newWindow = window.open(meetingInfo.roomUrl, '_blank');
         
-        // Navigate back to appointments after a short delay
-        setTimeout(() => {
-          navigate("/profile?tab=appointments");
-        }, 1000);
+        // Track the opened window for auto check-out when closed
+        setMeetingWindow(newWindow);
+        
+        // Don't navigate away immediately - let user stay on lobby to track meeting window
+        console.log("Meeting window opened, tracking for auto check-out");
       } else {
         console.error("No room URL available");
         alert("Không thể tìm thấy liên kết phòng họp");
@@ -162,10 +163,10 @@ const MeetingLobby = () => {
       console.log("Check-in failed, but redirecting to meeting room anyway");
       
       if (meetingInfo.roomUrl) {
-        window.open(meetingInfo.roomUrl, '_blank');
-        setTimeout(() => {
-          navigate("/profile?tab=appointments");
-        }, 1000);
+        const newWindow = window.open(meetingInfo.roomUrl, '_blank');
+        // Track the opened window for auto check-out when closed
+        setMeetingWindow(newWindow);
+        console.log("Meeting window opened (after check-in failure), tracking for auto check-out");
       }
 
       // Optional: Show toast notification about check-in failure
