@@ -70,8 +70,9 @@ function Contact() {
               transition={{ duration: 0.5, delay: 0.2 }}
               className="mt-4 text-xl max-w-3xl mx-auto"
             >
-              Chúng tôi luôn sẵn sàng lắng nghe và hỗ trợ bạn. Hãy liên hệ với chúng tôi
-              qua bất kỳ phương thức nào dưới đây hoặc điền vào mẫu liên hệ.
+              Chúng tôi luôn sẵn sàng lắng nghe và hỗ trợ bạn. Hãy liên hệ với
+              chúng tôi qua bất kỳ phương thức nào dưới đây hoặc điền vào mẫu
+              liên hệ.
             </motion.p>
           </div>
         </div>
@@ -83,7 +84,9 @@ function Contact() {
             {
               icon: <MapPin className="h-8 w-8 text-indigo-600" />,
               title: "Địa Chỉ",
-              info: ["17 Đ. D1, Long Thạnh Mỹ, Thủ Đức, Hồ Chí Minh 700000, Vietnam"],
+              info: [
+                "17 Đ. D1, Long Thạnh Mỹ, Thủ Đức, Hồ Chí Minh 700000, Vietnam",
+              ],
             },
             {
               icon: <Phone className="h-8 w-8 text-indigo-600" />,
@@ -93,9 +96,7 @@ function Contact() {
             {
               icon: <Mail className="h-8 w-8 text-indigo-600" />,
               title: "Email",
-              info: [
-                "EverwellHealthcare@proton.me",
-              ],
+              info: ["EverwellHealthcare@proton.me"],
             },
             {
               icon: <Clock className="h-8 w-8 text-indigo-600" />,
@@ -128,7 +129,7 @@ function Contact() {
         </div>
 
         <div className="grid md:grid-cols-2 gap-12 items-start mb-16">
-          <motion.div
+          {/* <motion.div
             initial={{ opacity: 0, x: -50 }}
             animate={{ opacity: 1, x: 0 }}
             transition={{ duration: 0.7 }}
@@ -255,7 +256,7 @@ function Contact() {
                 Gửi Tin Nhắn
               </button>
             </form>
-          </motion.div>
+          </motion.div> */}
 
           <motion.div
             initial={{ opacity: 0, x: 50 }}
@@ -352,8 +353,8 @@ function Contact() {
         >
           <h2 className="text-3xl font-bold mb-4">Cần Tư Vấn Ngay?</h2>
           <p className="text-xl mb-8 max-w-2xl mx-auto">
-            Đội ngũ chuyên gia của chúng tôi luôn sẵn sàng hỗ trợ bạn với mọi thắc mắc
-            về sức khỏe sinh sản và tình dục.
+            Đội ngũ chuyên gia của chúng tôi luôn sẵn sàng hỗ trợ bạn với mọi
+            thắc mắc về sức khỏe sinh sản và tình dục.
           </p>
           <a
             href="tel:+18005551234"
